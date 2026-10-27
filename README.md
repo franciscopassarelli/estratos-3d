@@ -33,11 +33,13 @@ src/
     geometry2d.js   Kernel 2D: booleanas, offset y trazos con Clipper (µm enteros)
     text.js         Texto -> región 2D con tipografías OFL (src/fonts, formato typeface)
     symbols.js      Símbolos decorativos como geometría cerrada
+    qr.js           Códigos QR como geometría (qrcode-generator, UTF-8) y contenidos: Wi-Fi, WhatsApp, enlaces
     mesh.js         Extrusión de regiones, piezas/volúmenes, reparación de uniones en T
     pipeline.js     Parámetros -> validación -> geometría -> orientación -> análisis
     analysis.js     Malla cerrada y orientada, cáscaras, apoyo, voladizos > 45°, volumen
     palette.js      Colores de filamento y constantes de impresión
-  objects/          Un módulo por objeto + registro y categorías
+  objects/          Un módulo por objeto + registro y categorías (15 objetos)
+    shared/sign.js  Cartel con base y ranura inclinada (display QR y cartel Wi-Fi)
   export/
     formats.js      STL binario, OBJ+MTL, 3MF (basematerials + componentes)
     save.js         Descarga directa o .zip vía capacidad "downloads" del artifact
@@ -61,8 +63,9 @@ tests/geometry.test.js
 
 Cada objeto exporta `{ id, name, category, description, tags, defaults, sections, orientations, build(params) }`.
 
+- Un ítem con `private: true` (como la clave del Wi-Fi) no se guarda en el navegador.
 - `sections[].items[]` describe los controles (`range`, `stepper`, `text`, `font`, `symbol`, `color`, `segmented`, `cards`, `toggle`) con límites y `visibleIf(params)` para mostrar solo lo que corresponde.
-- `build(params)` devuelve `{ parts, issues }`. Cada pieza (`part`) tiene un color y uno o más **volúmenes cerrados**; las piezas de distinto color se exportan como componentes separados en el 3MF.
+- `build(params, orientationId)` devuelve `{ parts, issues }`. Los objetos con `views` (por ejemplo, "armado") reciben ese id para mostrarse ensamblados; se descargan siempre en una orientación de `orientations`. Cada pieza (`part`) tiene un color y uno o más **volúmenes cerrados**; las piezas de distinto color se exportan como componentes separados en el 3MF.
 - `issues` son mensajes `error | warning | info` específicos del objeto (texto que no entra, agujero que toca el texto, base dividida, paredes finas…). `analysis.js` agrega los genéricos sobre la malla final.
 
 La vista previa y los archivos descargados salen del mismo resultado de `buildModel`, así que no pueden desincronizarse.

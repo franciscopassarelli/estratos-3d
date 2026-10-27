@@ -31,8 +31,10 @@ export function sanitize(def, input) {
   return p;
 }
 
+// `views` son orientaciones solo para mirar el objeto (por ejemplo, armado), no para imprimir.
 export function orientationMatrix(def, orientationId) {
-  const o = (def.orientations || []).find((x) => x.id === orientationId) || (def.orientations || [])[0];
+  const all = [...(def.orientations || []), ...(def.views || [])];
+  const o = all.find((x) => x.id === orientationId) || (def.orientations || [])[0];
   return o && o.matrix ? o.matrix : null;
 }
 
@@ -54,7 +56,7 @@ export function buildModel(def, rawParams, orientationId) {
   const t0 = performance.now();
   let result;
   try {
-    result = def.build(params);
+    result = def.build(params, orientationId);
   } catch (err) {
     console.error(err);
     return { def, params, parts: [], issues: [{ level: 'error', msg: 'No se pudo generar la geometría con estos valores. Probá con medidas más moderadas o restablecé el diseño.' }], analysis: null, ms: 0 };
@@ -74,4 +76,11 @@ export function statusOf(model) {
 
 export function disposeModel(model) {
   model?.parts?.forEach((p) => p.volumes.forEach((g) => g.dispose()));
+}
+
+/** Parámetros que se pueden guardar en el navegador (sin datos marcados como privados, p. ej. contraseñas). */
+export function storableParams(def, params) {
+  const out = { ...params };
+  for (const it of allItems(def)) if (it.private) delete out[it.key];
+  return out;
 }

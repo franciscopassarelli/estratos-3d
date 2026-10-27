@@ -7,6 +7,8 @@ import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $, debounce, storage } from './dom.js';
 
+const FEATURED = ['llavero', 'display-qr', 'posavasos', 'pantalla-lampara', 'soporte-auriculares', 'cartel-wifi', 'soporte-mandos', 'placa'];
+
 export function homePage() {
   return `
   <main>
@@ -55,7 +57,7 @@ export function homePage() {
         <div><span class="eyebrow">Diseños destacados</span><h2 id="pop-title">Listos para personalizar</h2></div>
         <a class="btn btn-ghost" href="/catalogo">Ver catálogo ${icon.arrow}</a>
       </div>
-      <div class="cards cards-featured">${OBJECTS.map(card).join('')}</div>
+      <div class="cards cards-featured">${FEATURED.map(getObject).filter(Boolean).map(card).join('')}</div>
     </section>
 
     <div class="wrap">${adSlot('inline')}</div>

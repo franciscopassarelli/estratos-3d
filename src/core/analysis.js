@@ -37,7 +37,7 @@ export function analyzeParts(parts) {
    let pOpen = 0, pBad = 0, partVol = 0, partTris = 0, partShells = 0;
    for (const geometry of part.volumes) {
     const m = weld(geometry);
-    meshes.push({ ...m, protrusion: part.protrusion || 0 });
+    meshes.push({ ...m, protrusion: part.protrusion || 0, bridges: !!part.bridges });
     const { vertices: V, tris: T } = m;
     const nv = V.length / 3;
     triangles += T.length / 3;
@@ -102,6 +102,7 @@ export function analyzeParts(parts) {
   meshes.forEach((m) => {
     const { vertices: V, tris: T } = m;
     const prot = m.protrusion;
+    // Piezas con puentes declarados (techos horizontales cortos apoyados en ambos lados): no cuentan como voladizo.
     for (let i = 0; i < T.length; i += 3) {
       const a = T[i] * 3, b = T[i + 1] * 3, c = T[i + 2] * 3;
       const ux = V[b] - V[a], uy = V[b + 1] - V[a + 1], uz = V[b + 2] - V[a + 2];
@@ -111,6 +112,7 @@ export function analyzeParts(parts) {
       if (!len || nz / len > -0.7071) continue;
       const zc = (V[a + 2] + V[b + 2] + V[c + 2]) / 3;
       if (zc < 0.2) continue;
+      if (m.bridges && nz / len < -0.999) continue;
       if (nz / len < -0.999) {
         const lvl = Math.round(zc * 50), xc = (V[a] + V[b] + V[c]) / 3, yc = (V[a + 1] + V[b + 1] + V[c + 1]) / 3;
         if (shells.some((s) => s.upLevels.has(lvl) && xc >= s.minX && xc <= s.maxX && yc >= s.minY && yc <= s.maxY)) continue;

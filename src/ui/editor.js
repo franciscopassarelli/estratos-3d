@@ -1,5 +1,5 @@
 import { getObject, CATEGORIES } from '../objects/index.js';
-import { buildModel, disposeModel, statusOf, sanitize } from '../core/pipeline.js';
+import { storableParams, buildModel, disposeModel, statusOf, sanitize } from '../core/pipeline.js';
 import { exportModel, slug } from '../export/formats.js';
 import { saveFiles, deliveryMode } from '../export/save.js';
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
@@ -238,7 +238,7 @@ export function mountEditor(root, id) {
     disposeModel(model);
     model = next; shown = display;
     params = { ...next.params };
-    storage.set(KEY, params);
+    storage.set(KEY, storableParams(def, params));
     renderStatus();
   }, 90);
 

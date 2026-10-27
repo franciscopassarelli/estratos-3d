@@ -22,6 +22,7 @@
     "esbuild": "^0.28.2",
     "fflate": "^0.8.3",
     "opentype.js": "^2.0.0",
+    "qrcode-generator": "^1.4.4",
     "three": "^0.160.0"
   },
   "type": "module",
