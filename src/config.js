@@ -23,4 +23,9 @@ export const SITE = {
   },
 };
 
+// ---- Sorteos ----
+// Clave pública (site key) de Cloudflare Turnstile para el formulario de sorteos.
+// Vacío = sin verificación anti-robots visible (igual hay otras protecciones). Ver SORTEOS.md.
+SITE.turnstileSiteKey = '';
+
 export const adsEnabled = () => /^ca-pub-\d{10,}$/.test(SITE.adsenseClient);

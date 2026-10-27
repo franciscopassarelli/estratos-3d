@@ -17,6 +17,10 @@ npm run build:artifact # un único HTML (Three.js por CDN) en dist-artifact/
 
 Seguí **PUBLICAR.md**: dominio, hosting, datos de `src/config.js`, Search Console y AdSense, paso a paso.
 
+## Sorteos
+
+Página pública, base de datos y panel privado: ver **SORTEOS.md**.
+
 ## Arquitectura
 
 ```
@@ -39,6 +43,13 @@ src/
     save.js         Descarga directa o .zip vía capacidad "downloads" del artifact
   viewer/Viewer.js  Visor Three.js (Z arriba, mm, cama de referencia, OrbitControls)
   ui/               Inicio, catálogo, editor, ayuda, anuncios (marcadores), miniaturas
+  content/promos.js Sorteos y promociones (textos, fechas, premios)
+  promo/validate.js Validación de inscripciones (compartida con el servidor)
+  ui/promo.js       Página pública del sorteo
+  ui/admin.js       Panel privado /admin
+functions/          API en Cloudflare Pages Functions (/api/sorteos, /api/admin)
+server/             Utilidades del servidor: sesión, D1, respuestas
+migrations/         Esquema de la base D1
 tools/
   prerender.mjs     HTML estático por ruta, sitemap.xml, robots.txt, ads.txt y 404.html
   font2typeface.mjs Convierte .woff a typeface JSON (opentype.js)

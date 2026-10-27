@@ -40,7 +40,7 @@ export function startRouter(handler) {
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (a.target === '_blank' || a.hasAttribute('download')) return;
     const href = a.getAttribute('href');
-    if (!href.startsWith('/') || href.startsWith('//')) return;
+    if (!href.startsWith('/') || href.startsWith('//') || href.startsWith('/api/')) return;
     e.preventDefault();
     const u = new URL(href, location.origin);
     // Enlace a una sección de la misma página

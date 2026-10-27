@@ -2,3 +2,5 @@ node_modules/
 dist/
 dist-artifact/
 out/
+.wrangler/
+.dev.vars

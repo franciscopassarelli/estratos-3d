@@ -6,6 +6,9 @@ import { GUIDES, getGuide } from './content/guides.js';
 import { homePage, mountHome } from './ui/home.js';
 import { catalogPage, mountCatalog } from './ui/catalog.js';
 import { editorPage, mountEditor } from './ui/editor.js';
+import { promoPage, mountPromo } from './ui/promo.js';
+import { adminPage, mountAdmin } from './ui/admin.js';
+import { PROMOS, getPromo } from './content/promos.js';
 import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, notFoundPage, mountContent } from './ui/pages.js';
 
 const noop = () => () => {};
@@ -40,6 +43,17 @@ export const ROUTES = [
     meta: ([slug]) => { const g = getGuide(slug); return { title: `${g.title} | ${SITE.name}`, description: g.description, type: 'article' }; },
     render: ([slug]) => guidePage(slug), mount: (root) => mountContent(root),
   },
+  {
+    // Sorteos: fuera de Google y sin publicidad.
+    pattern: /^\/sorteos\/([a-z0-9-]+)$/, section: '', noAds: true,
+    meta: ([slug]) => { const p = getPromo(slug); return { title: p ? `${p.title} | ${SITE.name}` : `Sorteo | ${SITE.name}`, description: p ? p.intro : '', noindex: true }; },
+    render: ([slug]) => promoPage(slug), mount: (root, [slug], query) => mountPromo(root, slug, query),
+  },
+  {
+    pattern: /^\/admin$/, section: '', noAds: true,
+    meta: () => ({ title: `Panel | ${SITE.name}`, description: '', noindex: true }),
+    render: () => adminPage(), mount: (root) => mountAdmin(root),
+  },
   { pattern: /^\/ayuda$/, section: 'ayuda', meta: () => ({ title: `Preguntas frecuentes | ${SITE.name}`, description: 'Respuestas sobre formatos de archivo, impresión a dos colores, comprobaciones y uso del editor.' }), render: helpPage, mount: mountContent },
   { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name} y cómo genera los objetos para impresión 3D.` }), render: aboutPage, mount: mountContent },
   { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Cómo comunicarte con ${SITE.name}.` }), render: contactPage, mount: mountContent },
@@ -63,6 +77,11 @@ export function resolve(path) {
     }
   }
   return { route: NOT_FOUND, params: [] };
+}
+
+/** Páginas que se generan como HTML pero no van al sitemap. */
+export function hiddenPaths() {
+  return ['/admin', ...PROMOS.filter((p) => p.visible).map((p) => `/sorteos/${p.slug}`)];
 }
 
 /** Todas las rutas públicas (para el HTML estático y el sitemap). */

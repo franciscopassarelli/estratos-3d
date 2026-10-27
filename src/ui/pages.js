@@ -110,6 +110,10 @@ export function privacyPage() {
       </ul>
       <p>Si visitás el sitio desde el Espacio Económico Europeo, el Reino Unido o Suiza, antes de mostrar anuncios personalizados te vamos a pedir tu consentimiento mediante un mensaje de cookies certificado por Google.</p>
 
+      <h2>Sorteos y promociones</h2>
+      <p>Si te anotás en un sorteo, guardamos tu nombre, el medio de contacto que elegiste (WhatsApp, email o Instagram), la fecha de inscripción y, si viniste desde un enlace de difusión, de dónde llegaste. Para evitar inscripciones automáticas también guardamos una huella cifrada de tu conexión, que no permite conocer tu dirección IP.</p>
+      <p>Usamos esos datos solo para organizar el sorteo y contactar a quien gane. No los compartimos con nadie y los eliminamos dentro de los 90 días de finalizado el sorteo. Del ganador publicamos únicamente el nombre y la inicial del apellido. Podés pedir que borremos tu inscripción en cualquier momento escribiendo a la dirección de contacto.</p>
+
       <h2>Datos técnicos</h2>
       <p>Como cualquier sitio web, el servidor de alojamiento puede registrar datos técnicos de cada visita, como la dirección IP, el navegador y la página visitada, con fines de seguridad y funcionamiento.</p>
 

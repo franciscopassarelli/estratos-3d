@@ -4,6 +4,7 @@ import { buildModel, disposeModel } from '../core/pipeline.js';
 import { FONTS } from '../core/text.js';
 import { card, bindThumbs } from './catalog.js';
 import { adSlot } from './ads.js';
+import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $, debounce, storage } from './dom.js';
 
 export function homePage() {
@@ -36,6 +37,8 @@ export function homePage() {
         </div>
       </div>
     </section>
+
+    ${(() => { const p = featuredPromo(); return p ? `<div class="wrap"><a class="promo-banner" href="/sorteos/${esc(p.slug)}"><span class="promo-banner-tag">Sorteo</span><span><b>${esc(p.title)}</b><span>Anotate gratis y participá por premios impresos en 3D.</span></span>${icon.arrow}</a></div>` : ''; })()}
 
     <section class="section wrap" aria-labelledby="cats-title">
       <div class="section-head"><div><span class="eyebrow">Categorías</span><h2 id="cats-title">¿Qué necesitás imprimir?</h2></div></div>

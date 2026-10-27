@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { SITE, adsEnabled } from '../src/config.js';
-import { resolve, staticPaths, NOT_FOUND } from '../src/routes.js';
+import { resolve, staticPaths, hiddenPaths, NOT_FOUND } from '../src/routes.js';
 import { header, footer } from '../src/ui/layout.js';
 
 const DIST = 'dist';
@@ -29,7 +29,7 @@ function page(route, params, p) {
     `<meta property="og:description" content="${esc(meta.description || '')}">`,
     meta.noindex ? '' : `<meta property="og:url" content="${esc(url(p))}">`,
     `<meta property="og:locale" content="${SITE.lang.replace('-', '_')}">`,
-    adsEnabled() ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}" crossorigin="anonymous"></script>` : '',
+    adsEnabled() && !route.noAds ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}" crossorigin="anonymous"></script>` : '',
   ].filter(Boolean).join('\n    ');
   return template
     .replace(/<html lang="[^"]*">/, `<html lang="${SITE.lang}">`)
@@ -41,7 +41,7 @@ function page(route, params, p) {
 }
 
 const paths = staticPaths();
-for (const p of paths) {
+for (const p of [...paths, ...hiddenPaths()]) {
   const { route, params } = resolve(p);
   if (route === NOT_FOUND) throw new Error('Ruta sin página: ' + p);
   const file = p === '/' ? path.join(DIST, 'index.html') : path.join(DIST, p, 'index.html');
@@ -56,7 +56,7 @@ fs.writeFileSync(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="
 ${paths.map((p) => `  <url><loc>${url(p)}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
 </urlset>
 `);
-fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
+fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 if (adsEnabled()) fs.writeFileSync(path.join(DIST, 'ads.txt'), `google.com, ${SITE.adsenseClient.replace(/^ca-/, '')}, DIRECT, f08c47fec0942fa0\n`);
 
 console.log(`Prerender: ${paths.length} páginas + 404, sitemap.xml, robots.txt${adsEnabled() ? ', ads.txt' : ''}`);
