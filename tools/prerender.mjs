@@ -29,6 +29,11 @@ function page(route, params, p) {
     `<meta property="og:description" content="${esc(meta.description || '')}">`,
     meta.noindex ? '' : `<meta property="og:url" content="${esc(url(p))}">`,
     `<meta property="og:locale" content="${SITE.lang.replace('-', '_')}">`,
+    `<meta property="og:image" content="${SITE.url}/og-image.png">`,
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:alt" content="${esc(SITE.name)}: objetos personalizados para imprimir en 3D">`,
+    '<meta name="twitter:card" content="summary_large_image">',
     adsEnabled() && !route.noAds ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}" crossorigin="anonymous"></script>` : '',
   ].filter(Boolean).join('\n    ');
   return template
@@ -36,6 +41,8 @@ function page(route, params, p) {
     .replace(/<title>[\s\S]*?<\/title>/, '')
     .replace(/<meta name="description"[^>]*>/, '')
     .replace(/<link rel="canonical"[^>]*>/, '')
+    // Las etiquetas Open Graph fijas de index.html se reemplazan por las de cada página.
+    .replace(/[ \t]*<meta (?:property="og:[^"]*"|name="twitter:[^"]*")[^>]*>\r?\n?/g, '')
     .replace('</head>', `    ${head}\n  </head>`)
     .replace('<div id="app"></div>', `<div id="app">${body}</div>`);
 }
