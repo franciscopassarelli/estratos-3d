@@ -152,23 +152,31 @@ export const GUIDES = [
         <ul><li>Los colores claros sobre bases oscuras necesitan más purga: el filamento nuevo arrastra restos del anterior.</li><li>Para el acabado incrustado (texto a ras), el color cambia en varias capas seguidas, así que este método no sirve: hace falta una impresora multicolor.</li></ul>` },
     ],
   },
-  {
-    slug: 'pla-petg-asa-que-material-usar',
-    kind: 'Artículo',
-    title: 'PLA, PETG o ASA: qué filamento usar para cada objeto',
-    description: 'Temperatura, resistencia al sol y facilidad de impresión de los tres filamentos más comunes, con recomendaciones por tipo de objeto.',
-    minutes: 4,
-    sections: [
-      { h: 'PLA', html: `
-        <p>Es el más fácil de imprimir: no necesita cama muy caliente, casi no se deforma y viene en muchísimos colores y acabados (seda, mate, madera). Su límite es la temperatura: empieza a ablandarse alrededor de los 55-60 °C. Sirve para llaveros, organizadores, placas de interior y soportes de escritorio.</p>` },
-      { h: 'PETG', html: `
-        <p>Es más flexible y resistente a los golpes que el PLA, y aguanta más temperatura (unos 75-80 °C). Tolera la humedad y el uso al aire libre mejor que el PLA. Puede dejar hilos finos entre piezas si la retracción no está bien ajustada. Es una buena opción para macetas y soportes que van a estar cerca de una ventana.</p>` },
-      { h: 'ASA', html: `
-        <p>Resiste la radiación UV y el calor, por eso es el material indicado para carteles y objetos de exterior. Se imprime mejor en impresoras cerradas, porque se contrae al enfriarse, y emite olor durante la impresión, así que conviene ventilar el ambiente.</p>` },
-      { h: 'Una advertencia', html: `
-        <p>Ningún objeto impreso con FDM es apto para contacto con alimentos solo por el material: las líneas entre capas acumulan restos difíciles de limpiar. Para tazas, platos o moldes de cocina, buscá productos certificados.</p>` },
-    ],
-  },
+ {
+  slug: 'pla-petg-asa-que-material-usar',
+  kind: 'Artículo',
+  title: 'PLA, PETG o ASA: qué filamento usar para cada objeto',
+  description: 'Temperatura, resistencia al sol y facilidad de impresión de los tres filamentos más comunes, con recomendaciones por tipo de objeto.',
+  minutes: 4,
+  sections: [
+    { h: 'PLA', html: `
+      <p>Es el más fácil de imprimir: no necesita cama muy caliente, casi no se deforma y viene en muchísimos colores y acabados (seda, mate, madera). Su límite es la temperatura: empieza a ablandarse alrededor de los 55-60 °C. Sirve para llaveros, organizadores, placas de interior y soportes de escritorio.</p>` },
+    { h: 'PETG', html: `
+      <p>Es más flexible y resistente a los golpes que el PLA, y aguanta más temperatura (unos 75-80 °C). Tolera la humedad y el uso al aire libre mejor que el PLA. Es una buena opción para macetas y soportes que van a estar cerca de una ventana.</p>
+      <p><strong>Configuración recomendada para imprimir PETG:</strong></p>
+      <ul>
+        <li><strong>Temperatura de pico:</strong> 230 °C a 245 °C.</li>
+        <li><strong>Cama caliente:</strong> 70 °C a 80 °C.</li>
+        <li><strong>Ventilador de capa:</strong> 30% a 50% máximo (reducir el enfriamiento mejora la adherencia entre capas).</li>
+        <li><strong>Velocidad:</strong> 40 a 60 mm/s (imprimir más lento evita fallas de extrusión).</li>
+        <li><strong>Consejo de adhesión:</strong> Usá fijador de pelo o laca sobre la cama para evitar que la pieza se adhiera en exceso y pueda dañar la lámina PEI o el cristal.</li>
+      </ul>` },
+    { h: 'ASA', html: `
+      <p>Resiste la radiación UV y el calor, por eso es el material indicado para carteles y objetos de exterior. Se imprime mejor en impresoras cerradas, porque se contrae al enfriarse, y emite olor durante la impresión, así que conviene ventilar el ambiente.</p>` },
+    { h: 'Una advertencia', html: `
+      <p>Ningún objeto impreso con FDM es apto para contacto con alimentos solo por el material: las líneas entre capas acumulan restos difíciles de limpiar. Para tazas, platos o moldes de cocina, buscá productos certificados.</p>` },
+  ],
+},
   {
     slug: 'primera-capa-no-se-pega',
     kind: 'Solución de problemas',
