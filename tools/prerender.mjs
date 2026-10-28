@@ -51,7 +51,9 @@ const paths = staticPaths();
 for (const p of [...paths, ...hiddenPaths()]) {
   const { route, params } = resolve(p);
   if (route === NOT_FOUND) throw new Error('Ruta sin página: ' + p);
-  const file = p === '/' ? path.join(DIST, 'index.html') : path.join(DIST, p, 'index.html');
+  // /catalogo -> catalogo.html: Cloudflare Pages lo sirve en /catalogo sin redirigir a /catalogo/
+  // (con catalogo/index.html redirige, y Google marca la URL del sitemap como "página con redirección").
+  const file = p === '/' ? path.join(DIST, 'index.html') : path.join(DIST, `${p.replace(/^\//, '')}.html`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, page(route, params, p));
 }
