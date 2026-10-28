@@ -6,6 +6,7 @@ import { loadAdsense, activateAds } from './ui/ads.js';
 import { startRouter, currentLocation } from './router.js';
 import { resolve } from './routes.js';
 import { SITE } from './config.js';
+import { trackPage } from './ui/analytics.js';
 
 const app = document.getElementById('app');
 let cleanup = () => {};
@@ -32,6 +33,7 @@ function render() {
   cleanup = route.mount(app, params, query) || (() => {});
   setMeta(route.meta(params), path);
   if (!route.noAds) { loadAdsense(); activateAds(app); }
+  trackPage(path, location.search);
   if (fragment) document.getElementById(fragment)?.scrollIntoView({ block: 'start' });
   else if (!firstRender) window.scrollTo(0, 0);
   firstRender = false;

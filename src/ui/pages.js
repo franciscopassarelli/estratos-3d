@@ -1,5 +1,5 @@
 // Páginas de contenido: guías, ayuda, acerca, contacto, condiciones y privacidad.
-import { SITE } from '../config.js';
+import { SITE, analyticsEnabled } from '../config.js';
 import { GUIDES, getGuide } from '../content/guides.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
@@ -109,6 +109,9 @@ export function privacyPage() {
         <li>Para saber cómo usa Google los datos de los sitios que muestran sus anuncios, consultá <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">esta página de Google</a>.</li>
       </ul>
       <p>Si visitás el sitio desde el Espacio Económico Europeo, el Reino Unido o Suiza, antes de mostrar anuncios personalizados te vamos a pedir tu consentimiento mediante un mensaje de cookies certificado por Google.</p>
+
+      <h2>Estadísticas de visitas</h2>
+      <p>Para saber cuánta gente usa el sitio y qué páginas sirven más, usamos Cloudflare Web Analytics, que no usa cookies ni guarda datos que te identifiquen${analyticsEnabled() ? ', y Google Analytics, que usa cookies para contar visitas y ver cómo se navega el sitio (páginas vistas, país aproximado, tipo de dispositivo). Google Analytics no recibe tu nombre ni tus datos de contacto. Si visitás el sitio desde el Espacio Económico Europeo, el Reino Unido o Suiza, no se usan cookies de medición sin tu consentimiento. Podés bloquear Google Analytics con el <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">complemento oficial de inhabilitación</a>' : ''}.</p>
 
       <h2>Sorteos y promociones</h2>
       <p>Si te anotás en un sorteo, guardamos tu nombre, el medio de contacto que elegiste (WhatsApp, email o Instagram), la fecha de inscripción y, si viniste desde un enlace de difusión, de dónde llegaste. Para evitar inscripciones automáticas también guardamos una huella cifrada de tu conexión, que no permite conocer tu dirección IP.</p>

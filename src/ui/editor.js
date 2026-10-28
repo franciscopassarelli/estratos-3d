@@ -2,6 +2,7 @@ import { getObject, CATEGORIES } from '../objects/index.js';
 import { storableParams, buildModel, disposeModel, statusOf, sanitize } from '../core/pipeline.js';
 import { exportModel, slug } from '../export/formats.js';
 import { saveFiles, deliveryMode } from '../export/save.js';
+import { trackEvent } from './analytics.js';
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { FONTS } from '../core/text.js';
 import { SYMBOLS, symbolSvgPath } from '../core/symbols.js';
@@ -370,6 +371,7 @@ export function mountEditor(root, id) {
           const res = await saveFiles(files, bundle);
           state.innerHTML = `<strong>Descarga iniciada</strong><span class="file">${esc(res.container)}</span>${res.zipped ? `<span class="note">Contiene: ${res.files.map(esc).join(', ')}</span>` : ''}<span class="note">Abrilo en tu laminador y revisá la vista previa antes de imprimir.</span><button class="btn" data-close type="button">Listo</button>`;
           toast(`Descargado: ${res.container} (${fmtBytes(res.bytes)})`);
+          trackEvent('descarga_archivo', { objeto: snapshot.def.id, formato: format });
         } catch (err) {
           const code = err && err.code;
           btn.disabled = false;

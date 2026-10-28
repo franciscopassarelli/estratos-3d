@@ -28,4 +28,9 @@ export const SITE = {
 // Vacío = sin verificación anti-robots visible (igual hay otras protecciones). Ver SORTEOS.md.
 SITE.turnstileSiteKey = '';
 
+// ---- Google Analytics 4 ----
+// ID de medición tal como lo muestra Analytics: 'G-XXXXXXXXXX'. Vacío = sin Analytics.
+SITE.gaId = 'G-G98H26X4CD';
+
 export const adsEnabled = () => /^ca-pub-\d{10,}$/.test(SITE.adsenseClient);
+export const analyticsEnabled = () => /^G-[A-Z0-9]{6,}$/.test(SITE.gaId);
