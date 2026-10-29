@@ -46,16 +46,152 @@ function pattern(kind, area, s, lw) {
   return intersection(lines, area);
 }
 
+// ---------- Símbolos (emojis) dibujados con geometría ----------
+// Las tipografías no traen emojis, así que se reemplazan por formas propias.
+
+// Semiplano n·p <= d, aproximado con un cuadrado enorme rotado.
+function halfPlane(nx, ny, d, L) {
+  const ang = Math.atan2(ny, nx);
+  return regularPolygon(nx * (d - L), ny * (d - L), L * Math.SQRT2, 4, ang + Math.PI / 4);
+}
+
+// Polígono convexo como intersección de semiplanos (no depende del formato interno de las regiones).
+function convexPolygon(pts) {
+  const cx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+  const cy = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+  const L = 50 * Math.max(...pts.map((p) => Math.hypot(p.x - cx, p.y - cy)), 1);
+  let reg = null;
+  for (let i = 0; i < pts.length; i++) {
+    const A = pts[i], B = pts[(i + 1) % pts.length];
+    let nx = B.y - A.y, ny = -(B.x - A.x);
+    const len = Math.hypot(nx, ny) || 1;
+    nx /= len; ny /= len;
+    if (nx * (cx - A.x) + ny * (cy - A.y) > 0) { nx = -nx; ny = -ny; } // normal hacia afuera
+    const hp = halfPlane(nx, ny, nx * A.x + ny * A.y, L);
+    reg = reg ? intersection(reg, hp) : hp;
+  }
+  return reg;
+}
+
+const SHAPES = {
+  heart() {
+    const r = 1;
+    return union(
+      regularPolygon(0, 0, r, 4, 0),
+      circle(r / 2, r / 2, r / Math.SQRT2, 64),
+      circle(-r / 2, r / 2, r / Math.SQRT2, 64),
+    );
+  },
+  star() {
+    const R = 1, ri = R * 0.382, pts = [], inner = [];
+    for (let k = 0; k < 5; k++) {
+      const a = Math.PI / 2 + (k * 2 * Math.PI) / 5;
+      pts.push({ x: R * Math.cos(a), y: R * Math.sin(a) });
+      const b = a + Math.PI / 5;
+      inner.push({ x: ri * Math.cos(b), y: ri * Math.sin(b) });
+    }
+    const tips = pts.map((P, k) => convexPolygon([P, inner[(k + 4) % 5], inner[k]]));
+    return union(offset(convexPolygon(inner), 0.01), ...tips);
+  },
+  flower() {
+    const petals = [];
+    for (let k = 0; k < 5; k++) {
+      const a = Math.PI / 2 + (k * 2 * Math.PI) / 5;
+      petals.push(circle(0.55 * Math.cos(a), 0.55 * Math.sin(a), 0.45, 48));
+    }
+    return union(circle(0, 0, 0.4, 48), ...petals);
+  },
+  paw() {
+    const toes = [[-0.62, 0.22], [-0.24, 0.62], [0.24, 0.62], [0.62, 0.22]].map(([x, y]) => circle(x, y, 0.2, 40));
+    const pad = union(circle(0, -0.32, 0.38, 64), circle(-0.24, -0.5, 0.26, 48), circle(0.24, -0.5, 0.26, 48));
+    return union(pad, ...toes);
+  },
+};
+
+const SYMBOL_OF = new Map();
+const addSyms = (chars, name) => Array.from(chars).forEach((c) => SYMBOL_OF.set(c, name));
+addSyms('❤♥♡❣💕💖💗💓💘💝💙💚💛💜🖤🤍🤎🧡🩷🩵🩶💞', 'heart');
+addSyms('★☆⭐🌟✨✦✧', 'star');
+addSyms('✿❀❁🌸🌼🌺🏵💮', 'flower');
+addSyms('🐾', 'paw');
+const IGNORE = /[︎️‍\u{1F3FB}-\u{1F3FF}]/u;
+const LOOKS_EMOJI = /\p{Extended_Pictographic}/u;
+
+// Escala a una altura dada y centra en (0, cy).
+function fitSymbol(name, h, cy) {
+  let g = SHAPES[name]();
+  const b = bbox(g);
+  g = scale(g, h / b.h);
+  const nb = bbox(g);
+  return translate(g, -nb.cx, cy - nb.cy);
+}
+
+// Arma la línea de texto mezclando letras de la tipografía y símbolos.
+function richText(str, font, h, issues) {
+  const chars = Array.from(str).filter((c) => !IGNORE.test(c));
+  const unknown = [...new Set(chars.filter((c) => LOOKS_EMOJI.test(c) && !SYMBOL_OF.has(c)))];
+  if (unknown.length) issues.push({ level: 'warning', msg: `Estos emojis no están disponibles y se omitieron: ${unknown.join(' ')}. Podés usar ❤ ★ ✿ 🐾` });
+  const clean = chars.filter((c) => !unknown.includes(c));
+
+  // Sin símbolos: camino normal (conserva el kerning de la tipografía).
+  if (!clean.some((c) => SYMBOL_OF.has(c))) {
+    const t = textRegion(clean.join(''), font, h);
+    return { region: t.region, missing: t.missing };
+  }
+
+  // Separar en tramos de texto y símbolos
+  const runs = [];
+  for (const c of clean) {
+    const sym = SYMBOL_OF.get(c);
+    if (sym) runs.push({ sym });
+    else if (runs.length && runs[runs.length - 1].text !== undefined) runs[runs.length - 1].text += c;
+    else runs.push({ text: c });
+  }
+
+  const hasLetters = runs.some((r) => r.text && r.text.trim());
+  const ref = hasLetters ? bbox(textRegion('H', font, h).region) : { h, cy: 0 };
+  const symH = hasLetters ? ref.h * 1.1 : h;
+  const gap = h * 0.12, spaceW = h * 0.3;
+  const missing = [];
+  const pieces = [];
+  let x = 0;
+  for (const r of runs) {
+    if (r.sym) {
+      let g = fitSymbol(r.sym, symH, ref.cy);
+      const b = bbox(g);
+      g = translate(g, x - (b.cx - b.w / 2), 0);
+      pieces.push(g);
+      x += b.w + gap;
+      continue;
+    }
+    const lead = r.text.length - r.text.trimStart().length;
+    const trail = r.text.length - r.text.trimEnd().length;
+    x += lead * spaceW;
+    const body = r.text.trim();
+    if (body) {
+      const t = textRegion(body, font, h);
+      missing.push(...t.missing);
+      if (t.region.length) {
+        const b = bbox(t.region);
+        pieces.push(translate(t.region, x - (b.cx - b.w / 2), 0));
+        x += b.w + gap;
+      }
+    }
+    x += trail * spaceW;
+  }
+  return { region: pieces.length ? union(...pieces) : [], missing: [...new Set(missing)] };
+}
+
 export default {
   id: 'posavasos',
   name: 'Posavasos personalizados',
   category: 'hogar',
   description: 'Set de posavasos con borde y canal que junta las gotas, patrón geométrico y nombre o iniciales en relieve o grabado. Con porta-posavasos opcional.',
-  tags: ['posavasos', 'vasos', 'mesa', 'cocina', 'regalo', 'bar', 'iniciales', 'geométrico'],
+  tags: ['emoji', 'corazón', 'posavasos', 'vasos', 'mesa', 'cocina', 'regalo', 'bar', 'iniciales', 'geométrico'],
   printTime: '45 min–1 h 30 c/u',
   defaults: {
     shape: 'round', diameter: 95, thickness: 4, count: 4,
-    text: 'Salud', font: 'pacifico', textHeight: 14, textMode: 'relief',
+    text: 'Salud', font: 'pacifico', textHeight: 18, textFill: 92, textMode: 'relief',
     pattern: 'hex', spacing: 12, lineWidth: 1.2,
     rimWidth: 3, channel: true, relief: 1.2, cutDepth: 1,
     holder: false, capacity: 4, clearance: 1.2,
@@ -73,9 +209,10 @@ export default {
       { key: 'count', type: 'stepper', label: 'Cantidad en la misma impresión', min: 1, max: 6 },
     ] },
     { title: 'Texto o iniciales', items: [
-      { key: 'text', type: 'text', label: 'Texto al centro (vacío = sin texto)', maxLength: 30, placeholder: 'Iniciales o nombre' },
+      { key: 'text', type: 'text', label: 'Texto al centro (vacío = sin texto)', maxLength: 30, placeholder: 'Iniciales o nombre', help: 'Podés sumar emojis: ❤ corazón, ★ estrella, ✿ flor, 🐾 huellita' },
       { key: 'font', type: 'font', label: 'Tipografía', visibleIf: (p) => !!p.text.trim() },
-      { key: 'textHeight', type: 'range', label: 'Altura de letra', min: 6, max: 40, step: 0.5, unit: 'mm', visibleIf: (p) => !!p.text.trim() },
+      { key: 'textHeight', type: 'range', label: 'Altura de letra', min: 6, max: 70, step: 0.5, unit: 'mm', visibleIf: (p) => !!p.text.trim() },
+      { key: 'textFill', type: 'range', label: 'Ocupar el centro hasta', min: 60, max: 100, step: 1, unit: '%', help: 'Límite para que el texto no toque el borde', visibleIf: (p) => !!p.text.trim() },
       { key: 'textMode', type: 'segmented', label: 'Acabado', options: [{ value: 'relief', label: 'Alto relieve' }, { value: 'engraved', label: 'Bajo relieve' }], visibleIf: (p) => !!p.text.trim() },
     ] },
     { title: 'Patrón y borde', items: [
@@ -118,12 +255,21 @@ export default {
     let text = [];
     const str = (p.text || '').trim();
     if (str) {
-      const t = textRegion(str, p.font, p.textHeight);
+      const t = richText(str, p.font, p.textHeight, issues);
       if (t.missing.length) issues.push({ level: 'warning', msg: `Se omitieron caracteres que la tipografía no tiene: ${t.missing.join(' ')}` });
       text = t.region;
       const ib = bbox(inner), tb = bbox(text);
-      const maxW = ib.w * (p.shape === 'square' ? 0.82 : 0.72);
-      if (tb.w > maxW) { const s = maxW / tb.w; text = scale(text, s); issues.push({ level: 'info', msg: `El texto se achicó al ${Math.round(s * 100)} % para entrar en el centro.` }); }
+      // Encaje real según la forma: en cuadrado alcanza con que entre en el lado;
+      // en redondo/hex, que las esquinas del rectángulo del texto queden dentro del círculo.
+      const fill = p.textFill / 100;
+      let s = 1;
+      if (p.shape === 'square') {
+        s = Math.min(1, (ib.w * fill) / tb.w, (ib.h * fill) / tb.h);
+      } else {
+        const R = (Math.min(ib.w, ib.h) / 2) * fill;
+        s = Math.min(1, R / Math.hypot(tb.w / 2, tb.h / 2));
+      }
+      if (s < 1) { text = scale(text, s); issues.push({ level: 'info', msg: `El texto se achicó al ${Math.round(s * 100)} % para entrar en el centro. Subí "Ocupar el centro" o agrandá el posavasos.` }); }
       const nb = bbox(text);
       text = translate(text, -nb.cx, -nb.cy);
       if (thinFraction(text, PRINT.minFeature) > 0.08) issues.push({ level: 'warning', msg: 'El texto tiene trazos de menos de 0,8 mm. Agrandalo o usá una tipografía más gruesa.' });
