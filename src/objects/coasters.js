@@ -73,7 +73,7 @@ export default {
       { key: 'count', type: 'stepper', label: 'Cantidad en la misma impresión', min: 1, max: 6 },
     ] },
     { title: 'Texto o iniciales', items: [
-      { key: 'text', type: 'text', label: 'Texto al centro (vacío = sin texto)', maxLength: 12, placeholder: 'Iniciales o nombre' },
+      { key: 'text', type: 'text', label: 'Texto al centro (vacío = sin texto)', maxLength: 30, placeholder: 'Iniciales o nombre' },
       { key: 'font', type: 'font', label: 'Tipografía', visibleIf: (p) => !!p.text.trim() },
       { key: 'textHeight', type: 'range', label: 'Altura de letra', min: 6, max: 40, step: 0.5, unit: 'mm', visibleIf: (p) => !!p.text.trim() },
       { key: 'textMode', type: 'segmented', label: 'Acabado', options: [{ value: 'relief', label: 'Alto relieve' }, { value: 'engraved', label: 'Bajo relieve' }], visibleIf: (p) => !!p.text.trim() },
