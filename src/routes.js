@@ -29,7 +29,7 @@ export const ROUTES = [
   {
     pattern: /^\/crear\/([a-z0-9-]+)$/, section: 'catalogo',
     exists: ([id]) => !!getObject(id),
-    meta: ([id]) => { const o = getObject(id); return { title: `${o.name} personalizable para imprimir en 3D | ${SITE.name}`, description: `${o.description} Vista previa 3D y descarga en 3MF, STL u OBJ.` }; },
+    meta: ([id]) => { const o = getObject(id); return { title: `${o.name}${/personaliz/i.test(o.name) ? '' : ' personalizable'} para imprimir en 3D | ${SITE.name}`, description: `${o.description} Vista previa 3D y descarga en 3MF, STL u OBJ.` }; },
     render: ([id]) => editorPage(id), mount: (root, [id]) => mountEditor(root, id),
   },
   {
