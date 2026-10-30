@@ -8,10 +8,6 @@ export default {
     675,
     1200
   ],
-  "mis2anitoslolo-cama-1.webp": [
-    800,
-    1000
-  ],
   "mis2anitoslolo-cama.webp": [
     800,
     1000

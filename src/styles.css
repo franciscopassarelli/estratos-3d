@@ -627,3 +627,14 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
   .site-footer ul { gap: 0; }
   .site-footer ul a { display: inline-block; padding: 8px 0; }
 }
+
+/* ---------- Diseños destacados en compu ---------- */
+/* Filas completas de 4 (8 diseños = 2 filas), imagen más grande y texto en 2 renglones. */
+@media (min-width: 561px) {
+  .cards-featured { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards-featured .card-body p { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cards-featured .card-media { aspect-ratio: 16 / 11; }
+}
+@media (min-width: 900px) {
+  .cards-featured { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+}
