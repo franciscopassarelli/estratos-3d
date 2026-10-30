@@ -1,6 +1,7 @@
 // Páginas de contenido: guías, ayuda, acerca, contacto, condiciones y privacidad.
 import { SITE, analyticsEnabled } from '../config.js';
 import { GUIDES, getGuide } from '../content/guides.js';
+import { galleryItems } from '../content/gallery.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
@@ -187,6 +188,53 @@ export function notFoundPage() {
       <p class="lead">Puede que el enlace esté mal escrito o que la página ya no exista.</p>
       <div class="hero-actions"><a class="btn btn-primary" href="/catalogo">Ir al catálogo</a><a class="btn" href="/">Volver al inicio</a></div>
     </div>
+  </main>`;
+}
+
+/** Tarjeta de una foto de la galería (también se usa en la portada). */
+export function galleryCard(g, eager = false) {
+  const obj = g.diseno ? getObject(g.diseno) : null;
+  const small = `/galeria/${g.foto.replace(/\.webp$/, '-chica.webp')}`;
+  const who = g.imprimio
+    ? `Impreso por ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.imprimio)}</a>` : esc(g.imprimio)}`
+    : g.autor ? `De ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.autor)}</a>` : esc(g.autor)}` : '';
+  return `
+    <figure class="gal-item">
+      <a class="gal-photo" href="/galeria/${esc(g.foto)}" target="_blank" rel="noopener" aria-label="Ver la foto en grande: ${esc(g.titulo)}">
+        <img src="${small}" srcset="${small} 640w, /galeria/${esc(g.foto)} ${g.w}w" sizes="(max-width: 560px) 92vw, 380px"
+          width="${g.w}" height="${g.h}" alt="${esc(g.alt || g.titulo)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+      </a>
+      <figcaption>
+        <b>${esc(g.titulo)}</b>
+        ${who ? `<span class="gal-who">${who}</span>` : ''}
+        ${obj ? `<a class="gal-cta" href="/crear/${obj.id}" title="${esc(obj.name)}">Hacé el tuyo ${icon.arrow}</a>` : ''}
+      </figcaption>
+    </figure>`;
+}
+
+export function galleryPage() {
+  const items = galleryItems();
+  const ig = SITE.instagram ? `https://instagram.com/${SITE.instagram}` : '';
+  return `
+  <main class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Galería</span>
+      <h1>Hecho con ${esc(SITE.name)}</h1>
+      <p class="lead">Piezas reales, impresas a partir de diseños de la web. Así quedan los archivos fuera de la pantalla.</p>
+    </div>
+    ${items.length ? `<div class="gallery">${items.map((g, i) => galleryCard(g, i < 2)).join('')}</div>`
+      : `<p class="empty">Todavía no hay fotos. ¡La tuya puede ser la primera!</p>`}
+    <section class="gal-send">
+      <div>
+        <h2>¿Imprimiste algo con ${esc(SITE.name)}?</h2>
+        <p>Mandanos una foto de tu pieza y la sumamos a la galería con tu nombre o tu @. Revisamos cada foto antes de publicarla.</p>
+      </div>
+      <div class="gal-send-actions">
+        ${ig ? `<a class="btn btn-primary" href="${ig}" target="_blank" rel="noopener">Mandala por Instagram</a>` : ''}
+        ${SITE.email ? `<a class="btn" href="mailto:${esc(SITE.email)}?subject=${encodeURIComponent('Foto para la galería')}">Por correo</a>` : ''}
+      </div>
+    </section>
+    ${adSlot('banner')}
   </main>`;
 }
 

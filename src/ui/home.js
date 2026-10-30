@@ -6,6 +6,8 @@ import { card, bindThumbs } from './catalog.js';
 import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $, debounce, storage } from './dom.js';
+import { galleryItems } from '../content/gallery.js';
+import { galleryCard } from './pages.js';
 
 const FEATURED = ['llavero', 'display-qr', 'posavasos', 'pantalla-lampara', 'soporte-auriculares', 'cartel-wifi', 'soporte-mandos', 'placa'];
 
@@ -61,6 +63,15 @@ export function homePage() {
     </section>
 
     <div class="wrap">${adSlot('inline')}</div>
+
+    ${(() => { const g = galleryItems().slice(0, 4); return g.length ? `
+    <section class="section wrap" aria-labelledby="gal-title">
+      <div class="section-head">
+        <div><span class="eyebrow">Hecho con Estratos 3D</span><h2 id="gal-title">Así quedan impresos</h2></div>
+        <a class="btn btn-ghost" href="/galeria">Ver galería ${icon.arrow}</a>
+      </div>
+      <div class="gallery gallery-home">${g.map((x) => galleryCard(x)).join('')}</div>
+    </section>` : ''; })()}
 
     <section class="section wrap" id="como-funciona" aria-labelledby="how-title">
       <div class="section-head"><div><span class="eyebrow">Cómo funciona</span><h2 id="how-title">De la idea al archivo en cuatro pasos</h2></div></div>

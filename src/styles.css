@@ -553,6 +553,23 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
   .editor .sec-tabs button { padding: 0 10px; font-size: 13.5px; }
 }
 
+/* ---------- Galería ---------- */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.gal-item { margin: 0; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.gal-photo { display: block; aspect-ratio: 4 / 5; background: var(--bg-2); overflow: hidden; }
+.gal-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.gal-photo:hover img { transform: scale(1.03); }
+.gal-item figcaption { display: grid; gap: 4px; padding: 12px 14px 14px; }
+.gal-item figcaption b { font-size: 15px; }
+.gal-who { font-size: 13px; color: var(--muted); }
+.gal-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--accent); font-weight: 600; font-size: 14px; text-decoration: none; }
+.gal-cta svg { width: 16px; height: 16px; }
+.gal-send { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between; margin-top: 32px; padding: 22px 24px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+.gal-send h2 { font-size: 20px; }
+.gal-send p { color: var(--ink-2); max-width: 60ch; margin-top: 4px; }
+.gal-send-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 560px) { .gallery { grid-template-columns: 1fr 1fr; gap: 10px; } .gal-item figcaption { padding: 10px; } .gal-item figcaption b { font-size: 14px; } .gal-cta { font-size: 13px; } .gallery-home .gal-item:nth-child(n+3) { display: none; } }
+
 /* ---------- Ajustes para celulares ---------- */
 /* Pantallas táctiles: áreas de toque más grandes y campos de 16 px
    (con menos de 16 px, Safari en iPhone hace zoom al tocar un campo). */

@@ -8,6 +8,8 @@ export const SITE = {
   // Responsable del sitio, para la política de privacidad (nombre o razón social).
   owner: 'Francisco Passarelli',
   country: 'Argentina',
+  // Instagram de la marca (sin @). Se usa para pedir fotos para la galería.
+  instagram: 'fran.estratos3d',
   lang: 'es-AR',
   // Fecha de la última revisión de los textos legales (AAAA-MM-DD).
   legalUpdated: '2026-10-26',

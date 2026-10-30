@@ -14,6 +14,7 @@ export function header(section) {
         <a href="/"${cur('inicio')}>Inicio</a>
         <a href="/catalogo"${cur('catalogo')}>Catálogo</a>
         <a href="/guias"${cur('guias')}>Guías</a>
+        <a href="/galeria"${cur('galeria')}>Galería</a>
         <a href="/ayuda"${cur('ayuda')}>Ayuda</a>
       </nav>
       <a class="btn btn-primary btn-sm header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
@@ -31,7 +32,7 @@ export function footer() {
       </div>
       <div>
         <h4>Herramienta</h4>
-        <ul><li><a href="/catalogo">Catálogo</a></li><li><a href="/#como-funciona">Cómo funciona</a></li><li><a href="/guias">Guías</a></li><li><a href="/acerca">Acerca de</a></li></ul>
+        <ul><li><a href="/catalogo">Catálogo</a></li><li><a href="/#como-funciona">Cómo funciona</a></li><li><a href="/guias">Guías</a></li><li><a href="/galeria">Galería</a></li><li><a href="/acerca">Acerca de</a></li></ul>
       </div>
       <div>
         <h4>Ayuda</h4>
