@@ -17,7 +17,7 @@ export function header(section) {
         <a href="/galeria"${cur('galeria')}>Galería</a>
         <a href="/ayuda"${cur('ayuda')}>Ayuda</a>
       </nav>
-      <a class="btn btn-primary btn-sm header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
+      <a class="btn btn-primary btn-sm btn-cta header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
     </div>
   </header>`;
 }

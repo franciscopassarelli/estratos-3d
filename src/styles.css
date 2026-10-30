@@ -638,3 +638,62 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 @media (min-width: 900px) {
   .cards-featured { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
 }
+/* ---------- Botones destacados ---------- */
+/* «Crear un objeto»: una pieza impresa en 3D. Píldora con capas apiladas debajo (estratos),
+   líneas de capa en la cara, degradé que fluye y un brillo. Se eleva al pasar el mouse y se hunde al tocarla. */
+.btn-cta {
+  --cta-hi: color-mix(in srgb, var(--accent) 80%, #3FE0CC);
+  --l1: color-mix(in srgb, var(--accent) 72%, #000);
+  --l2: color-mix(in srgb, var(--accent) 84%, #000);
+  --l3: color-mix(in srgb, var(--accent) 60%, #000);
+  --step: 2px;
+  position: relative; overflow: hidden; isolation: isolate;
+  border-radius: 999px; border-color: transparent; font-weight: 700;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, .07) 3px 4px),
+    linear-gradient(115deg, var(--accent) 0%, var(--cta-hi) 50%, var(--accent) 100%);
+  background-size: 100% 100%, 220% 100%;
+  transform: translateY(calc(var(--step) * -1));
+  box-shadow:
+    0 var(--step) 0 var(--l1),
+    0 calc(var(--step) * 2) 0 var(--l2),
+    0 calc(var(--step) * 3) 0 var(--l3),
+    0 calc(var(--step) * 3 + 10px) 22px -8px color-mix(in srgb, var(--accent) 80%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .3);
+  animation: cta-flow 7s ease-in-out infinite;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+.btn-cta.btn-sm { --step: 1.5px; }
+.btn-cta::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .4) 50%, transparent 62%);
+  transform: translateX(-130%);
+  animation: cta-shine 4.5s ease-in-out 1.5s infinite;
+}
+.btn-cta:hover {
+  --step: 2.6px; filter: brightness(1.05); border-color: transparent;
+  transform: translateY(calc(var(--step) * -1.4));
+}
+.btn-cta.btn-sm:hover { --step: 2px; }
+.btn-cta:active { --step: .6px; transform: translateY(calc(var(--step) * 2)); transition-duration: .06s; }
+.btn-cta svg { transition: transform .25s ease; }
+.btn-cta:hover svg { transform: rotate(90deg); }
+/* En modo oscuro el turquesa ya es claro: el degradé va hacia un turquesa casi blanco para que se note. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-cta { --cta-hi: color-mix(in srgb, var(--accent) 62%, #D2FFF7); } }
+:root[data-theme="dark"] .btn-cta { --cta-hi: color-mix(in srgb, var(--accent) 62%, #D2FFF7); }
+@keyframes cta-flow { 0%, 100% { background-position: 0 0, 0% 50%; } 50% { background-position: 0 0, 100% 50%; } }
+@keyframes cta-shine { 0% { transform: translateX(-130%); } 30%, 100% { transform: translateX(130%); } }
+
+/* «Cómo funciona»: la misma forma de pieza, pero con una sola capa y colores suaves. */
+.btn-soft {
+  border-radius: 999px; background: var(--accent-soft); color: var(--ink);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 35%, var(--bg)), 0 3px 0 color-mix(in srgb, var(--accent) 22%, var(--bg));
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.btn-soft:hover { border-color: var(--accent); transform: translateY(-3px);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 40%, var(--bg)), 0 4px 0 color-mix(in srgb, var(--accent) 25%, var(--bg)); }
+.btn-soft:active { transform: translateY(0); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 35%, var(--bg)); transition-duration: .06s; }
+.btn-soft svg { color: var(--accent); transition: transform .2s ease; }
+.btn-soft:hover svg { transform: translateY(2px); }

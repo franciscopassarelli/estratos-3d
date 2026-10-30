@@ -21,8 +21,8 @@ export function homePage() {
           <h1>Piezas a medida para tu impresora 3D, <span>sin saber modelar.</span></h1>
           <p class="lead">Elegí un objeto, cambiá medidas, textos y colores, y mirá el resultado en 3D mientras lo ajustás. Al terminar, descargás un archivo real generado con tus valores y revisado antes de imprimir.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary btn-lg" href="/catalogo">${icon.plus} Crear un objeto</a>
-            <a class="btn btn-lg" href="/#como-funciona">Cómo funciona</a>
+            <a class="btn btn-primary btn-lg btn-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
+            <a class="btn btn-lg btn-soft" href="/#como-funciona">Cómo funciona ${icon.chevron}</a>
           </div>
           <div class="hero-facts"><span><b>${OBJECTS.length}</b> diseños editables</span><span><b>${FONTS.length}</b> tipografías para relieve</span><span>Capa de <b>0,20 mm</b> como referencia</span></div>
         </div>
