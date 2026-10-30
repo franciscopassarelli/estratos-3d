@@ -15,7 +15,7 @@ export const SITE = {
   // ---- AdSense ----
   // ID de editor tal como lo muestra AdSense: 'ca-pub-0000000000000000'.
   // Vacío = se muestran los espacios de prueba con la palabra ANUNCIO.
-  adsenseClient: '',
+  adsenseClient: 'ca-pub-6086874027794907',
   // IDs de los bloques de anuncios creados en AdSense > Anuncios > Por bloque de anuncios.
   adSlots: {
     banner: '', // horizontal, debajo del contenido de cada página
