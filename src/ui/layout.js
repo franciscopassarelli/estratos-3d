@@ -1,5 +1,6 @@
 import { icon, esc } from './dom.js';
 import { SITE } from '../config.js';
+import { featuredPromo } from '../content/promos.js';
 
 const logo = `<span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Estratos <small>3D</small></span>`;
 
@@ -19,7 +20,38 @@ export function header(section) {
       </nav>
       <a class="btn btn-primary btn-sm btn-cta header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
     </div>
-  </header>`;
+  </header>
+  ${sideNav(cur)}
+  ${tabBar(cur)}`;
+}
+
+/** Menú lateral (compu): logo, botón Crear y secciones con ícono y nombre. */
+function sideNav(cur) {
+  const promo = featuredPromo();
+  return `
+  <aside class="side-nav" aria-label="Navegación principal">
+    <a class="side-logo" href="/" aria-label="${esc(SITE.name)}, inicio"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span></a>
+    <a class="side-create" href="/catalogo"${cur('catalogo')}><span class="side-create-btn">${icon.plus}</span><span>Crear</span></a>
+    <nav class="side-links">
+      <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
+      <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
+      <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
+      <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
+    </nav>
+    ${promo ? `<div class="side-bottom"><a class="side-promo" href="/sorteos/${esc(promo.slug)}" title="${esc(promo.title)}">${icon.gift}<span>Sorteo</span><i class="side-dot" aria-hidden="true"></i></a></div>` : ''}
+  </aside>`;
+}
+
+/** Barra de íconos abajo (celular), con Crear en el centro. */
+function tabBar(cur) {
+  return `
+  <nav class="tabbar" aria-label="Navegación">
+    <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
+    <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
+    <a class="tab-create" href="/catalogo"${cur('catalogo')}><span class="tab-create-btn">${icon.plus}</span><span>Crear</span></a>
+    <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
+    <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
+  </nav>`;
 }
 
 export function footer() {

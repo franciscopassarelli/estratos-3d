@@ -697,3 +697,70 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 .btn-soft:active { transform: translateY(0); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 35%, var(--bg)); transition-duration: .06s; }
 .btn-soft svg { color: var(--accent); transition: transform .2s ease; }
 .btn-soft:hover svg { transform: translateY(2px); }
+/* ---------- Menú lateral (compu) y barra de íconos (celular) ---------- */
+.side-nav, .tabbar { display: none; }
+.side-create-btn, .tab-create-btn {
+  display: grid; place-items: center; border-radius: 50%; color: var(--accent-ink);
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #D2FFF7));
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 72%, #000), 0 4px 0 color-mix(in srgb, var(--accent) 58%, #000),
+    0 10px 20px -8px color-mix(in srgb, var(--accent) 85%, transparent);
+  transform: translateY(-2px); transition: transform .16s ease, box-shadow .16s ease;
+}
+.side-create-btn svg, .tab-create-btn svg { width: 22px; height: 22px; stroke-width: 2.4; transition: transform .25s ease; }
+
+@media (min-width: 961px) {
+  body { padding-left: 84px; }
+  .site-header { display: none; }
+  .side-nav {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: fixed; inset: 0 auto 0 0; width: 84px; z-index: 60; padding: 18px 8px 16px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(10px);
+    border-right: 1px solid var(--line);
+  }
+  .side-logo { display: grid; place-items: center; width: 48px; height: 44px; margin-bottom: 14px; border-radius: 12px; }
+  .side-logo .logo-mark { width: 30px; gap: 3px; }
+  .side-logo .logo-mark i { height: 6px; }
+  .side-create { display: grid; justify-items: center; gap: 7px; margin-bottom: 12px; text-decoration: none; font: 700 11.5px var(--f-body); color: var(--ink); }
+  .side-create-btn { width: 46px; height: 46px; }
+  .side-create:hover .side-create-btn { transform: translateY(-3.5px); }
+  .side-create:hover svg { transform: rotate(90deg); }
+  .side-create:active .side-create-btn { transform: translateY(1px); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+  .side-links { display: grid; gap: 2px; width: 100%; }
+  .side-links a, .side-promo {
+    position: relative; display: grid; justify-items: center; gap: 4px; padding: 10px 2px; border-radius: 12px;
+    color: var(--muted); text-decoration: none; font: 500 11.5px var(--f-body); transition: background .15s, color .15s;
+  }
+  .side-links a svg, .side-promo svg { width: 22px; height: 22px; }
+  .side-links a:hover, .side-promo:hover { background: var(--bg-2); color: var(--ink); }
+  .side-links a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .side-bottom { margin-top: auto; width: 100%; }
+  .side-dot { position: absolute; top: 8px; right: 20px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--surface); animation: side-pulse 2.4s ease-in-out infinite; }
+  @keyframes side-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  /* Sin encabezado arriba: lo que quedaba fijo debajo de él sube. */
+  .stage-col { top: calc(16px + env(safe-area-inset-top, 0px)); }
+  .editor .panel { top: calc(16px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 32px); }
+  .info nav, .related { top: 24px; }
+  .info section { scroll-margin-top: 24px; }
+  .toasts { top: calc(16px + env(safe-area-inset-top, 0px)); }
+  main > .wrap:first-child, .editor-page { padding-top: 8px; }
+}
+
+@media (max-width: 820px) {
+  .tabbar {
+    display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    padding: 4px max(6px, env(safe-area-inset-left, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-right, 0px));
+    background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+  }
+  .tabbar a { display: grid; justify-items: center; gap: 3px; min-height: 50px; padding: 6px 0 4px; color: var(--muted); text-decoration: none; font: 600 10.5px var(--f-body); }
+  .tabbar a svg { width: 23px; height: 23px; }
+  .tabbar a[aria-current="page"] { color: var(--accent); }
+  .tab-create { color: var(--ink) !important; }
+  .tab-create-btn { width: 50px; height: 50px; margin-top: -22px; }
+  .tab-create:active .tab-create-btn { transform: translateY(1px); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  /* En el editor manda la barra de Descargar. */
+  body:has(.mobile-bar) .tabbar { display: none; }
+  body:has(.mobile-bar) { padding-bottom: 0; }
+}
