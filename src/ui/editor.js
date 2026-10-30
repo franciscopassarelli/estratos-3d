@@ -104,6 +104,8 @@ export function editorPage(id) {
             <button class="btn btn-sm" id="view-reset" type="button" title="Volver a la vista inicial">${icon.reset}<span>Vista inicial</span></button>
             <button class="btn btn-sm" id="view-detail" type="button" title="Acercar al detalle">${icon.zoom}<span>Detalle</span></button>
             ${def.useOrientation ? `<button class="btn btn-sm" id="view-mode" type="button" aria-pressed="true">${icon.phone}<span>Ver en la cama</span></button>` : ''}
+            <button class="btn btn-sm" id="view-scene" type="button" aria-pressed="false" title="Cambiar entre la cama de impresión y un fondo liso">${icon.scene}<span>Fondo</span></button>
+            <button class="btn btn-sm" id="view-photo" type="button" title="Sacar una foto del diseño para compartir">${icon.camera}<span>Foto</span></button>
           </div>
           <div class="stage-dims" id="stage-dims"></div>
           <span class="stage-hint" id="stage-hint">Arrastrá para girar · rueda o pellizco para acercar</span>
@@ -114,11 +116,12 @@ export function editorPage(id) {
           <span class="status" id="status" role="status"></span>
           <button class="btn btn-ghost btn-sm" id="reset" type="button">${icon.reset} Restablecer</button>
         </div>
+        <div id="tabs-anchor"></div>
+        <div class="sec-tabs" role="tablist" aria-label="Secciones del diseño" id="sec-tabs"></div>
         <div id="controls"></div>
-        <details class="group" open id="print-group">
-          <summary>Preparación para imprimir ${icon.chevron}</summary>
+        <section class="group" id="print-group" data-sec="print" role="tabpanel" aria-label="Preparación para imprimir" hidden>
           <div class="group-body" id="print-body"></div>
-        </details>
+        </section>
         <div class="export" id="export"></div>
       </div>
     </div>
@@ -155,12 +158,35 @@ export function mountEditor(root, id) {
 
   // ---- Controles
   const controlsEl = $('#controls', root);
+  // Pestañas: cada sección se ve de a una, así los controles quedan a mano sin bajar.
+  const tabsEl = $('#sec-tabs', root), printGroup = $('#print-group', root);
+  const TABS = [...def.sections.map((s, i) => [String(i), s.title]), ['print', 'Revisión']];
+  let tab = '0';
+  const renderTabs = () => {
+    tabsEl.innerHTML = TABS.map(([k, t]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === tab}">${esc(t)}${k === 'print' ? '<span class="tab-badge" id="tab-badge" hidden></span>' : ''}</button>`).join('');
+  };
+  const setTab = (k) => {
+    tab = k;
+    tabsEl.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
+    controlsEl.querySelectorAll('[data-sec]').forEach((el) => { el.hidden = el.dataset.sec !== k; });
+    printGroup.hidden = k !== 'print';
+    // Si la página ya estaba bajada, vuelve al principio de la sección elegida.
+    const panel = $('#panel', root), anchor = $('#tabs-anchor', root);
+    if (getComputedStyle(panel).overflowY === 'auto') { if (panel.scrollTop > anchor.offsetTop) panel.scrollTop = anchor.offsetTop; }
+    else {
+      const stick = parseFloat(getComputedStyle(tabsEl).top) || 0;
+      const y = anchor.getBoundingClientRect().top + window.scrollY - stick;
+      if (window.scrollY > y) window.scrollTo({ top: y });
+    }
+    tabsEl.querySelector(`[data-tab="${k}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
+  tabsEl.addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
   const renderControls = () => {
     controlsEl.innerHTML = def.sections.map((s, i) => `
-      <details class="group" ${i < 2 || s.items.some((it) => it.type === 'text') ? 'open' : ''}>
-        <summary>${esc(s.title)} ${icon.chevron}</summary>
+      <section class="group" data-sec="${i}" role="tabpanel" aria-label="${esc(s.title)}" ${String(i) === tab ? '' : 'hidden'}>
         <div class="group-body">${s.items.map((it) => control(it, params)).join('')}</div>
-      </details>`).join('');
+      </section>`).join('');
+    renderTabs();
     syncVisibility();
   };
   const items = def.sections.flatMap((s) => s.items);
@@ -233,7 +259,7 @@ export function mountEditor(root, id) {
     const next = buildModel(def, params, orientation);
     let display = next;
     if (viewUse && def.useOrientation && def.useOrientation !== orientation) display = buildModel(def, params, def.useOrientation);
-    viewer?.setModel(display.parts, { reframe: firstBuild ? true : 'auto' });
+    viewer?.setModel(display.parts, { reframe: firstBuild ? true : 'auto', layers: display === next });
     firstBuild = false;
     if (shown && shown !== model) disposeModel(shown);
     disposeModel(model);
@@ -252,6 +278,13 @@ export function mountEditor(root, id) {
     $('#mobile-dims', root).textContent = a ? `${fmtNum(a.dims.x, 0)} × ${fmtNum(a.dims.y, 0)} × ${fmtNum(a.dims.z, 0)} mm` : 'Sin geometría';
     renderPrint();
     renderExport();
+    const badge = $('#tab-badge', root);
+    if (badge) {
+      const n = model.issues.filter((i) => i.level === 'error' || i.level === 'warning').length;
+      badge.hidden = !n;
+      badge.textContent = n;
+      badge.className = `tab-badge ${model.issues.some((i) => i.level === 'error') ? 'error' : 'warning'}`;
+    }
   };
 
   const renderPrint = () => {
@@ -395,6 +428,41 @@ export function mountEditor(root, id) {
     firstBuild = true;
     rebuild.flush();
   });
+  const sceneBtn = $('#view-scene', root);
+  const applyScene = (mode) => { viewer?.setScene(mode); sceneBtn?.setAttribute('aria-pressed', String(mode === 'studio')); };
+  applyScene(storage.get('estratos:scene', 'bed'));
+  sceneBtn?.addEventListener('click', () => {
+    const mode = viewer?.sceneMode === 'studio' ? 'bed' : 'studio';
+    storage.set('estratos:scene', mode);
+    applyScene(mode);
+  });
+  if (!viewer) { sceneBtn?.remove(); $('#view-photo', root)?.remove(); }
+  $('#view-photo', root)?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    try {
+      const blob = await viewer.photo();
+      if (!blob) { toast('No hay nada para fotografiar todavía.', 'error'); return; }
+      const name = `${slug(`${def.id}-${params.text || params.line1 || params.label || ''}`)}-estratos3d.png`;
+      const file = new File([blob], name, { type: 'image/png' });
+      let shared = false;
+      if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file], text: 'Lo diseñé gratis en estratos3d.com' }); shared = true; } catch (err) { shared = err?.name === 'AbortError'; }
+      }
+      if (!shared) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(file); a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast('Foto guardada. ¡Compartila y etiquetá a @fran.estratos3d!');
+      }
+      trackEvent('foto_diseno', { objeto: def.id });
+    } catch (err) {
+      console.error(err);
+      toast('No se pudo sacar la foto en este navegador.', 'error');
+    } finally { btn.disabled = false; }
+  });
+
   $('#reset', root).addEventListener('click', () => {
     params = { ...def.defaults };
     orientation = def.orientations[0].id;

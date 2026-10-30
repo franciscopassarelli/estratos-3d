@@ -532,6 +532,27 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 }
 @media (max-width: 860px) { .prow > [role="cell"]:nth-child(4) { justify-self: end; } }
 
+/* ---------- Editor: pestañas y visor ---------- */
+.sec-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 8px 10px; background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 3; }
+.sec-tabs::-webkit-scrollbar { display: none; }
+.sec-tabs button { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font-weight: 600; font-size: 14px; cursor: pointer; }
+.sec-tabs button:hover { background: var(--bg-2); color: var(--ink); }
+.sec-tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tab-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; font: 700 11px/18px var(--f-body); text-align: center; color: #fff; background: var(--warn); }
+.tab-badge.error { background: var(--err); }
+.group[hidden] { display: none; }
+.stage.studio { background: radial-gradient(90% 75% at 50% 35%, #FBF8F2, #E3DCCF); }
+.stage-tools .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+@media (min-width: 961px) {
+  /* Compu: el panel tiene su propio scroll y la descarga queda siempre visible abajo. */
+  .editor .panel { position: sticky; top: calc(76px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 96px); display: flex; flex-direction: column; overflow-y: auto; }
+  .editor .panel > * { flex: none; }
+  .editor .export { position: sticky; bottom: 0; margin-top: auto; z-index: 2; border-top: 1px solid var(--line); }
+  .editor .sec-tabs { gap: 2px; padding: 8px 6px; }
+  .editor .sec-tabs button { padding: 0 10px; font-size: 13.5px; }
+}
+
 /* ---------- Ajustes para celulares ---------- */
 /* Pantallas táctiles: áreas de toque más grandes y campos de 16 px
    (con menos de 16 px, Safari en iPhone hace zoom al tocar un campo). */
@@ -547,15 +568,20 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 }
 
 @media (max-width: 960px) {
-  /* Editor: el visor queda fijo arriba mientras bajás por los controles,
-     así ves cada cambio sin volver a subir. */
+  /* Editor: el visor queda fijo arriba y las pestañas de secciones justo debajo,
+     así ves cada cambio y tenés todos los controles a un toque. */
+  .editor { --stage-h: clamp(220px, 36vh, 340px); }
+  @supports (height: 1svh) { .editor { --stage-h: clamp(220px, 36svh, 340px); } }
   .stage-col { position: sticky; top: calc(56px + env(safe-area-inset-top, 0px)); z-index: 20; background: var(--bg); padding-block: 8px; margin-top: -8px; }
-  .stage { height: clamp(220px, 36vh, 340px); height: clamp(220px, 36svh, 340px); min-height: 0; }
+  .stage { height: var(--stage-h); min-height: 0; }
+  .editor .panel { overflow: visible; overflow: clip; }
+  .sec-tabs { top: calc(56px + var(--stage-h) + 16px + env(safe-area-inset-top, 0px)); z-index: 19; box-shadow: 0 6px 12px -10px rgba(0,0,0,.25); }
 }
 /* Celular acostado: no hay alto suficiente para fijar el visor. */
 @media (max-width: 960px) and (max-height: 520px) {
   .stage-col { position: static; }
   .stage { height: 70vh; }
+  .sec-tabs { top: calc(56px + env(safe-area-inset-top, 0px)); }
 }
 
 @media (max-width: 560px) {
