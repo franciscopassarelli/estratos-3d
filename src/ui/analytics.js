@@ -8,7 +8,18 @@ const CONSENT_REGIONS = ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', '
 let ready = false;
 let lastPath = '';
 
+// Modo dueño: entrá una vez a estratos3d.com/?interno=1 en cada navegador tuyo
+function esInterno() {
+  try {
+    if (new URLSearchParams(location.search).has('interno')) localStorage.setItem('interno', '1');
+    return localStorage.getItem('interno') === '1';
+  } catch {
+    return false; // si localStorage falla, se cuenta normal
+  }
+}
+
 function init() {
+  if (esInterno()) return false;
   if (ready || !analyticsEnabled()) return ready;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function gtag() { window.dataLayer.push(arguments); };
