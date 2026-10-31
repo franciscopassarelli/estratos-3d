@@ -134,11 +134,29 @@ export function editorPage(id) {
   </main>`;
 }
 
-export function mountEditor(root, id) {
+/** Ajustes que llegan por la URL (por ejemplo, desde las ideas de Navidad): ?shape=estrella&text=Ana */
+function paramsFromQuery(def, query) {
+  if (!query) return null;
+  const out = {};
+  for (const it of def.sections.flatMap((s) => s.items)) {
+    if (it.private || !query.has(it.key)) continue;
+    const v = query.get(it.key);
+    out[it.key] = it.type === 'range' || it.type === 'stepper' ? Number(v) : it.type === 'toggle' ? v === '1' || v === 'true' : v;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+export function mountEditor(root, id, query) {
   const def = getObject(id);
   if (!def) return () => {};
   const KEY = `estratos:params:${def.id}`;
   let params = sanitize(def, storage.get(KEY, {}));
+  const preset = paramsFromQuery(def, query);
+  if (preset) {
+    // Una idea precargada arranca desde el diseño original con esos cambios.
+    params = sanitize(def, { ...def.defaults, ...preset });
+    history.replaceState(history.state, '', location.pathname);
+  }
   let orientation = storage.get(`${KEY}:orientation`, def.orientations[0].id);
   if (!def.orientations.some((o) => o.id === orientation)) orientation = def.orientations[0].id;
   let viewUse = !!def.useOrientation;

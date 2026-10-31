@@ -1,6 +1,7 @@
 import { icon, esc } from './dom.js';
 import { SITE } from '../config.js';
 import { featuredPromo } from '../content/promos.js';
+import { activeEvent, EVENTS } from '../content/events.js';
 
 const logo = `<span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Estratos <small>3D</small></span>`;
 
@@ -16,6 +17,7 @@ export function header(section) {
         <a href="/catalogo"${cur('catalogo')}>Catálogo</a>
         <a href="/guias"${cur('guias')}>Guías</a>
         <a href="/galeria"${cur('galeria')}>Galería</a>
+        ${(() => { const ev = activeEvent(); return ev ? `<a class="nav-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree} ${esc(ev.label)}</a>` : ''; })()}
         <a href="/ayuda"${cur('ayuda')}>Ayuda</a>
       </nav>
       <a class="btn btn-primary btn-sm btn-cta header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
@@ -32,6 +34,7 @@ function sideNav(cur) {
   <aside class="side-nav" aria-label="Navegación principal">
     <a class="side-logo" href="/" aria-label="${esc(SITE.name)}, inicio"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span></a>
     <a class="side-create" href="/catalogo"${cur('catalogo')}><span class="side-create-btn">${icon.plus}</span><span>Crear</span></a>
+    ${(() => { const ev = activeEvent(); return ev ? `<a class="side-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree}<span>${esc(ev.label)}</span></a>` : ''; })()}
     <nav class="side-links">
       <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
       <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
@@ -64,7 +67,7 @@ export function footer() {
       </div>
       <div>
         <h4>Herramienta</h4>
-        <ul><li><a href="/catalogo">Catálogo</a></li><li><a href="/#como-funciona">Cómo funciona</a></li><li><a href="/guias">Guías</a></li><li><a href="/galeria">Galería</a></li><li><a href="/acerca">Acerca de</a></li></ul>
+        <ul><li><a href="/catalogo">Catálogo</a></li><li><a href="/#como-funciona">Cómo funciona</a></li><li><a href="/guias">Guías</a></li><li><a href="/galeria">Galería</a></li>${EVENTS.map((e) => `<li><a href="${e.path}">Especial ${esc(e.label)}</a></li>`).join('')}<li><a href="/acerca">Acerca de</a></li></ul>
       </div>
       <div>
         <h4>Ayuda</h4>

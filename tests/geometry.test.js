@@ -3,6 +3,7 @@ import { OBJECTS } from '../src/objects/index.js';
 import { buildModel, statusOf } from '../src/core/pipeline.js';
 import { exportModel } from '../src/export/formats.js';
 import fs from 'fs';
+fs.mkdirSync('out', { recursive: true });
 
 const variants = {
   llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }],
@@ -19,6 +20,11 @@ const variants = {
   'soporte-auriculares': [{}, { textMode: 'engraved', saddleSpan: 200, height: 200 }, { text: '', mast: 14, baseDepth: 80, saddleRadius: 90 }],
   'soporte-mandos': [{}, { bays: 3, bayWidth: 70, angle: 55, backHeight: 140 }, { bays: 1, text: '' }, { dividers: false }],
   'soporte-notebook': [{}, { slots: 3, device: 8, tilt: 15, gap: 6 }, { slots: 2, device: 35, sleeve: 10, tilt: 0 }],
+  'adorno-navidad': [{}, { shape: 'estrella', text: 'Mateo' }, { shape: 'arbol', rim: 0 }, { shape: 'campana', font: 'pacifico' }, { shape: 'etiqueta', text: 'Para Juli' }, { shape: 'bola', text: '' }],
+  'estrella-arbol': [{}, { style: 'open' }, { points: 6, style: 'open', frame: 2.2 }, { points: 8, sharp: 55 }, { stem: false }],
+  'copo-nieve': [{}, { seed: 42, branches: 5, center: 'ring' }, { seed: 88, center: 'star', size: 120 }, { seed: 3, branches: 1, size: 40 }],
+  servilletero: [{}, { trees: 5, diameter: 45 }, { trees: 12, diameter: 70, treeSize: 90 }],
+  'arbol-conico': [{}, { lobes: 0, twist: 0 }, { lobes: 14, waveDepth: 10, height: 220 }],
   'cartel-deslizante': [{}, { title: '', holes: false, width: 125, windowWidth: 40, word1: 'ABIERTO', word2: 'CERRADO' }, { border: 0, height: 50, title: 'BAÑO', word1: 'BAÑO', word2: 'PRIVADO' }],
 };
 let fail = 0;

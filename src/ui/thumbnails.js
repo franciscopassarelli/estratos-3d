@@ -31,3 +31,32 @@ export function renderThumbnails() {
   };
   setTimeout(next, 60);
 }
+
+/**
+ * Miniaturas de variantes con ajustes propios (por ejemplo, las ideas de Navidad).
+ * items: [{ def, params }]. Llama a onImage(indice, url) a medida que las genera. Devuelve una función para cancelar.
+ */
+export function renderPresetThumbs(items, onImage) {
+  if (!items.length || !webglAvailable()) return () => {};
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-10000px;top:0;width:480px;height:360px;pointer-events:none;';
+  document.body.appendChild(host);
+  const viewer = new Viewer(host, { bed: false });
+  if (viewer.failed) { host.remove(); return () => {}; }
+  let i = 0, stopped = false;
+  const done = () => { stopped = true; viewer.dispose(); host.remove(); };
+  const next = () => {
+    if (stopped) return;
+    if (i >= items.length) { done(); return; }
+    const { def, params } = items[i];
+    const model = buildModel(def, { ...def.defaults, ...params }, (def.useOrientation || def.orientations[0].id));
+    viewer.setModel(model.parts, { reframe: true, layers: false });
+    const url = viewer.snapshot(480, 360);
+    disposeModel(model);
+    if (url) onImage(i, url);
+    i++;
+    if (window.requestIdleCallback) window.requestIdleCallback(next, { timeout: 300 }); else setTimeout(next, 30);
+  };
+  setTimeout(next, 120);
+  return () => { if (!stopped) done(); };
+}

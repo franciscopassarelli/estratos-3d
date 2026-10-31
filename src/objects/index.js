@@ -16,6 +16,11 @@ import headphoneStand from './headphoneStand.js';
 import controllerStand from './controllerStand.js';
 import laptopStand from './laptopStand.js';
 import slideSign from './slideSign.js';
+import ornament from './ornament.js';
+import treeTopper from './treeTopper.js';
+import snowflake from './snowflake.js';
+import napkinRing from './napkinRing.js';
+import coneTree from './coneTree.js';
 
 export const CATEGORIES = [
   { id: 'hogar', label: 'Hogar y decoración', blurb: 'Macetas, soportes y adornos' },
@@ -30,6 +35,7 @@ export const OBJECTS = [
   keychain, namePlate, phoneStand, deskOrganizer, planter,
   qrDisplay, wifiSign, qrKeychain, coasters, lampShade,
   drawerTray, headphoneStand, controllerStand, laptopStand, slideSign,
+  ornament, treeTopper, snowflake, napkinRing, coneTree,
 ];
 
 // Objetos que también encajan en otras categorías
@@ -37,6 +43,8 @@ const EXTRA = {
   llavero: ['personalizados'], placa: ['personalizados', 'hogar'], organizador: ['hogar'], 'soporte-celular': ['accesorios'],
   'display-qr': ['personalizados'], 'cartel-wifi': ['hogar'], 'llavero-qr': ['personalizados'], posavasos: ['personalizados'],
   'bandeja-cajon': ['hogar'], 'soporte-auriculares': ['personalizados'], 'soporte-notebook': ['organizacion'], 'cartel-deslizante': ['organizacion'],
+  'adorno-navidad': ['personalizados'],
+  'servilletero': ['organizacion'],
 };
 
 export const categoriesOf = (obj) => [obj.category, ...(EXTRA[obj.id] || [])];

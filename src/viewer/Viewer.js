@@ -331,6 +331,12 @@ export class Viewer {
     const fit = Math.max(sphere.radius, 4) / Math.sin(fov / 2) / Math.min(1, this.camera.aspect * 0.9);
     const dir = pos.clone().sub(tgt).normalize();
     if (dir.z < 0.25) { dir.z = 0.25; dir.normalize(); }
+    // Piezas planas (llaveros, adornos, copos): se miran más desde arriba para que se luzcan.
+    const sz = this.box.getSize(new THREE.Vector3());
+    if (sz.z < 0.3 * Math.max(sz.x, sz.y) && dir.z < 1.4 * Math.hypot(dir.x, dir.y)) {
+      const hz = Math.hypot(dir.x, dir.y) || 1;
+      dir.x = (dir.x / hz) * 0.55; dir.y = (dir.y / hz) * 0.55; dir.z = 0.84; dir.normalize();
+    }
     this.camera.position.copy(sphere.center).add(dir.multiplyScalar(fit * 1.15));
     this.camera.lookAt(sphere.center);
     r.render(this.scene, this.camera);

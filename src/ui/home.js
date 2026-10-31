@@ -7,6 +7,7 @@ import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $, debounce, storage } from './dom.js';
 import { galleryItems } from '../content/gallery.js';
+import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 
 const FEATURED = ['llavero', 'display-qr', 'posavasos', 'pantalla-lampara', 'soporte-auriculares', 'cartel-wifi', 'soporte-mandos', 'placa'];
@@ -42,6 +43,7 @@ export function homePage() {
       </div>
     </section>
 
+    ${(() => { const ev = activeEvent(); return ev ? `<div class="wrap"><a class="event-banner" href="${ev.path}"><span class="event-banner-icon">${icon.tree}</span><span><b>Especial ${esc(ev.label)}</b><span>${esc(ev.aviso)}</span></span>${icon.arrow}</a></div>` : ''; })()}
     ${(() => { const p = featuredPromo(); return p ? `<div class="wrap"><a class="promo-banner" href="/sorteos/${esc(p.slug)}"><span class="promo-banner-tag">Sorteo</span><span><b>${esc(p.title)}</b><span>Anotate gratis y participá por premios impresos en 3D.</span></span>${icon.arrow}</a></div>` : ''; })()}
 
     <section class="section wrap" aria-labelledby="cats-title">

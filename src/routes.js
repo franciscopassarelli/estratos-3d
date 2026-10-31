@@ -9,7 +9,8 @@ import { editorPage, mountEditor } from './ui/editor.js';
 import { promoPage, mountPromo } from './ui/promo.js';
 import { adminPage, mountAdmin } from './ui/admin.js';
 import { PROMOS, getPromo } from './content/promos.js';
-import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, notFoundPage, mountContent } from './ui/pages.js';
+import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
+import { EVENTS } from './content/events.js';
 
 const noop = () => () => {};
 const catalogState = { category: 'all', query: '' };
@@ -30,7 +31,7 @@ export const ROUTES = [
     pattern: /^\/crear\/([a-z0-9-]+)$/, section: 'catalogo',
     exists: ([id]) => !!getObject(id),
     meta: ([id]) => { const o = getObject(id); return { title: `${o.name}${/personaliz/i.test(o.name) ? '' : ' personalizable'} para imprimir en 3D | ${SITE.name}`, description: `${o.description} Vista previa 3D y descarga en 3MF, STL u OBJ.` }; },
-    render: ([id]) => editorPage(id), mount: (root, [id]) => mountEditor(root, id),
+    render: ([id]) => editorPage(id), mount: (root, [id], query) => mountEditor(root, id, query),
   },
   {
     pattern: /^\/guias$/, section: 'guias',
@@ -59,6 +60,11 @@ export const ROUTES = [
     meta: () => ({ title: `Galería: piezas impresas con ${SITE.name}`, description: 'Fotos reales de llaveros, placas y objetos impresos en 3D a partir de diseños personalizados de Estratos 3D. Mandá la tuya.' }),
     render: () => galleryPage(), mount: (root) => mountContent(root),
   },
+  ...EVENTS.map((ev) => ({
+    pattern: new RegExp(`^${ev.path}$`), section: `evento-${ev.id}`,
+    meta: () => ({ title: `${ev.title} | ${SITE.name}`, description: ev.description }),
+    render: () => eventPage(ev.id), mount: (root) => mountEvent(root, ev.id),
+  })),
   { pattern: /^\/ayuda$/, section: 'ayuda', meta: () => ({ title: `Preguntas frecuentes | ${SITE.name}`, description: 'Respuestas sobre formatos de archivo, impresión a dos colores, comprobaciones y uso del editor.' }), render: helpPage, mount: mountContent },
   { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name} y cómo genera los objetos para impresión 3D.` }), render: aboutPage, mount: mountContent },
   { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Cómo comunicarte con ${SITE.name}.` }), render: contactPage, mount: mountContent },
@@ -94,7 +100,7 @@ export function staticPaths() {
   return [
     '/', '/catalogo',
     ...OBJECTS.map((o) => `/crear/${o.id}`),
-    '/guias', ...GUIDES.map((g) => `/guias/${g.slug}`), '/galeria',
+    '/guias', ...GUIDES.map((g) => `/guias/${g.slug}`), '/galeria', ...EVENTS.map((e) => e.path),
     '/ayuda', '/acerca', '/contacto', '/condiciones', '/privacidad',
   ];
 }

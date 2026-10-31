@@ -7,7 +7,7 @@ import { toShapes } from '../core/geometry2d.js';
 const TAU = Math.PI * 2;
 
 // ---------- Mapeo de la pared "desenrollada" (x = recorrido, y = altura) al cilindro o prisma ----------
-function makeMapper(shape, sides, apothemMid, C) {
+export function makeMapper(shape, sides, apothemMid, C) {
   if (shape === 'round') {
     const Rm = apothemMid;
     return (x, y, off) => { const th = (x / C) * TAU, R = Rm + off; return [Math.cos(th) * R, Math.sin(th) * R, y]; };
@@ -24,7 +24,7 @@ function makeMapper(shape, sides, apothemMid, C) {
 }
 
 /** Malla cerrada de una pared con agujeros: región 2D [0,C]x[0,H] -> tubo de grosor w. */
-function wallMesh(region, C, H, w, cuts, map) {
+export function wallMesh(region, C, H, w, cuts, map) {
   const V = [], Tr = [], key = new Map();
   const eps = 1e-6;
   // Sobre cada línea de corte, los puntos que difieren en 1–2 µm (redondeo de Clipper) se unifican.

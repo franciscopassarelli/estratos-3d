@@ -2,6 +2,8 @@
 import { SITE, analyticsEnabled } from '../config.js';
 import { GUIDES, getGuide } from '../content/guides.js';
 import { galleryItems } from '../content/gallery.js';
+import { getEvent, presetHref } from '../content/events.js';
+import { renderPresetThumbs } from './thumbnails.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
@@ -236,6 +238,62 @@ export function galleryPage() {
     </section>
     ${adSlot('banner')}
   </main>`;
+}
+
+/** Página de un evento (Navidad, etc.): ideas con ajustes precargados y consejos. */
+export function eventPage(id) {
+  const ev = getEvent(id);
+  if (!ev) return notFoundPage();
+  const ig = SITE.instagram ? `https://instagram.com/${SITE.instagram}` : '';
+  const ideas = ev.ideas.filter((x) => getObject(x.objeto));
+  return `
+  <main class="event-page event-${esc(ev.id)}">
+    <section class="event-hero">
+      <div class="wrap">
+        <span class="eyebrow">${icon.tree} Especial ${esc(ev.label)}</span>
+        <h1>${esc(ev.title)}</h1>
+        <p class="lead">${esc(ev.lead)}</p>
+      </div>
+    </section>
+    <div class="wrap">
+      <div class="section-head"><div><span class="eyebrow">Ideas para imprimir</span><h2>Elegí una y cambiale el nombre</h2></div></div>
+      <div class="cards event-ideas">${ideas.map((x, i) => {
+        const def = getObject(x.objeto);
+        return `
+        <a class="card" href="${esc(presetHref(x))}" data-idea="${i}">
+          <div class="card-media"><span class="placeholder">Generando vista…</span><span class="tag">${esc(def.name)}</span></div>
+          <div class="card-body">
+            <h3>${esc(x.titulo)}</h3>
+            <p>${esc(x.texto)}</p>
+            <span class="card-cta">Personalizar ${icon.arrow}</span>
+          </div>
+        </a>`;
+      }).join('')}</div>
+      ${adSlot('inline')}
+      <section class="event-tips">
+        ${ev.consejos.map((c) => `<article><h2>${esc(c.h)}</h2>${c.html}</article>`).join('')}
+      </section>
+      <section class="gal-send">
+        <div>
+          <h2>¿Imprimiste tus adornos?</h2>
+          <p>Mandanos una foto y la sumamos a la <a href="/galeria">galería</a> con tu nombre o tu @.</p>
+        </div>
+        <div class="gal-send-actions">
+          ${ig ? `<a class="btn btn-primary" href="${ig}" target="_blank" rel="noopener">Mandala por Instagram</a>` : ''}
+        </div>
+      </section>
+    </div>
+  </main>`;
+}
+
+export function mountEvent(root, id) {
+  const ev = getEvent(id);
+  if (!ev) return () => {};
+  const ideas = ev.ideas.filter((x) => getObject(x.objeto));
+  return renderPresetThumbs(ideas.map((x) => ({ def: getObject(x.objeto), params: x.params })), (i, url) => {
+    const ph = root.querySelector(`[data-idea="${i}"] .placeholder`);
+    if (ph) ph.outerHTML = `<img src="${url}" alt="Vista 3D: ${esc(ideas[i].titulo)}">`;
+  });
 }
 
 export function mountContent(root) {
