@@ -21,6 +21,10 @@ import treeTopper from './treeTopper.js';
 import snowflake from './snowflake.js';
 import napkinRing from './napkinRing.js';
 import coneTree from './coneTree.js';
+import remoteCaddy from './remoteCaddy.js';
+import honeycombKeyRack from './honeycombKeyRack.js';
+import honeycombPenHolder from './honeycombPenHolder.js';
+import lowPolyVase from './lowPolyVase.js';
 
 export const CATEGORIES = [
   { id: 'hogar', label: 'Hogar y decoración', blurb: 'Macetas, soportes y adornos' },
@@ -36,6 +40,7 @@ export const OBJECTS = [
   qrDisplay, wifiSign, qrKeychain, coasters, lampShade,
   drawerTray, headphoneStand, controllerStand, laptopStand, slideSign,
   ornament, treeTopper, snowflake, napkinRing, coneTree,
+  remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase,
 ];
 
 // Objetos que también encajan en otras categorías
@@ -45,6 +50,7 @@ const EXTRA = {
   'bandeja-cajon': ['hogar'], 'soporte-auriculares': ['personalizados'], 'soporte-notebook': ['organizacion'], 'cartel-deslizante': ['organizacion'],
   'adorno-navidad': ['personalizados'],
   'servilletero': ['organizacion'],
+  'organizador-controles': ['hogar', 'tecnologia'], 'llavero-pared-panal': ['hogar'], 'portalapices-panal': ['hogar'],
 };
 
 export const categoriesOf = (obj) => [obj.category, ...(EXTRA[obj.id] || [])];

@@ -188,10 +188,12 @@ export class Viewer {
     const smooth = tris <= SMOOTH_MAX_TRIS;
     for (const p of parts) {
       const mat = plaMaterial(p.color, layers);
-      if (!smooth) mat.flatShading = true;
+      // `flat`: diseños facetados a propósito (low poly): se muestran con caras planas.
+      const soft = smooth && !p.flat;
+      if (!soft) mat.flatShading = true;
       for (const g of p.volumes) {
         let shown = g, own = false;
-        if (smooth) { try { shown = toCreasedNormals(g, CREASE); own = true; } catch { shown = g; } }
+        if (soft) { try { shown = toCreasedNormals(g, CREASE); own = true; } catch { shown = g; } }
         const mesh = new THREE.Mesh(shown, mat);
         mesh.userData.ownGeometry = own;
         this.group.add(mesh);

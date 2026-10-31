@@ -25,6 +25,10 @@ const variants = {
   'copo-nieve': [{}, { seed: 42, branches: 5, center: 'ring' }, { seed: 88, center: 'star', size: 120 }, { seed: 3, branches: 1, size: 40 }],
   servilletero: [{}, { trees: 5, diameter: 45 }, { trees: 12, diameter: 70, treeSize: 90 }],
   'arbol-conico': [{}, { lobes: 0, twist: 0 }, { lobes: 14, waveDepth: 10, height: 220 }],
+  'organizador-controles': [{}, { shape: 'rect', frontRow: false, slots: 4 }, { front: 100, back: 60 }],
+  'llavero-pared-panal': [{}, { irregular: false, hooks: 8 }, { cols: 3, rows: 2, hooks: 2 }, { seed: 42, cols: 7, rows: 5, cell: 25 }],
+  'portalapices-panal': [{}, { rings: 1 }, { rings: 3, cell: 18, dome: 60 }],
+  'florero-low-poly': [{}, { sides: 6, rows: 3 }, { twist: 90, rows: 8, sides: 12 }, { mode: 'vase' }, { belly: 45, wall: 3, neck: 50 }],
   'cartel-deslizante': [{}, { title: '', holes: false, width: 125, windowWidth: 40, word1: 'ABIERTO', word2: 'CERRADO' }, { border: 0, height: 50, title: 'BAÑO', word1: 'BAÑO', word2: 'PRIVADO' }],
 };
 let fail = 0;
