@@ -22,26 +22,34 @@ function cssVar(name, fallback) {
   return v || fallback;
 }
 
-/** Material de PLA con líneas de capa que se desvanecen cuando son más finas que un píxel. */
-function plaMaterial(color, layers) {
-  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.52, metalness: 0, envMapIntensity: 0.35 });
-  if (!layers) return mat;
+/**
+ * Material de PLA con líneas de capa que se desvanecen cuando son más finas que un píxel.
+ * glow: pieza que deja pasar la luz (pantallas de lámpara). Brilla más de frente que en los bordes,
+ * como un plástico fino iluminado desde adentro.
+ */
+function plaMaterial(color, layers, glow = false) {
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0, envMapIntensity: 0.35 });
+  if (glow) { mat.emissive = new THREE.Color(color).lerp(new THREE.Color('#FFC77A'), 0.55); mat.emissiveIntensity = 0; }
+  if (!layers && !glow) return mat;
   mat.extensions = { derivatives: true };
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uLayer = { value: LAYER };
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying float vLayerZ;')
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvLayerZ = (modelMatrix * vec4(transformed, 1.0)).z;');
-    sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying float vLayerZ;\nuniform float uLayer;')
-      .replace('#include <color_fragment>', `#include <color_fragment>
+    let frag = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vLayerZ;\nuniform float uLayer;');
+    if (layers) frag = frag.replace('#include <color_fragment>', `#include <color_fragment>
         float lz = vLayerZ / uLayer;
         float fw = fwidth(lz);
         float fade = 1.0 - smoothstep(0.18, 0.5, fw);
         float seam = pow(0.5 + 0.5 * cos(6.2831853 * lz), 3.0);
         diffuseColor.rgb *= 1.0 - 0.2 * fade * seam;`);
+    if (glow) frag = frag.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        float facing = abs(dot(normalize(normal), normalize(vViewPosition)));
+        totalEmissiveRadiance *= mix(0.12, 1.0, pow(facing, 1.6));`);
+    sh.fragmentShader = frag;
   };
-  mat.customProgramCacheKey = () => 'pla-layers';
+  mat.customProgramCacheKey = () => `pla-${layers ? 'l' : ''}${glow ? 'g' : ''}`;
   return mat;
 }
 
@@ -81,13 +89,20 @@ export class Viewer {
 
     this.camera = new THREE.PerspectiveCamera(35, 1, 1, 5000);
     this.camera.up.set(0, 0, 1);
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8f8a80, 1.15));
+    this.hemi = new THREE.HemisphereLight(0xffffff, 0x8f8a80, 1.15);
+    this.scene.add(this.hemi);
     const key = new THREE.DirectionalLight(0xfffaf2, 1.7);
     key.position.set(120, -200, 260);
     this.scene.add(key);
     const rim = new THREE.DirectionalLight(0xeef3ff, 0.55);
     rim.position.set(-200, 160, 120);
     this.scene.add(rim);
+    this.key = key; this.rim = rim;
+    // Luz interior para las lámparas (se prende con setLights)
+    this.lamp = new THREE.PointLight(0xffc27a, 0, 0, 2);
+    this.scene.add(this.lamp);
+    this.lightsOn = false;
+    this.hasGlow = false;
     this.scene.add(this.group);
 
     // Sombra de contacto: la silueta del objeto vista desde arriba, desenfocada y apoyada en el piso.
@@ -154,6 +169,19 @@ export class Viewer {
     }
   }
 
+  /** Prende o apaga las lámparas: la pantalla brilla, la luz interior ilumina la base y el ambiente se oscurece. */
+  setLights(on) {
+    if (this.failed) return;
+    this.lightsOn = !!on;
+    const lit = this.lightsOn && this.hasGlow;
+    for (const m of this.group.children) if (m.material.emissive) m.material.emissiveIntensity = lit ? 0.75 : 0;
+    this.lamp.intensity = lit ? this._lampPower : 0;
+    this.hemi.intensity = lit ? 0.35 : 1.15;
+    this.key.intensity = lit ? 0.45 : 1.7;
+    this.rim.intensity = lit ? 0.2 : 0.55;
+    this.container.classList?.toggle('night', lit);
+  }
+
   /** 'bed': sobre la cama de impresión (muestra la escala). 'studio': fondo liso de producto. */
   setScene(mode) {
     if (this.failed) return;
@@ -183,11 +211,11 @@ export class Viewer {
     if (this.failed) return;
     this._clear();
     this.box.makeEmpty();
-    let focus = null;
+    let focus = null, glowBox = null;
     const tris = parts.reduce((s, p) => s + p.volumes.reduce((t, g) => t + g.attributes.position.count / 3, 0), 0);
     const smooth = tris <= SMOOTH_MAX_TRIS;
     for (const p of parts) {
-      const mat = plaMaterial(p.color, layers);
+      const mat = plaMaterial(p.color, layers || !!p.glow, !!p.glow);
       // `flat`: diseños facetados a propósito (low poly): se muestran con caras planas.
       const soft = smooth && !p.flat;
       if (!soft) mat.flatShading = true;
@@ -200,9 +228,17 @@ export class Viewer {
         g.computeBoundingBox();
         this.box.union(g.boundingBox);
         if (p.focus) (focus ||= new THREE.Box3()).union(g.boundingBox);
+        if (p.glow) (glowBox ||= new THREE.Box3()).union(g.boundingBox);
       }
     }
     this.focusBox = focus;
+    this.hasGlow = !!glowBox;
+    if (glowBox) {
+      const c = glowBox.getCenter(new THREE.Vector3()), sz = glowBox.getSize(new THREE.Vector3());
+      this.lamp.position.set(c.x, c.y, glowBox.min.z + sz.z * 0.35);
+      this._lampPower = 2.2 * Math.max(sz.x, sz.y) ** 2;
+    }
+    this.setLights(this.lightsOn);
     this._contactShadow();
     const size = this.box.isEmpty() ? 0 : this.box.getSize(new THREE.Vector3()).length();
     const changed = !this.lastSize || Math.abs(size - this.lastSize) / this.lastSize > 0.35;
@@ -316,7 +352,7 @@ export class Viewer {
    * Foto lista para redes (4:5, 1080 × 1350): fondo de estudio, sombra suave y la marca abajo.
    * Respeta el ángulo que el usuario eligió girando el modelo. Devuelve un Blob PNG.
    */
-  async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com' } = {}) {
+  async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com', zoom = 1.15, type = 'image/png', quality } = {}) {
     if (this.failed || this.box.isEmpty()) return null;
     const r = this.renderer, prevMode = this.sceneMode;
     const prevSize = new THREE.Vector2(); r.getSize(prevSize);
@@ -339,7 +375,7 @@ export class Viewer {
       const hz = Math.hypot(dir.x, dir.y) || 1;
       dir.x = (dir.x / hz) * 0.55; dir.y = (dir.y / hz) * 0.55; dir.z = 0.84; dir.normalize();
     }
-    this.camera.position.copy(sphere.center).add(dir.multiplyScalar(fit * 1.15));
+    this.camera.position.copy(sphere.center).add(dir.multiplyScalar(fit * zoom));
     this.camera.lookAt(sphere.center);
     r.render(this.scene, this.camera);
 
@@ -347,9 +383,12 @@ export class Viewer {
     c.width = width; c.height = height;
     const g = c.getContext('2d');
     const bg = g.createRadialGradient(width / 2, height * 0.38, height * 0.05, width / 2, height * 0.5, height * 0.8);
-    bg.addColorStop(0, '#FBF8F2'); bg.addColorStop(1, '#E6DFD3');
+    const night = this.lightsOn && this.hasGlow;
+    if (night) { bg.addColorStop(0, '#4A3A2C'); bg.addColorStop(0.55, '#241B15'); bg.addColorStop(1, '#120E0B'); }
+    else { bg.addColorStop(0, '#FBF8F2'); bg.addColorStop(1, '#E6DFD3'); }
     g.fillStyle = bg; g.fillRect(0, 0, width, height);
     g.drawImage(r.domElement, 0, 0, width, height);
+    if (brand) {
     // Marca: tres capas + nombre, abajo al centro
     const y = height - 70;
     g.font = '600 34px "IBM Plex Sans", system-ui, sans-serif';
@@ -358,7 +397,8 @@ export class Viewer {
     g.fillStyle = '#1B6E63';
     [[0.2, 0.6, 0.55], [0.1, 0.8, 0.8], [0, 1, 1]].forEach(([ox, w, a], i) => { g.globalAlpha = a; g.beginPath(); if (g.roundRect) g.roundRect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7, 3); else g.rect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7); g.fill(); });
     g.globalAlpha = 1;
-    g.fillStyle = '#2B2E33'; g.fillText(brand, x0 + mark + gap, y + 1);
+    g.fillStyle = night ? '#F1E6D8' : '#2B2E33'; g.fillText(brand, x0 + mark + gap, y + 1);
+    }
     if (title) { g.font = '700 46px "IBM Plex Sans", system-ui, sans-serif'; g.textAlign = 'center'; g.fillStyle = '#2B2E33'; g.fillText(title, width / 2, 90); }
 
     // Restaura la vista del usuario
@@ -367,7 +407,7 @@ export class Viewer {
     this.resize();
     this.camera.position.copy(pos); this.controls.target.copy(tgt); this.controls.update();
     this.setScene(prevMode);
-    return new Promise((res) => c.toBlob(res, 'image/png'));
+    return new Promise((res) => c.toBlob(res, type, quality));
   }
 
   dispose() {

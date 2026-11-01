@@ -25,6 +25,7 @@ import remoteCaddy from './remoteCaddy.js';
 import honeycombKeyRack from './honeycombKeyRack.js';
 import honeycombPenHolder from './honeycombPenHolder.js';
 import lowPolyVase from './lowPolyVase.js';
+import ledLamp from './ledLamp.js';
 
 export const CATEGORIES = [
   { id: 'hogar', label: 'Hogar y decoración', blurb: 'Macetas, soportes y adornos' },
@@ -40,7 +41,7 @@ export const OBJECTS = [
   qrDisplay, wifiSign, qrKeychain, coasters, lampShade,
   drawerTray, headphoneStand, controllerStand, laptopStand, slideSign,
   ornament, treeTopper, snowflake, napkinRing, coneTree,
-  remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase,
+  remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase, ledLamp,
 ];
 
 // Objetos que también encajan en otras categorías

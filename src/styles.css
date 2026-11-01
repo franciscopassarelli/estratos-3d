@@ -798,3 +798,13 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 .event-tips article { padding: 20px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); display: grid; gap: 10px; align-content: start; }
 .event-tips h2 { font-size: 18px; }
 .event-tips p { color: var(--ink-2); font-size: 15px; }
+
+/* ---------- Lámparas encendidas ---------- */
+.stage.night { background: radial-gradient(90% 75% at 50% 40%, #4A3A2C, #1A1410 70%); }
+.stage.night .stage-dims .tag, .stage.night .stage-hint { color: #E9DCCB; }
+
+/* ---------- Miniaturas tipo foto de producto ---------- */
+.card-media:has(.thumb-photo) { background: #EDE7DC; }
+.card-media img.thumb-photo { object-fit: cover; transition: transform .35s ease; }
+.card:hover .card-media img.thumb-photo { transform: scale(1.04); }
+.card-media .tag { z-index: 1; }

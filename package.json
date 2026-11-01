@@ -9,7 +9,8 @@
     "test": "node tests/geometry.test.js",
     "build:artifact": "node tools/build-artifact.mjs",
     "preview": "vite preview",
-    "galeria": "node tools/gallery-images.mjs"
+    "galeria": "node tools/gallery-images.mjs",
+    "miniaturas": "node tools/thumbnails.mjs"
   },
   "keywords": [],
   "author": "",

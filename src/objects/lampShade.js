@@ -246,7 +246,7 @@ function buildPerforated(p) {
   const openPct = Math.round((1 - area(region) / (C * H)) * 100);
   issues.push({ level: 'info', msg: `${holes.length} huecos en ${rowsInfo} filas (${openPct} % de la superficie). Todos tienen el techo a 45° o más: se imprimen sin soportes.` });
   lightNote(issues);
-  return { parts: [part('body', 'Pantalla', p.color, geo)], issues };
+  return { parts: [part('body', 'Pantalla', p.color, geo, { glow: true })], issues };
 }
 
 function buildVase(p) {
@@ -284,5 +284,5 @@ function buildVase(p) {
   if (Math.min(rb, rt) < 25) issues.push({ level: 'info', msg: 'Con una boca tan chica puede costar meter la vela o el portalámparas.' });
   issues.push({ level: 'info', msg: 'Se descarga como un sólido: en el laminador activá "modo vaso" (Spiral vase) y poné 0 capas inferiores para que quede abierta abajo. Una línea de 0,6–0,8 mm deja la pared más firme.' });
   lightNote(issues);
-  return { parts: [part('body', 'Pantalla', p.color, geometryFromMesh(V, Tr))], issues };
+  return { parts: [part('body', 'Pantalla', p.color, geometryFromMesh(V, Tr), { glow: true })], issues };
 }

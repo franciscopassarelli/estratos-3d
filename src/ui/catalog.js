@@ -3,6 +3,7 @@ import { thumbnail, onThumbnail } from './thumbnails.js';
 import { esc, icon, $, $$ } from './dom.js';
 import { adSlot, activateAds } from './ads.js';
 import { allItems } from '../core/pipeline.js';
+import { THUMBS, THUMB_VERSION } from '../content/thumbs.js';
 
 const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
 
@@ -14,7 +15,9 @@ export function card(def) {
   return `
   <a class="card" href="/crear/${def.id}" data-card="${def.id}">
     <div class="card-media">
-      ${img ? `<img src="${img}" alt="Vista 3D de ${esc(def.name)}">` : `<span class="placeholder">Generando vista…</span>`}
+      ${THUMBS.has(def.id)
+        ? `<img class="thumb-photo" src="/miniaturas/${def.id}.webp?v=${THUMB_VERSION}" alt="${esc(def.name)} para imprimir en 3D" width="960" height="720" loading="lazy" decoding="async">`
+        : img ? `<img src="${img}" alt="Vista 3D de ${esc(def.name)}">` : `<span class="placeholder">Generando vista…</span>`}
       <span class="tag">${esc(catLabel(def.category))}</span>
     </div>
     <div class="card-body">

@@ -104,6 +104,7 @@ export function editorPage(id) {
             <button class="btn btn-sm" id="view-reset" type="button" title="Volver a la vista inicial">${icon.reset}<span>Vista inicial</span></button>
             <button class="btn btn-sm" id="view-detail" type="button" title="Acercar al detalle">${icon.zoom}<span>Detalle</span></button>
             ${def.useOrientation ? `<button class="btn btn-sm" id="view-mode" type="button" aria-pressed="true">${icon.phone}<span>Ver en la cama</span></button>` : ''}
+            <button class="btn btn-sm" id="view-light" type="button" aria-pressed="true" title="Prender o apagar la luz de la lámpara" hidden>${icon.bulb}<span>Encender</span></button>
             <button class="btn btn-sm" id="view-scene" type="button" aria-pressed="false" title="Cambiar entre la cama de impresión y un fondo liso">${icon.scene}<span>Fondo</span></button>
             <button class="btn btn-sm" id="view-photo" type="button" title="Sacar una foto del diseño para compartir">${icon.camera}<span>Foto</span></button>
           </div>
@@ -278,6 +279,8 @@ export function mountEditor(root, id, query) {
     let display = next;
     if (viewUse && def.useOrientation && def.useOrientation !== orientation) display = buildModel(def, params, def.useOrientation);
     viewer?.setModel(display.parts, { reframe: firstBuild ? true : 'auto', layers: display === next });
+    const lb = $('#view-light', root);
+    if (lb) lb.hidden = !viewer?.hasGlow;
     firstBuild = false;
     if (shown && shown !== model) disposeModel(shown);
     disposeModel(model);
@@ -446,6 +449,16 @@ export function mountEditor(root, id, query) {
     firstBuild = true;
     rebuild.flush();
   });
+  // Lámparas: arrancan encendidas
+  viewer?.setLights(true);
+  $('#view-light', root)?.addEventListener('click', (e) => {
+    const on = !viewer.lightsOn;
+    viewer.setLights(on);
+    e.currentTarget.setAttribute('aria-pressed', String(on));
+    e.currentTarget.querySelector('span').textContent = on ? 'Encender' : 'Apagada';
+  });
+  // Para generar las miniaturas del catálogo (tools/thumbnails.mjs)
+  if (new URLSearchParams(location.search).has('captura')) window.__estratosViewer = viewer;
   const sceneBtn = $('#view-scene', root);
   const applyScene = (mode) => { viewer?.setScene(mode); sceneBtn?.setAttribute('aria-pressed', String(mode === 'studio')); };
   applyScene(storage.get('estratos:scene', 'bed'));

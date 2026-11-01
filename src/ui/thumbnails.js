@@ -2,6 +2,7 @@
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { buildModel, disposeModel } from '../core/pipeline.js';
 import { OBJECTS } from '../objects/index.js';
+import { THUMBS } from '../content/thumbs.js';
 
 const cache = new Map();
 const listeners = new Set();
@@ -13,12 +14,14 @@ export function onThumbnail(fn) { listeners.add(fn); return () => listeners.dele
 export function renderThumbnails() {
   if (started || !webglAvailable()) return;
   started = true;
+  // Las que ya tienen foto pre-generada no se calculan en el navegador
+  const queue = OBJECTS.filter((o) => !THUMBS.has(o.id));
+  if (!queue.length) return;
   const host = document.createElement('div');
   host.style.cssText = 'position:fixed;left:-10000px;top:0;width:480px;height:360px;pointer-events:none;';
   document.body.appendChild(host);
   const viewer = new Viewer(host, { bed: false });
   if (viewer.failed) { host.remove(); return; }
-  const queue = [...OBJECTS];
   const next = () => {
     const def = queue.shift();
     if (!def) { viewer.dispose(); host.remove(); return; }

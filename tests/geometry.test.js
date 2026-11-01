@@ -29,6 +29,7 @@ const variants = {
   'llavero-pared-panal': [{}, { irregular: false, hooks: 8 }, { cols: 3, rows: 2, hooks: 2 }, { seed: 42, cols: 7, rows: 5, cell: 25 }],
   'portalapices-panal': [{}, { rings: 1 }, { rings: 3, cell: 18, dome: 60 }],
   'florero-low-poly': [{}, { sides: 6, rows: 3 }, { twist: 90, rows: 8, sides: 12 }, { mode: 'vase' }, { belly: 45, wall: 3, neck: 50 }],
+  'lampara-led': [{}, { style: 'acanalada', diameter: 100 }, { style: 'ondulada', diameter: 100 }, { cable: false, tiers: 4 }],
   'cartel-deslizante': [{}, { title: '', holes: false, width: 125, windowWidth: 40, word1: 'ABIERTO', word2: 'CERRADO' }, { border: 0, height: 50, title: 'BAÑO', word1: 'BAÑO', word2: 'PRIVADO' }],
 };
 let fail = 0;
