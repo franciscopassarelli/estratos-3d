@@ -865,3 +865,18 @@ html.lb-lock { overflow: hidden; }
   .chips::-webkit-scrollbar, .subchips::-webkit-scrollbar { display: none; }
   .chip, .subchip { flex: none; }
 }
+
+/* Carrusel de variantes en las tarjetas */
+.card-media[data-carousel] img.thumb-photo { opacity: 0; transition: opacity .45s ease, transform .35s ease; }
+.card-media[data-carousel] img.thumb-photo.is-on { opacity: 1; }
+.car-btn { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; width: 34px; height: 34px; border-radius: 50%; border: 0; display: grid; place-items: center; background: rgba(20, 22, 26, .62); color: #fff; cursor: pointer; opacity: 0; transition: opacity .2s, background .2s; backdrop-filter: blur(4px); }
+.car-btn svg { width: 16px; height: 16px; }
+.car-prev { left: 8px; } .car-prev svg { transform: rotate(180deg); }
+.car-next { right: 8px; }
+.car-btn:hover { background: rgba(20, 22, 26, .85); }
+.card:hover .car-btn, .car-btn:focus-visible { opacity: 1; }
+@media (hover: none) { .car-btn { opacity: .85; width: 30px; height: 30px; } }
+.car-dots { position: absolute; left: 0; right: 0; bottom: 9px; z-index: 2; display: flex; justify-content: center; gap: 5px; pointer-events: none; }
+.car-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .55); box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); transition: width .25s, background .25s; }
+.car-dots i.on { width: 16px; border-radius: 3px; background: #fff; }
+.car-label { position: absolute; right: 10px; top: 10px; z-index: 2; font: 500 11px var(--f-mono); color: #fff; background: rgba(20, 22, 26, .62); padding: 3px 8px; border-radius: 999px; backdrop-filter: blur(4px); }

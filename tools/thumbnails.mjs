@@ -51,5 +51,7 @@ try {
 // Lista de miniaturas disponibles (con versión para que el navegador no muestre una vieja)
 const ids = fs.readdirSync(OUT).filter((f) => f.endsWith('.webp')).map((f) => f.replace('.webp', '')).sort();
 const v = Date.now().toString(36);
-fs.writeFileSync('src/content/thumbs.js', `// Generado por \`npm run miniaturas\`. No lo edites a mano.\nexport const THUMB_VERSION = '${v}';\nexport const THUMBS = new Set(${JSON.stringify(ids)});\n`);
+const vdir = `${OUT}/variantes`;
+const vids = fs.existsSync(vdir) ? fs.readdirSync(vdir).filter((f) => f.endsWith('.webp')).map((f) => f.replace('.webp', '')).sort() : [];
+fs.writeFileSync('src/content/thumbs.js', `// Generado por \`npm run miniaturas\`. No lo edites a mano.\nexport const THUMB_VERSION = '${v}';\nexport const THUMBS = new Set(${JSON.stringify(ids)});\nexport const VARIANT_THUMBS = new Set(${JSON.stringify(vids)});\n`);
 console.log(`\n${done.length} miniaturas nuevas · ${ids.length} en total.`);

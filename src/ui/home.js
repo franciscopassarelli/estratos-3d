@@ -2,7 +2,7 @@ import { OBJECTS, CATEGORIES, categoriesOf, getObject } from '../objects/index.j
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { buildModel, disposeModel } from '../core/pipeline.js';
 import { FONTS } from '../core/text.js';
-import { card, bindThumbs } from './catalog.js';
+import { card, bindThumbs, bindCarousels } from './catalog.js';
 import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $, debounce, storage } from './dom.js';
@@ -11,7 +11,7 @@ import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 import { bindLightbox } from './lightbox.js';
 
-const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos'];
+const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
 
 export function homePage() {
   return `
@@ -103,7 +103,7 @@ export function homePage() {
 }
 
 export function mountHome(root) {
-  const offThumbs = bindThumbs(root);
+  const offThumbs = bindThumbs(root), offCar = bindCarousels(root);
   const offLightbox = bindLightbox(root);
   const stage = $('#demo-stage', root);
   const def = getObject('llavero');
@@ -135,5 +135,5 @@ export function mountHome(root) {
     const saved = storage.get(`estratos:params:${def.id}`, {});
     storage.set(`estratos:params:${def.id}`, { ...saved, text: params.text, font: params.font });
   });
-  return () => { offThumbs(); offLightbox(); viewer?.dispose(); disposeModel(model); };
+  return () => { offThumbs(); offCar(); offLightbox(); viewer?.dispose(); disposeModel(model); };
 }

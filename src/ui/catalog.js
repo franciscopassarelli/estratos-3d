@@ -3,7 +3,8 @@ import { thumbnail, onThumbnail } from './thumbnails.js';
 import { esc, icon, $, $$ } from './dom.js';
 import { adSlot, activateAds } from './ads.js';
 import { allItems } from '../core/pipeline.js';
-import { THUMBS, THUMB_VERSION } from '../content/thumbs.js';
+import { THUMBS, THUMB_VERSION, VARIANT_THUMBS } from '../content/thumbs.js';
+import { VARIANTS, variantHref } from '../content/variants.js';
 
 const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
 
@@ -12,6 +13,28 @@ export function card(def) {
   const colors = items.filter((i) => i.type === 'color').length;
   const params = items.filter((i) => i.type !== 'color').length;
   const img = thumbnail(def.id);
+  // Variantes con foto propia: carrusel con flechas (y pasa solo al apoyar el mouse)
+  const vars = (VARIANTS[def.id] || []).filter((v, i) => (i === 0 ? THUMBS.has(def.id) : VARIANT_THUMBS.has(`${def.id}--${v.key}`)));
+  if (vars.length > 1) {
+    const src = (v, i) => (i === 0 ? `/miniaturas/${def.id}.webp` : `/miniaturas/variantes/${def.id}--${v.key}.webp`);
+    return `
+  <a class="card" href="/crear/${def.id}" data-card="${def.id}">
+    <div class="card-media" data-carousel>
+      ${vars.map((v, i) => `<img class="thumb-photo${i ? '' : ' is-on'}" src="${src(v, i)}?v=${THUMB_VERSION}" alt="${esc(def.name)}: ${esc(v.label)}" width="960" height="720" loading="lazy" decoding="async" data-href="${esc(variantHref(def.id, v))}" data-label="${esc(v.label)}">`).join('')}
+      <span class="tag">${esc(subOf(def)?.label || catLabel(def.category))}</span>
+      <span class="car-label">${esc(vars[0].label)}</span>
+      <button class="car-btn car-prev" type="button" aria-label="Diseño anterior">${icon.arrow}</button>
+      <button class="car-btn car-next" type="button" aria-label="Diseño siguiente">${icon.arrow}</button>
+      <span class="car-dots" aria-hidden="true">${vars.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span>
+    </div>
+    <div class="card-body">
+      <h3>${esc(def.name)}</h3>
+      <p>${esc(def.description)}</p>
+      <div class="card-meta"><span>${vars.length} diseños</span><span>${params} ajustes</span><span>${esc(def.printTime)}</span></div>
+      <span class="card-cta">Personalizar ${icon.arrow}</span>
+    </div>
+  </a>`;
+  }
   return `
   <a class="card" href="/crear/${def.id}" data-card="${def.id}">
     <div class="card-media">
@@ -27,6 +50,47 @@ export function card(def) {
       <span class="card-cta">Personalizar ${icon.arrow}</span>
     </div>
   </a>`;
+}
+
+/** Carruseles de las tarjetas (delegado: sirve aunque la grilla se vuelva a dibujar). */
+export function bindCarousels(root) {
+  const timers = new Map();
+  const go = (box, step) => {
+    const imgs = [...box.querySelectorAll('img.thumb-photo')];
+    if (imgs.length < 2) return;
+    const cur = imgs.findIndex((im) => im.classList.contains('is-on'));
+    const next = (cur + step + imgs.length) % imgs.length;
+    imgs[cur].classList.remove('is-on'); imgs[next].classList.add('is-on');
+    box.querySelectorAll('.car-dots i').forEach((d, i) => d.classList.toggle('on', i === next));
+    const label = box.querySelector('.car-label'); if (label) label.textContent = imgs[next].dataset.label;
+    const a = box.closest('a.card'); if (a) a.setAttribute('href', imgs[next].dataset.href);
+  };
+  const onClick = (e) => {
+    const b = e.target.closest('.car-btn');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    const box = b.closest('[data-carousel]');
+    stop(box);
+    go(box, b.classList.contains('car-prev') ? -1 : 1);
+  };
+  const stop = (box) => { clearInterval(timers.get(box)); timers.delete(box); };
+  const onOver = (e) => {
+    const box = e.target.closest?.('[data-carousel]');
+    if (!box || timers.has(box) || !matchMedia('(hover: hover)').matches) return;
+    timers.set(box, setInterval(() => go(box, 1), 1800));
+    box.querySelectorAll('img.thumb-photo[loading="lazy"]').forEach((im) => { im.loading = 'eager'; });
+  };
+  const onOut = (e) => {
+    const box = e.target.closest?.('[data-carousel]');
+    if (box && !box.contains(e.relatedTarget)) stop(box);
+  };
+  root.addEventListener('click', onClick, true);
+  root.addEventListener('mouseover', onOver);
+  root.addEventListener('mouseout', onOut);
+  return () => {
+    root.removeEventListener('click', onClick, true); root.removeEventListener('mouseover', onOver); root.removeEventListener('mouseout', onOut);
+    for (const t of timers.values()) clearInterval(t);
+  };
 }
 
 export function bindThumbs(root) {
@@ -113,6 +177,6 @@ export function mountCatalog(root, state) {
     syncUrl(); render();
   });
   activateAds(root);
-  const off = bindThumbs(root);
-  return () => off();
+  const off = bindThumbs(root), offCar = bindCarousels(root);
+  return () => { off(); offCar(); };
 }

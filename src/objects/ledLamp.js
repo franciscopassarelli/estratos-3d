@@ -78,6 +78,94 @@ function outerBottom(p) {
   return m;
 }
 
+/**
+ * Vaso cerrado abajo (pared exterior + interior + piso), abierto arriba. rFn(th, t) es el radio
+ * exterior con t de 0 (piso) a 1 (boca). hole: radio de un agujero central en el piso (0 = sin agujero).
+ */
+function cupMesh(rFn, H, w, F, Nt, L, hole = 0) {
+  const V = [], T = [], outer = [], inner = [];
+  for (let l = 0; l <= L; l++) {
+    const t = l / L; outer.push(V.length);
+    for (let k = 0; k < Nt; k++) { const th = (k / Nt) * TAU, r = rFn(th, t); V.push([Math.cos(th) * r, Math.sin(th) * r, H * t]); }
+  }
+  for (let l = 0; l <= L; l++) {
+    const t = F / H + (1 - F / H) * (l / L); inner.push(V.length);
+    for (let k = 0; k < Nt; k++) { const th = (k / Nt) * TAU, r = rFn(th, t) - w; V.push([Math.cos(th) * r, Math.sin(th) * r, H * t]); }
+  }
+  const nx = (k) => (k + 1) % Nt;
+  for (let l = 0; l < L; l++) for (let k = 0; k < Nt; k++) {
+    const a = outer[l] + k, b = outer[l] + nx(k), c = outer[l + 1] + nx(k), d = outer[l + 1] + k;
+    T.push(a, b, c, a, c, d);
+    const e = inner[l] + k, f = inner[l] + nx(k), g = inner[l + 1] + nx(k), h = inner[l + 1] + k;
+    T.push(e, g, f, e, h, g);
+  }
+  for (let k = 0; k < Nt; k++) {
+    const O0 = outer[L] + k, O1 = outer[L] + nx(k), I0 = inner[L] + k, I1 = inner[L] + nx(k);
+    T.push(O0, O1, I1, O0, I1, I0);
+  }
+  if (!hole) {
+    const cb = V.length; V.push([0, 0, 0]);
+    const ct = V.length; V.push([0, 0, F]);
+    for (let k = 0; k < Nt; k++) { T.push(cb, outer[0] + nx(k), outer[0] + k); T.push(ct, inner[0] + k, inner[0] + nx(k)); }
+  } else {
+    const hb = V.length; for (let k = 0; k < Nt; k++) { const th = (k / Nt) * TAU; V.push([Math.cos(th) * hole, Math.sin(th) * hole, 0]); }
+    const ht = V.length; for (let k = 0; k < Nt; k++) { const th = (k / Nt) * TAU; V.push([Math.cos(th) * hole, Math.sin(th) * hole, F]); }
+    for (let k = 0; k < Nt; k++) {
+      T.push(hb + k, outer[0] + nx(k), outer[0] + k, hb + k, hb + nx(k), outer[0] + nx(k)); // piso de abajo
+      T.push(ht + k, inner[0] + k, inner[0] + nx(k), ht + k, inner[0] + nx(k), ht + nx(k)); // piso de arriba
+      T.push(hb + k, ht + k, ht + nx(k), hb + k, ht + nx(k), hb + nx(k));                   // pared del agujero
+    }
+  }
+  return geometryFromMesh(V, T);
+}
+
+/** Estilo hongo: pie acanalado que se ensancha abajo (con la luz en el fondo) y sombrero que se calza arriba. */
+function buildMushroom(p, orientationId) {
+  const issues = [];
+  const amp = (p.depth / 100) * 2.5, N = Math.round(p.ribs);
+  const rib = (th) => amp * Math.cos(N * th);
+  const ledR = p.led / 2, w = p.wall;
+  // Pie: abajo ancho, cuello angosto y arriba un vaso donde se apoya la luz LED.
+  // El cuello es más angosto que la luz: la luz queda apoyada en el ensanche (a 45°, sin soportes).
+  const stemW = Math.max(w, 1.6), Hs = p.height - 1.2;
+  const rcup = ledR + 0.6 + stemW, rn = Math.max(ledR - 5, 10) + stemW, Rb = Math.max(rcup * 1.7, rcup + 20);
+  const cupH = 14, flare = (rcup - rn) * 1.1, zn = Hs - cupH - flare;
+  const RbOk = Math.min(Rb, rn + 0.42 * zn); // la panza del pie no puede pasar de 45° de pendiente
+  const stemR = (th, t) => {
+    const z = t * Hs;
+    const r = z <= zn ? rn + (RbOk - rn) * (1 - z / zn) ** 2.2 : z <= zn + flare ? rn + (z - zn) / 1.1 : rcup;
+    return r + rib(th) * (z <= zn ? 1 : 0.5);
+  };
+  const stem = cupMesh(stemR, Hs, stemW, 2.4, N * 4, 90, p.cable ? 4 : 0);
+  const rt = rcup;
+  // Sombrero (se imprime boca abajo: la tapa sobre la cama y las paredes abriéndose a menos de 45°)
+  const Rc = p.diameter / 2 * 1.3, rf = Math.max(Rc * 0.5, rt + amp + 4), Hc = Math.max(1.6 * (Rc - rf), p.height * 0.36), F = 1.2;
+  const capR = (th, t) => rf + (Rc - rf) * (0.55 * t + 0.45 * t * t) + rib(th) * (0.4 + 0.6 * t);
+  const cap = [cupMesh(capR, Hc, w, F, N * 4, 40)];
+  // Collar que abraza la boca del pie
+  const ci = rt + amp + 0.5, collar = difference(circle(0, 0, ci + 1.6, 96), circle(0, 0, ci, 96));
+  cap.push(extrudeRegion(collar, 0, Math.min(14, Hc - 4)));
+  if (orientationId === 'assembled') {
+    const m = new THREE.Matrix4().makeTranslation(0, 0, Hs + F).multiply(new THREE.Matrix4().makeRotationX(Math.PI));
+    cap.forEach((g) => g.applyMatrix4(m));
+  } else {
+    const off = (RbOk + Rc + 8) / Math.SQRT2;
+    cap.forEach((g) => g.translate(off, off, 0));
+    if (off + RbOk + Rc > 215) issues.push({ level: 'info', msg: 'El pie y el sombrero juntos no entran en una cama de 22 cm: imprimilos por separado.' });
+  }
+  if (Rc * 2 > 215) issues.push({ level: 'warning', msg: 'El sombrero es más ancho que una cama de 22 cm.' });
+  issues.push({ level: 'info', msg: 'La luz LED se apoya arriba del pie, en el vaso. El sombrero se calza encima y se ilumina entero. El cable baja por adentro del pie.' });
+  issues.push({ level: 'info', msg: 'Las dos piezas se pueden imprimir en modo vaso (Spiral vase) con piso. El sombrero va boca abajo, con la tapa sobre la cama.' });
+  return {
+    parts: [
+      part('shade', 'Sombrero', p.colorShade, cap, { focus: true, glow: true }),
+      part('base', 'Pie', p.colorBase, stem),
+    ],
+    issues,
+    led: { z: orientationId === 'assembled' ? Hs + 0.4 : null },
+  };
+}
+
 export default {
   id: 'lampara-led',
   name: 'Lámpara LED de dos piezas',
@@ -97,17 +185,18 @@ export default {
         { value: 'ondulada', label: 'Ondulada', hint: 'Ondas que giran' },
         { value: 'texturada', label: 'Texturada', hint: 'Bultos en grilla y estrías finas' },
         { value: 'espiral', label: 'Globo espiral', hint: 'Forma de globo con estrías que giran' },
+        { value: 'hongo', label: 'Hongo', hint: 'Sombrero acanalado sobre un pie que se ensancha' },
       ] },
       { key: 'tiers', type: 'stepper', min: 2, max: 6, visibleIf: (p) => p.style === 'ondas' || p.style === 'texturada', label: (p) => (p.style === 'texturada' ? 'Filas de bultos' : 'Pisos') },
-      { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 120, visibleIf: (p) => ['acanalada', 'texturada', 'espiral'].includes(p.style) },
+      { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 120, visibleIf: (p) => ['acanalada', 'texturada', 'espiral', 'hongo'].includes(p.style) },
       { key: 'lobes', type: 'stepper', label: (p) => (p.style === 'texturada' ? 'Bultos por vuelta' : 'Ondas'), min: 3, max: 12, visibleIf: (p) => p.style === 'ondulada' || p.style === 'texturada' },
       { key: 'depth', type: 'range', label: 'Profundidad del relieve', min: 5, max: 100, step: 1, unit: '%' },
     ] },
     { title: 'Medidas', items: [
-      { key: 'diameter', type: 'range', label: 'Ancho de la pantalla', min: 70, max: 180, step: 1, unit: 'mm' },
-      { key: 'height', type: 'range', label: 'Alto de la pantalla', min: 70, max: 220, step: 1, unit: 'mm' },
+      { key: 'diameter', type: 'range', label: (p) => (p.style === 'hongo' ? 'Ancho del sombrero' : 'Ancho de la pantalla'), min: 70, max: 180, step: 1, unit: 'mm' },
+      { key: 'height', type: 'range', label: (p) => (p.style === 'hongo' ? 'Alto total' : 'Alto de la pantalla'), min: 70, max: 220, step: 1, unit: 'mm' },
       { key: 'wall', type: 'range', label: 'Pared de la pantalla', min: 0.8, max: 2.4, step: 0.1, unit: 'mm', help: 'Más fina = deja pasar más luz' },
-      { key: 'baseHeight', type: 'range', label: 'Alto de la base', min: 20, max: 80, step: 1, unit: 'mm' },
+      { key: 'baseHeight', type: 'range', label: 'Alto de la base', min: 20, max: 80, step: 1, unit: 'mm', visibleIf: (p) => p.style !== 'hongo' },
     ] },
     { title: 'Luz', items: [
       { key: 'led', type: 'range', label: 'Hueco para la luz LED', min: 30, max: 70, step: 1, unit: 'mm', help: 'Diámetro de tu luz LED (las «puck» a pilas suelen medir 40–45 mm)' },
@@ -123,6 +212,7 @@ export default {
   useOrientation: 'assembled',
 
   build(p, orientationId = 'print') {
+    if (p.style === 'hongo') return buildMushroom(p, orientationId);
     const issues = [];
     const Rin = innerBottom(p), Rout = outerBottom(p), hb = p.baseHeight;
     const clr = 0.4, lipH = 6, lipW = 2.4;
