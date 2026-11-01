@@ -808,3 +808,13 @@ input[aria-invalid="true"] { border-color: var(--err) !important; }
 .card-media img.thumb-photo { object-fit: cover; transition: transform .35s ease; }
 .card:hover .card-media img.thumb-photo { transform: scale(1.04); }
 .card-media .tag { z-index: 1; }
+
+/* La foto de la tarjeta nunca se sale de su recuadro (no tapa el título) */
+.card-media { overflow: hidden; }
+.card-media img.thumb-photo { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* «Ver catálogo completo»: pieza suave con la flecha que avanza */
+.btn-more { font-weight: 700; padding-inline: 20px; }
+.btn-more svg { transition: transform .2s ease; }
+.btn-more:hover svg { transform: translateX(4px); }
+@media (max-width: 560px) { .section-head .btn-more { width: 100%; justify-content: center; } }

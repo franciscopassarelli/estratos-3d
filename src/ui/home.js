@@ -59,7 +59,7 @@ export function homePage() {
     <section class="section wrap" aria-labelledby="pop-title">
       <div class="section-head">
         <div><span class="eyebrow">Diseños destacados</span><h2 id="pop-title">Listos para personalizar</h2></div>
-        <a class="btn btn-ghost" href="/catalogo">Ver catálogo ${icon.arrow}</a>
+        <a class="btn btn-soft btn-more" href="/catalogo">Ver catálogo completo ${icon.arrow}</a>
       </div>
       <div class="cards cards-featured">${FEATURED.map(getObject).filter(Boolean).map(card).join('')}</div>
     </section>
