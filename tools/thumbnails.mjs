@@ -14,6 +14,9 @@ try { ({ chromium } = await import('playwright')); } catch {
 }
 const { OBJECTS } = await import('../src/objects/index.js');
 const only = process.argv.slice(2);
+// Fotos reales (o renders fotorrealistas) que no hay que pisar con la captura del visor.
+// Para reemplazar una a propósito, pasá su id:  npm run miniaturas -- botellero
+const FOTOS = new Set(JSON.parse(fs.readFileSync('public/miniaturas/fotos.json', 'utf8')));
 const OUT = 'public/miniaturas';
 const PORT = 4179;
 fs.mkdirSync(OUT, { recursive: true });
@@ -27,7 +30,7 @@ await page.route(/googletagmanager|googlesyndication|google-analytics|doubleclic
 const done = [];
 try {
   for (const def of OBJECTS) {
-    if (only.length && !only.includes(def.id)) continue;
+    if (only.length ? !only.includes(def.id) : FOTOS.has(def.id)) continue;
     await page.goto(`http://localhost:${PORT}/crear/${def.id}?captura`, { waitUntil: 'networkidle' });
     await page.waitForFunction(() => window.__estratosViewer && !window.__estratosViewer.box.isEmpty(), null, { timeout: 30000 });
     await page.waitForTimeout(800);

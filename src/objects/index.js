@@ -27,6 +27,10 @@ import honeycombPenHolder from './honeycombPenHolder.js';
 import lowPolyVase from './lowPolyVase.js';
 import ledLamp from './ledLamp.js';
 import swingBin from './swingBin.js';
+import wineRack from './wineRack.js';
+import makeupHolder from './makeupHolder.js';
+import lipstickHolder from './lipstickHolder.js';
+import monsteraCoaster from './monsteraCoaster.js';
 
 // Categorías y subcategorías del catálogo. Cada diseño está en UNA sola subcategoría:
 // para sumar un diseño nuevo, agregá su id en la lista que corresponda.
@@ -36,15 +40,16 @@ export const CATEGORIES = [
     { id: 'navidad', label: 'Navidad', ids: ['adorno-navidad', 'estrella-arbol', 'copo-nieve', 'arbol-conico', 'servilletero'] },
     { id: 'plantas', label: 'Macetas y floreros', ids: ['maceta', 'florero-low-poly'] },
     { id: 'lamparas', label: 'Lámparas', ids: ['lampara-led', 'pantalla-lampara'] },
-    { id: 'mesa', label: 'Mesa', ids: ['posavasos'] },
+    { id: 'mesa', label: 'Mesa y cocina', ids: ['posavasos', 'posavasos-monstera', 'botellero'] },
   ] },
   { id: 'accesorios', label: 'Accesorios', blurb: 'Llaveros con nombre o con QR', subs: [
     { id: 'llaveros', label: 'Llaveros', ids: ['llavero', 'llavero-qr'] },
   ] },
-  { id: 'organizacion', label: 'Organización', blurb: 'Escritorio, cajones, living y entrada', subs: [
+  { id: 'organizacion', label: 'Organización', blurb: 'Escritorio, cajones, living, baño y maquillaje', subs: [
     { id: 'escritorio', label: 'Escritorio', ids: ['organizador', 'portalapices-panal', 'tachito-tapa'] },
     { id: 'cajones', label: 'Cajones', ids: ['bandeja-cajon'] },
     { id: 'casa', label: 'Living y entrada', ids: ['organizador-controles', 'llavero-pared-panal'] },
+    { id: 'tocador', label: 'Baño y maquillaje', ids: ['organizador-maquillaje', 'organizador-labiales'] },
   ] },
   { id: 'negocios', label: 'Negocios', blurb: 'Carteles con QR, placas y señalética', subs: [
     { id: 'qr', label: 'Carteles con QR', ids: ['display-qr', 'cartel-wifi'] },
@@ -63,6 +68,7 @@ export const OBJECTS = [
   drawerTray, headphoneStand, controllerStand, laptopStand, slideSign,
   ornament, treeTopper, snowflake, napkinRing, coneTree,
   remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase, ledLamp, swingBin,
+  wineRack, makeupHolder, lipstickHolder, monsteraCoaster,
 ];
 
 const SUB_OF = new Map();

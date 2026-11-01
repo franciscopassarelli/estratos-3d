@@ -1,3 +1,3 @@
 // Generado por `npm run miniaturas`. No lo edites a mano.
-export const THUMB_VERSION = 'mvy5ahvg';
-export const THUMBS = new Set(["adorno-navidad","arbol-conico","bandeja-cajon","cartel-deslizante","cartel-wifi","copo-nieve","display-qr","estrella-arbol","florero-low-poly","lampara-led","llavero","llavero-pared-panal","llavero-qr","maceta","organizador","organizador-controles","pantalla-lampara","placa","portalapices-panal","posavasos","servilletero","soporte-auriculares","soporte-celular","soporte-mandos","soporte-notebook","tachito-tapa"]);
+export const THUMB_VERSION = '98a15fa6';
+export const THUMBS = new Set(["adorno-navidad","arbol-conico","bandeja-cajon","botellero","cartel-deslizante","cartel-wifi","copo-nieve","display-qr","estrella-arbol","florero-low-poly","lampara-led","llavero","llavero-pared-panal","llavero-qr","maceta","organizador","organizador-controles","organizador-labiales","organizador-maquillaje","pantalla-lampara","placa","portalapices-panal","posavasos","posavasos-monstera","servilletero","soporte-auriculares","soporte-celular","soporte-mandos","soporte-notebook","tachito-tapa"]);

@@ -31,6 +31,10 @@ const variants = {
   'florero-low-poly': [{}, { sides: 6, rows: 3 }, { twist: 90, rows: 8, sides: 12 }, { mode: 'vase' }, { belly: 45, wall: 3, neck: 50 }],
   'lampara-led': [{}, { style: 'acanalada', diameter: 100 }, { style: 'ondulada', diameter: 100 }, { cable: false, tiers: 4 }, { style: 'texturada', diameter: 100, height: 180 }, { style: 'espiral', diameter: 120 }],
   'tachito-tapa': [{}, { texture: false }, { width: 90, height: 100, cell: 12 }],
+  botellero: [{}, { bottles: 1, bottle: 90 }, { bottles: 3, bottle: 60 }, { bottles: 4, bottle: 55, thickness: 3 }],
+  'organizador-maquillaje': [{}, { rows: 1, cols: 4 }, { tray: 0, cols: 5, cell: 30 }],
+  'organizador-labiales': [{}, { cols: 3, rows: 5 }, { cols: 1, rows: 10, item: 12, back: false }],
+  'posavasos-monstera': [{}, { count: 1, slits: 6, size: 140 }, { slits: 2, size: 75, holes: false, count: 1 }],
   'cartel-deslizante': [{}, { title: '', holes: false, width: 125, windowWidth: 40, word1: 'ABIERTO', word2: 'CERRADO' }, { border: 0, height: 50, title: 'BAÑO', word1: 'BAÑO', word2: 'PRIVADO' }],
 };
 let fail = 0;
