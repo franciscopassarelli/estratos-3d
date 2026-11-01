@@ -60,8 +60,8 @@ export function catalogPage(state) {
 const n = (k) => `<span class="chip-n">${k}</span>`;
 function catChips(state) {
   const cat = state.category || 'all';
-  return `<button class="chip" data-cat="all" aria-pressed="${cat === 'all'}">Todos ${n(OBJECTS.length)}</button>`
-    + CATEGORIES.map((c) => `<button class="chip${c.personal ? ' chip-personal' : ''}" data-cat="${c.id}" aria-pressed="${cat === c.id}">${esc(c.label)} ${n(objectsIn(c.id).length)}</button>`).join('');
+  return `<button class="chip" data-cat="all" aria-pressed="${cat === 'all'}">Todos ${n(objectsIn('all').length)}</button>`
+    + CATEGORIES.map((c) => `<button class="chip${c.personal ? ' chip-personal' : ''}${c.seasonal ? ' chip-seasonal' : ''}" data-cat="${c.id}" aria-pressed="${cat === c.id}">${esc(c.label)} ${n(objectsIn(c.id).length)}</button>`).join('');
 }
 function subChips(state) {
   const cat = CATEGORIES.find((c) => c.id === state.category);
@@ -84,7 +84,9 @@ export function mountCatalog(root, state) {
   };
   const render = () => {
     const q = norm((state.query || '').trim());
-    const list = objectsIn(state.category, state.sub).filter((o) => {
+    // Buscando desde «Todos» también aparecen los de temporada (por ejemplo, «adorno»)
+    const pool = q && (!state.category || state.category === 'all') ? OBJECTS : objectsIn(state.category, state.sub);
+    const list = pool.filter((o) => {
       if (!q) return true;
       const hay = norm([o.name, o.description, subOf(o)?.label || '', ...o.tags].join(' '));
       return q.split(/\s+/).every((w) => hay.includes(w));

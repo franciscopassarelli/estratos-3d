@@ -11,7 +11,7 @@ import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 import { bindLightbox } from './lightbox.js';
 
-const FEATURED = ['llavero', 'display-qr', 'posavasos', 'pantalla-lampara', 'soporte-auriculares', 'cartel-wifi', 'soporte-mandos', 'placa'];
+const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos'];
 
 export function homePage() {
   return `

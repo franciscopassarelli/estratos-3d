@@ -1,8 +1,8 @@
-// Servilletero con arbolitos calados alrededor. Usa la misma pared con huecos que la pantalla de lámpara.
+// Servilletero con arbolitos calados alrededor. Usa una pared con huecos desenrollada (ver shared/wall.js).
 // Los árboles tienen los lados inclinados a más de 45°: se imprimen parados sin soportes.
 import { difference, union, rect, thinFraction } from '../core/geometry2d.js';
 import { part } from '../core/mesh.js';
-import { wallMesh, makeMapper } from './lampShade.js';
+import { wallMesh, makeMapper } from './shared/wall.js';
 
 const TAU = Math.PI * 2;
 

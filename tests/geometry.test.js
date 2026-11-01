@@ -7,6 +7,8 @@ fs.mkdirSync('out', { recursive: true });
 
 const variants = {
   llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }, { variant: 'bar', text: 'JAXSON' }, { variant: 'bar', font: 'pacifico', text: 'Alex' }],
+  'porta-capsulas': [{}, { perColumn: 3, baseRings: 1 }, { perColumn: 6, wall: 1.6, rim: 40, neck: 33 }],
+  'caja-panuelos': [{}, { opening: 'slot', hole: 70, tiers: 1, texture: false }, { inner: 90, height: 100, tiers: 2, wave: 4, ribs: 60 }],
   'llavero-articulado': [{}, { text: 'Mason', font: 'archivo' }, { text: 'LIAM', font: 'bungee', split: 30 }, { text: 'Ava', font: 'pacifico', letterHeight: 12 }],
   'llavero-placa': [{}, { icon: 'sparkle', line2: 'LOGO' }, { icon: 'waves', dashes: false, border: false, size: 32 }, { line1: '', line3: '', icon: 'none' }],
   'llavero-lettering': [{}, { line2: 'slogan', symbol: 'star' }, { line1: '', line2: 'Nombre', layered: false }, { font: 'titan', line2: 'frase', symbol: 'heart' }],
@@ -19,7 +21,6 @@ const variants = {
   'cartel-wifi': [{}, { password: 'clave1234', showPassword: true }, { security: 'nopass', title: '', hidden: true }],
   'llavero-qr': [{}, { backText: '', frontText: '' }, { qrType: 'url', qrData: 'estratos3d.com', ecc: 'M', qrSize: 40 }, { qrType: 'instagram', qrData: '@estratos3d', backText: 'Ñandú' }],
   posavasos: [{}, { shape: 'hex', pattern: 'diamonds', textMode: 'engraved', holder: true, count: 1 }, { shape: 'square', pattern: 'rays', text: '', count: 2 }, { pattern: 'rings', channel: false, count: 6 }, { pattern: 'none', text: 'AB', font: 'archivo', holder: true, capacity: 8 }],
-  'pantalla-lampara': [{}, { holes: 'drops' }, { holes: 'slots', shape: 'prism', sides: 6 }, { shape: 'prism', sides: 4, columns: 8, holeSize: 85 }, { shape: 'prism', sides: 3, holes: 'drops', columns: 9 }, { style: 'vase' }, { style: 'vase', shape: 'prism', surface: 'smooth', twist: 0 }],
   'bandeja-cajon': [{}, { printSet: 'all', modulesX: 3, modulesY: 2, drawerW: 420, drawerD: 300, divX: 1, divY: 3, dividerPct: 100, radius: 0 }, { divX: 5, divY: 1, radius: 12, dividerPct: 30 }],
   'soporte-auriculares': [{}, { textMode: 'engraved', saddleSpan: 200, height: 200 }, { text: '', mast: 14, baseDepth: 80, saddleRadius: 90 }],
   'soporte-mandos': [{}, { bays: 3, bayWidth: 70, angle: 55, backHeight: 140 }, { bays: 1, text: '' }, { dividers: false }],

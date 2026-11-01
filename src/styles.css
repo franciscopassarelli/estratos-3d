@@ -852,6 +852,7 @@ html.lb-lock { overflow: hidden; }
 .chip-n { display: inline-block; min-width: 20px; margin-left: 4px; padding: 0 6px; border-radius: 999px; font: 600 11px/18px var(--f-mono); background: var(--bg-2); color: var(--muted); }
 .chip[aria-pressed="true"] .chip-n { background: color-mix(in srgb, var(--bg) 25%, transparent); color: inherit; }
 .chip-personal { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.chip-seasonal { border-color: color-mix(in srgb, #E0484F 55%, var(--line)); }
 .subchips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -8px 0 14px; padding: 10px 12px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
 .subchips:empty { display: none; }
 .subchips-label { font: 600 12px var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }
