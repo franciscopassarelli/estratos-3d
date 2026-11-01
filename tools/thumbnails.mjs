@@ -32,7 +32,7 @@ try {
     await page.waitForFunction(() => window.__estratosViewer && !window.__estratosViewer.box.isEmpty(), null, { timeout: 30000 });
     await page.waitForTimeout(800);
     const data = await page.evaluate(async () => {
-      const blob = await window.__estratosViewer.photo({ width: 960, height: 720, brand: '', zoom: 1.0, type: 'image/webp', quality: 0.86 });
+      const blob = await window.__estratosViewer.photo({ width: 960, height: 720, brand: '', zoom: 1.28, type: 'image/webp', quality: 0.86, angle: 'product' });
       const buf = new Uint8Array(await blob.arrayBuffer());
       let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000));
       return btoa(s);

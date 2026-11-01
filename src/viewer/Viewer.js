@@ -349,59 +349,81 @@ export class Viewer {
   }
 
   /**
-   * Foto lista para redes (4:5, 1080 × 1350): fondo de estudio, sombra suave y la marca abajo.
-   * Respeta el ángulo que el usuario eligió girando el modelo. Devuelve un Blob PNG.
+   * Foto de producto ambientada: el objeto apoyado en una mesa de madera, con una pared cálida desenfocada
+   * y luz de ventana (o de noche, si hay una lámpara encendida). Se renderiza al doble de tamaño y se achica,
+   * para que los bordes salgan suaves. Devuelve un Blob.
+   * - angle 'product': ángulo de catálogo (bajo para objetos altos, desde arriba para piezas planas).
+   *   Si no, respeta el ángulo que el usuario eligió girando el modelo.
    */
-  async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com', zoom = 1.15, type = 'image/png', quality } = {}) {
+  async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com', zoom = 1.15, type = 'image/png', quality, angle = 'user' } = {}) {
     if (this.failed || this.box.isEmpty()) return null;
-    const r = this.renderer, prevMode = this.sceneMode;
+    const r = this.renderer, prevMode = this.sceneMode, SS = 2;
     const prevSize = new THREE.Vector2(); r.getSize(prevSize);
     const prevRatio = r.getPixelRatio();
     const pos = this.camera.position.clone(), tgt = this.controls.target.clone();
     this.setScene('studio');
     r.setPixelRatio(1);
-    r.setSize(width, height, false);
+    r.setSize(width * SS, height * SS, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    // Mantiene la dirección de la vista actual, pero encuadra el objeto completo con aire.
+
     const sphere = this.box.getBoundingSphere(new THREE.Sphere());
     const fov = (this.camera.fov * Math.PI) / 180;
     const fit = Math.max(sphere.radius, 4) / Math.sin(fov / 2) / Math.min(1, this.camera.aspect * 0.9);
-    const dir = pos.clone().sub(tgt).normalize();
-    if (dir.z < 0.25) { dir.z = 0.25; dir.normalize(); }
-    // Piezas planas (llaveros, adornos, copos): se miran más desde arriba para que se luzcan.
     const sz = this.box.getSize(new THREE.Vector3());
-    if (sz.z < 0.3 * Math.max(sz.x, sz.y) && dir.z < 1.4 * Math.hypot(dir.x, dir.y)) {
-      const hz = Math.hypot(dir.x, dir.y) || 1;
-      dir.x = (dir.x / hz) * 0.55; dir.y = (dir.y / hz) * 0.55; dir.z = 0.84; dir.normalize();
+    const flat = sz.z < 0.3 * Math.max(sz.x, sz.y);
+    let dir;
+    if (angle === 'product') dir = flat ? new THREE.Vector3(0.32, -0.62, 1) : new THREE.Vector3(0.62, -1.05, sz.z > Math.max(sz.x, sz.y) ? 0.42 : 0.62);
+    else {
+      dir = pos.clone().sub(tgt);
+      if (dir.z < 0.25 * dir.length()) dir.z = 0.25 * dir.length();
+      if (flat && dir.z < 1.4 * Math.hypot(dir.x, dir.y)) { const hz = Math.hypot(dir.x, dir.y) || 1; dir.set((dir.x / hz) * 0.55, (dir.y / hz) * 0.55, 0.84); }
     }
-    this.camera.position.copy(sphere.center).add(dir.multiplyScalar(fit * zoom));
-    this.camera.lookAt(sphere.center);
+    dir.normalize();
+    // Objetos altos: se encuadra un poco más abajo del centro para que se vea la mesa
+    const aim = sphere.center.clone(); if (!flat) aim.z -= sphere.radius * 0.04;
+    this.camera.position.copy(aim).add(dir.clone().multiplyScalar(fit * zoom));
+    this.camera.lookAt(aim);
+    this.camera.updateMatrixWorld();
+    const prevOp = this.shadow.material.opacity;
+    this.shadow.material.opacity = 0.6; // sobre madera, la sombra de apoyo tiene que notarse
     r.render(this.scene, this.camera);
+    this.shadow.material.opacity = prevOp;
+
+    // Línea del fondo de la mesa: un punto del piso detrás del objeto, proyectado a la pantalla
+    const back = new THREE.Vector3(-dir.x, -dir.y, 0).normalize().multiplyScalar(sphere.radius * 2.6).add(new THREE.Vector3(sphere.center.x, sphere.center.y, this.box.min.z));
+    const pb = back.clone().project(this.camera);
+    const horizon = Math.min(0.72, Math.max(0, (1 - pb.y) / 2)) * height;
+    const base = new THREE.Vector3(sphere.center.x, sphere.center.y, this.box.min.z).project(this.camera);
+    const foot = { x: ((base.x + 1) / 2) * width, y: ((1 - base.y) / 2) * height };
 
     const c = document.createElement('canvas');
     c.width = width; c.height = height;
     const g = c.getContext('2d');
-    const bg = g.createRadialGradient(width / 2, height * 0.38, height * 0.05, width / 2, height * 0.5, height * 0.8);
     const night = this.lightsOn && this.hasGlow;
-    if (night) { bg.addColorStop(0, '#4A3A2C'); bg.addColorStop(0.55, '#241B15'); bg.addColorStop(1, '#120E0B'); }
-    else { bg.addColorStop(0, '#FBF8F2'); bg.addColorStop(1, '#E6DFD3'); }
-    g.fillStyle = bg; g.fillRect(0, 0, width, height);
+    paintRoom(g, width, height, horizon, night, foot);
+    g.imageSmoothingQuality = 'high';
     g.drawImage(r.domElement, 0, 0, width, height);
-    if (brand) {
-    // Marca: tres capas + nombre, abajo al centro
-    const y = height - 70;
-    g.font = '600 34px "IBM Plex Sans", system-ui, sans-serif';
-    g.textBaseline = 'middle';
-    const tw = g.measureText(brand).width, mark = 34, gap = 14, total = mark + gap + tw, x0 = (width - total) / 2;
-    g.fillStyle = '#1B6E63';
-    [[0.2, 0.6, 0.55], [0.1, 0.8, 0.8], [0, 1, 1]].forEach(([ox, w, a], i) => { g.globalAlpha = a; g.beginPath(); if (g.roundRect) g.roundRect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7, 3); else g.rect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7); g.fill(); });
-    g.globalAlpha = 1;
-    g.fillStyle = night ? '#F1E6D8' : '#2B2E33'; g.fillText(brand, x0 + mark + gap, y + 1);
+    if (night) {
+      // Resplandor sobre la mesa alrededor de la lámpara
+      const glow = g.createRadialGradient(foot.x, foot.y, 0, foot.x, foot.y, width * 0.45);
+      glow.addColorStop(0, 'rgba(255,190,110,0.22)'); glow.addColorStop(1, 'rgba(255,190,110,0)');
+      g.globalCompositeOperation = 'screen'; g.fillStyle = glow; g.fillRect(0, horizon, width, height - horizon); g.globalCompositeOperation = 'source-over';
     }
-    if (title) { g.font = '700 46px "IBM Plex Sans", system-ui, sans-serif'; g.textAlign = 'center'; g.fillStyle = '#2B2E33'; g.fillText(title, width / 2, 90); }
+    if (brand) {
+      const y = height - 70;
+      g.font = '600 34px "IBM Plex Sans", system-ui, sans-serif';
+      g.textBaseline = 'middle';
+      const tw = g.measureText(brand).width, mark = 34, gap = 14, total = mark + gap + tw, x0 = (width - total) / 2;
+      g.fillStyle = 'rgba(20,16,12,0.45)';
+      if (g.roundRect) { g.beginPath(); g.roundRect(x0 - 22, y - 30, total + 44, 60, 30); g.fill(); }
+      g.fillStyle = '#7FE3D3';
+      [[0.2, 0.6, 0.55], [0.1, 0.8, 0.8], [0, 1, 1]].forEach(([ox, w, a], i) => { g.globalAlpha = a; g.beginPath(); if (g.roundRect) g.roundRect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7, 3); else g.rect(x0 + ox * mark, y - 13 + i * 10, mark * w, 7); g.fill(); });
+      g.globalAlpha = 1;
+      g.fillStyle = '#FFFFFF'; g.fillText(brand, x0 + mark + gap, y + 1);
+    }
+    if (title) { g.font = '700 46px "IBM Plex Sans", system-ui, sans-serif'; g.textAlign = 'center'; g.fillStyle = night ? '#F1E6D8' : '#2B2E33'; g.fillText(title, width / 2, 90); }
 
-    // Restaura la vista del usuario
     r.setPixelRatio(prevRatio);
     r.setSize(prevSize.x, prevSize.y, false);
     this.resize();
@@ -422,4 +444,69 @@ export class Viewer {
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }
+}
+
+/** Pseudoaleatorio reproducible para la veta de la madera. */
+function seeded(seed) { let a = seed >>> 0; return () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; }
+
+/**
+ * Pinta el ambiente de la foto: pared cálida con luz de ventana desenfocada y una mesa de madera
+ * en perspectiva desde `horizon` hacia abajo. De noche, todo más oscuro y con la luz cálida de la lámpara.
+ */
+function paintRoom(g, W, H, horizon, night, foot) {
+  // Pared
+  const wall = g.createLinearGradient(0, 0, 0, Math.max(1, horizon));
+  if (night) { wall.addColorStop(0, '#2A211B'); wall.addColorStop(1, '#3B2E24'); }
+  else { wall.addColorStop(0, '#E9DFD2'); wall.addColorStop(1, '#DDD0BF'); }
+  g.fillStyle = wall; g.fillRect(0, 0, W, Math.max(1, horizon) + 2);
+  // Luz de ventana (o de la lámpara sobre la pared)
+  const lx = night ? foot.x : W * 0.18, ly = night ? Math.min(horizon, foot.y) - H * 0.2 : H * 0.1;
+  const light = g.createRadialGradient(lx, ly, 0, lx, ly, W * (night ? 0.7 : 0.85));
+  if (night) { light.addColorStop(0, 'rgba(255,186,110,0.5)'); light.addColorStop(1, 'rgba(255,186,110,0)'); }
+  else { light.addColorStop(0, 'rgba(255,250,240,0.85)'); light.addColorStop(1, 'rgba(255,250,240,0)'); }
+  g.fillStyle = light; g.fillRect(0, 0, W, Math.max(1, horizon) + 2);
+  // Sombras suaves de una ventana con parteluz (día)
+  if (!night && horizon > H * 0.15) {
+    g.save(); g.filter = `blur(${Math.round(W * 0.025)}px)`; g.globalAlpha = 0.07; g.fillStyle = '#5A4632';
+    g.fillRect(W * 0.55, horizon * 0.08, W * 0.03, horizon * 0.8); g.fillRect(W * 0.38, horizon * 0.42, W * 0.5, W * 0.025);
+    g.restore();
+  }
+
+  // Mesa de madera
+  const top = Math.max(0, horizon);
+  const wood = g.createLinearGradient(0, top, 0, H);
+  if (night) { wood.addColorStop(0, '#3A2618'); wood.addColorStop(1, '#22160E'); }
+  else { wood.addColorStop(0, '#C9A57E'); wood.addColorStop(1, '#AE8659'); }
+  g.fillStyle = wood; g.fillRect(0, top, W, H - top);
+  // Veta: líneas que se juntan hacia el fondo (perspectiva)
+  const rnd = seeded(7), vx = W * 0.5, vy = top - H * 1.2;
+  g.save(); g.beginPath(); g.rect(0, top, W, H - top); g.clip();
+  for (let i = 0; i < 90; i++) {
+    const x = (rnd() * 1.6 - 0.3) * W, w = 0.6 + rnd() * 2.2;
+    g.strokeStyle = night ? `rgba(0,0,0,${0.08 + rnd() * 0.12})` : (rnd() > 0.5 ? `rgba(90,58,30,${0.05 + rnd() * 0.08})` : `rgba(255,236,210,${0.05 + rnd() * 0.07})`);
+    g.lineWidth = w; g.beginPath();
+    for (let t = 0; t <= 1.0001; t += 0.05) {
+      const yy = top + (H - top) * t, k = (yy - vy) / (H - vy);
+      const xx = vx + (x - vx) * k + Math.sin(t * 9 + i) * 2.5 * k;
+      t === 0 ? g.moveTo(xx, yy) : g.lineTo(xx, yy);
+    }
+    g.stroke();
+  }
+  // Borde trasero de la mesa y reflejo suave de la luz
+  if (top > 0) {
+    g.fillStyle = night ? 'rgba(0,0,0,0.35)' : 'rgba(80,52,28,0.18)'; g.fillRect(0, top, W, Math.max(2, H * 0.004));
+  }
+  const sheen = g.createRadialGradient(night ? foot.x : W * 0.3, top + (H - top) * 0.25, 0, night ? foot.x : W * 0.3, top + (H - top) * 0.25, W * 0.7);
+  sheen.addColorStop(0, night ? 'rgba(255,170,90,0.18)' : 'rgba(255,248,235,0.28)'); sheen.addColorStop(1, 'rgba(255,248,235,0)');
+  g.fillStyle = sheen; g.fillRect(0, top, W, H - top);
+  // Profundidad de campo: el fondo de la mesa, apenas desenfocado
+  if (top > 0 && g.filter !== undefined) {
+    const band = Math.min(H - top, H * 0.12);
+    g.save(); g.filter = 'blur(3px)'; g.drawImage(g.canvas, 0, top, W, band, 0, top, W, band); g.restore();
+  }
+  g.restore();
+  // Viñeta
+  const vg = g.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.35, W / 2, H * 0.55, Math.max(W, H) * 0.85);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, night ? 'rgba(0,0,0,0.55)' : 'rgba(60,40,20,0.22)');
+  g.fillStyle = vg; g.fillRect(0, 0, W, H);
 }
