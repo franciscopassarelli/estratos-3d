@@ -11,6 +11,7 @@ import { adminPage, mountAdmin } from './ui/admin.js';
 import { PROMOS, getPromo } from './content/promos.js';
 import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
 import { EVENTS } from './content/events.js';
+import { bindLightbox } from './ui/lightbox.js';
 
 const noop = () => () => {};
 const catalogState = { category: 'all', query: '' };
@@ -58,7 +59,7 @@ export const ROUTES = [
   {
     pattern: /^\/galeria$/, section: 'galeria',
     meta: () => ({ title: `Galería: piezas impresas con ${SITE.name}`, description: 'Fotos reales de llaveros, placas y objetos impresos en 3D a partir de diseños personalizados de Estratos 3D. Mandá la tuya.' }),
-    render: () => galleryPage(), mount: (root) => mountContent(root),
+    render: () => galleryPage(), mount: (root) => { const off = bindLightbox(root); mountContent(root); return off; },
   },
   ...EVENTS.map((ev) => ({
     pattern: new RegExp(`^${ev.path}$`), section: `evento-${ev.id}`,

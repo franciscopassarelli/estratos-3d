@@ -9,6 +9,7 @@ import { esc, icon, $, debounce, storage } from './dom.js';
 import { galleryItems } from '../content/gallery.js';
 import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
+import { bindLightbox } from './lightbox.js';
 
 const FEATURED = ['llavero', 'display-qr', 'posavasos', 'pantalla-lampara', 'soporte-auriculares', 'cartel-wifi', 'soporte-mandos', 'placa'];
 
@@ -70,7 +71,7 @@ export function homePage() {
     <section class="section wrap" aria-labelledby="gal-title">
       <div class="section-head">
         <div><span class="eyebrow">Hecho con Estratos 3D</span><h2 id="gal-title">Así quedan impresos</h2></div>
-        <a class="btn btn-ghost" href="/galeria">Ver galería ${icon.arrow}</a>
+        <a class="btn btn-soft btn-more" href="/galeria">Ver galería completa ${icon.arrow}</a>
       </div>
       <div class="gallery gallery-home">${g.map((x) => galleryCard(x)).join('')}</div>
     </section>` : ''; })()}
@@ -103,6 +104,7 @@ export function homePage() {
 
 export function mountHome(root) {
   const offThumbs = bindThumbs(root);
+  const offLightbox = bindLightbox(root);
   const stage = $('#demo-stage', root);
   const def = getObject('llavero');
   let params = { ...def.defaults, text: 'Sofía', font: 'archivo' };
@@ -133,5 +135,5 @@ export function mountHome(root) {
     const saved = storage.get(`estratos:params:${def.id}`, {});
     storage.set(`estratos:params:${def.id}`, { ...saved, text: params.text, font: params.font });
   });
-  return () => { offThumbs(); viewer?.dispose(); disposeModel(model); };
+  return () => { offThumbs(); offLightbox(); viewer?.dispose(); disposeModel(model); };
 }

@@ -202,7 +202,7 @@ export function galleryCard(g, eager = false) {
     : g.autor ? `De ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.autor)}</a>` : esc(g.autor)}` : '';
   return `
     <figure class="gal-item">
-      <a class="gal-photo" href="/galeria/${esc(g.foto)}" target="_blank" rel="noopener" aria-label="Ver la foto en grande: ${esc(g.titulo)}">
+      <a class="gal-photo" href="/galeria/${esc(g.foto)}" aria-label="Ver la foto en grande: ${esc(g.titulo)}">
         <img src="${small}" srcset="${small} 640w, /galeria/${esc(g.foto)} ${g.w}w" sizes="(max-width: 560px) 92vw, 380px"
           width="${g.w}" height="${g.h}" alt="${esc(g.alt || g.titulo)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
       </a>

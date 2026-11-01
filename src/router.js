@@ -34,7 +34,12 @@ export function navigate(href, { replace = false } = {}) {
 
 export function startRouter(handler) {
   onChange = handler;
-  window.addEventListener(HASH ? 'hashchange' : 'popstate', () => handler());
+  window.addEventListener(HASH ? 'hashchange' : 'popstate', () => {
+    // El visor de fotos usa el historial para cerrarse con «atrás»: no es un cambio de página.
+    if (window.__lightboxOpen) return;
+    if (window.__lightboxClosing) { window.__lightboxClosing = false; return; }
+    handler();
+  });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
