@@ -14,7 +14,7 @@ import { EVENTS } from './content/events.js';
 import { bindLightbox } from './ui/lightbox.js';
 
 const noop = () => () => {};
-const catalogState = { category: 'all', query: '' };
+const catalogState = { category: 'all', sub: 'all', query: '' };
 
 export const ROUTES = [
   {
@@ -25,7 +25,12 @@ export const ROUTES = [
   {
     pattern: /^\/catalogo$/, section: 'catalogo',
     meta: () => ({ title: `Catálogo de diseños | ${SITE.name}`, description: 'Objetos paramétricos para imprimir en 3D: hogar, accesorios, organización, negocios y tecnología. Elegí uno y personalizalo.' }),
-    render: (_, q) => { const c = q?.get('categoria'); if (c && CATEGORIES.some((x) => x.id === c)) catalogState.category = c; return catalogPage(catalogState); },
+    render: (_, q) => {
+      const c = q?.get('categoria'), t = q?.get('tipo');
+      if (c && CATEGORIES.some((x) => x.id === c)) { catalogState.category = c; catalogState.sub = 'all'; }
+      if (t && CATEGORIES.find((x) => x.id === catalogState.category)?.subs?.some((s) => s.id === t)) catalogState.sub = t;
+      return catalogPage(catalogState);
+    },
     mount: (root) => mountCatalog(root, catalogState),
   },
   {

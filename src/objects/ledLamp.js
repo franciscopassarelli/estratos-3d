@@ -17,6 +17,18 @@ function shadeRadius(p, th, t) {
     return R * (0.86 * squircle) * (1 + (p.depth / 100) * (Math.sin(Math.PI * f) - 0.5));
   }
   if (p.style === 'acanalada') return R + (p.depth / 100) * 6 * Math.cos(Math.round(p.ribs) * th);
+  if (p.style === 'texturada') {
+    // Bultos en grilla (alternados por fila) + estrías verticales finas por encima
+    const k = Math.round(p.lobes), rows = Math.round(p.tiers);
+    const bump = Math.cos(k * th) * Math.cos(TAU * rows * t);
+    const fade = Math.min(1, t * 12, (1 - t) * 12);
+    return R + fade * ((p.depth / 100) * 10 * bump) + (p.depth / 100) * 1.6 * Math.cos(Math.round(p.ribs) * th);
+  }
+  if (p.style === 'espiral') {
+    // Globo: más angosto abajo y en la boca, panza a 45 % del alto; estrías que giran media vuelta
+    const prof = 0.74 + 0.26 * Math.sin(Math.PI * Math.min(1, t / 0.9)) - 0.12 * Math.max(0, t - 0.6) / 0.4;
+    return R * prof + (p.depth / 100) * 5 * Math.cos(Math.round(p.ribs) * th + TAU * 0.5 * t);
+  }
   // ondulada: ondas que giran hacia arriba
   const turns = 0.6;
   return R + (p.depth / 100) * 30 * Math.cos(Math.round(p.lobes) * th + TAU * turns * t) * (0.6 + 0.4 * Math.sin(Math.PI * t));
@@ -25,8 +37,10 @@ function shadeRadius(p, th, t) {
 /** Pantalla hueca: superficie exterior e interior (corrida el grosor de la pared), abierta arriba y abajo. */
 function shadeMesh(p, z0) {
   const H = p.height, w = p.wall;
-  const Nt = p.style === 'acanalada' ? Math.round(p.ribs) * 8 : p.style === 'ondulada' ? Math.round(p.lobes) * 24 : 160;
-  const L = p.style === 'ondas' ? Math.round(p.tiers) * 24 : p.style === 'ondulada' ? 60 : 2;
+  const st = p.style;
+  const Nt = st === 'acanalada' ? Math.round(p.ribs) * 8 : st === 'ondulada' ? Math.round(p.lobes) * 24
+    : st === 'texturada' ? Math.round(p.ribs) * 6 : st === 'espiral' ? Math.round(p.ribs) * 8 : 160;
+  const L = st === 'ondas' ? Math.round(p.tiers) * 24 : st === 'ondulada' ? 60 : st === 'texturada' ? Math.round(p.tiers) * 22 : st === 'espiral' ? 80 : 2;
   const V = [], T = [], outer = [], inner = [];
   for (let l = 0; l <= L; l++) {
     const t = l / L, z = z0 + H * t;
@@ -81,10 +95,12 @@ export default {
         { value: 'ondas', label: 'Ondas apiladas', hint: 'Almohadones de luz' },
         { value: 'acanalada', label: 'Acanalada', hint: 'Estrías verticales finas' },
         { value: 'ondulada', label: 'Ondulada', hint: 'Ondas que giran' },
+        { value: 'texturada', label: 'Texturada', hint: 'Bultos en grilla y estrías finas' },
+        { value: 'espiral', label: 'Globo espiral', hint: 'Forma de globo con estrías que giran' },
       ] },
-      { key: 'tiers', type: 'stepper', label: 'Pisos', min: 2, max: 6, visibleIf: (p) => p.style === 'ondas' },
-      { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 90, visibleIf: (p) => p.style === 'acanalada' },
-      { key: 'lobes', type: 'stepper', label: 'Ondas', min: 3, max: 12, visibleIf: (p) => p.style === 'ondulada' },
+      { key: 'tiers', type: 'stepper', min: 2, max: 6, visibleIf: (p) => p.style === 'ondas' || p.style === 'texturada', label: (p) => (p.style === 'texturada' ? 'Filas de bultos' : 'Pisos') },
+      { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 120, visibleIf: (p) => ['acanalada', 'texturada', 'espiral'].includes(p.style) },
+      { key: 'lobes', type: 'stepper', label: (p) => (p.style === 'texturada' ? 'Bultos por vuelta' : 'Ondas'), min: 3, max: 12, visibleIf: (p) => p.style === 'ondulada' || p.style === 'texturada' },
       { key: 'depth', type: 'range', label: 'Profundidad del relieve', min: 5, max: 100, step: 1, unit: '%' },
     ] },
     { title: 'Medidas', items: [

@@ -37,6 +37,7 @@ function sideNav(cur) {
     ${(() => { const ev = activeEvent(); return ev ? `<a class="side-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree}<span>${esc(ev.label)}</span></a>` : ''; })()}
     <nav class="side-links">
       <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
+      <a href="/catalogo"${cur('catalogo')}>${icon.grid}<span>Catálogo</span></a>
       <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
       <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
       <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>

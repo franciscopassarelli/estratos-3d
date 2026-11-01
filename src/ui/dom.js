@@ -21,6 +21,7 @@ export const icon = {
   menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   home: svg('<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>'),
+  grid: svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>'),
   book: svg('<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2V5z"/><path d="M4 20a2 2 0 0 0 2 2h13v-4"/><path d="M9 7h6"/>'),
   help: svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.8-2.5 2.2-2.5 3.8M12 17h.01"/>'),
   tree: svg('<path d="M12 2.5 6.5 9.5h3L5 15.5h4.5L5.5 20h13L14.5 15.5H19l-4.5-6h3z"/><path d="M12 20v2"/>'),
