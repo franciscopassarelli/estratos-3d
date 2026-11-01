@@ -6,7 +6,11 @@ import fs from 'fs';
 fs.mkdirSync('out', { recursive: true });
 
 const variants = {
-  llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }],
+  llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }, { variant: 'bar', text: 'JAXSON' }, { variant: 'bar', font: 'pacifico', text: 'Alex' }],
+  'llavero-articulado': [{}, { text: 'Mason', font: 'archivo' }, { text: 'LIAM', font: 'bungee', split: 30 }, { text: 'Ava', font: 'pacifico', letterHeight: 12 }],
+  'llavero-placa': [{}, { icon: 'sparkle', line2: 'LOGO' }, { icon: 'waves', dashes: false, border: false, size: 32 }, { line1: '', line3: '', icon: 'none' }],
+  'llavero-lettering': [{}, { line2: 'slogan', symbol: 'star' }, { line1: '', line2: 'Nombre', layered: false }, { font: 'titan', line2: 'frase', symbol: 'heart' }],
+  'llavero-inicial': [{}, { letter: 'L', name: 'Luca' }, { letter: 'D', name: 'Diego' }, { letter: 'A', name: 'Alejandro' }, { letter: 'o', name: 'Olivia', letterFont: 'archivo' }, { letter: 'I', name: 'Isabella María' }],
   placa: [{}, { shape: 'oval', mode: 'inlay', decoration: 'heart' }, { shape: 'badge', mode: 'engraved', holes: 'none', line2: '' }, { font: 'archivo', line1: 'Consultorio 3', line2: 'Dra. Pérez', border: 0 }],
   'soporte-celular': [{}, { cable: false }, { angle: 80, backLength: 140, baseDepth: 60 }],
   organizador: [{}, { variant: 'cups', cols: 3, rows: 2, label: '' }, { cols: 1, rows: 1, radius: 0 }],

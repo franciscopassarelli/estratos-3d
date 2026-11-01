@@ -4,6 +4,32 @@ import { symbolRegion } from '../core/symbols.js';
 import { extrudeRegion, part } from '../core/mesh.js';
 import { PRINT } from '../core/palette.js';
 
+/** Estilo barra: letras macizas paradas sobre una barra fina que pasa por el medio. */
+function buildBar(p) {
+  const issues = [];
+  const t = textRegion(p.text || '', p.font, p.letterHeight);
+  if (t.missing.length) issues.push({ level: 'warning', msg: `La tipografía no tiene estos caracteres y se omitieron: ${t.missing.join(' ')}` });
+  const content = t.region;
+  if (!content.length) return { parts: [], issues: [{ level: 'error', msg: 'Escribí al menos una letra.' }] };
+  const cb = bbox(content), H = p.letterHeight;
+  const railH = Math.max(3, H * 0.34), holeR = p.hole / 2, R = holeR + p.ringWall;
+  const cx = cb.minX - R - 1.2, cy = cb.minY + H * 0.45;
+  const rail = rect((cx + cb.maxX - 1) / 2, cy, cb.maxX - 1 - cx, railH);
+  const holeC = circle(cx, cy, holeR, 48);
+  const base = difference(union(rail, circle(cx, cy, R, 64)), holeC);
+  if (islandCount(union(base, content)) > 1) issues.push({ level: 'error', msg: 'Alguna letra no toca la barra. Usá letras más gruesas o sin espacios.' });
+  const top = p.thickness + p.textHeight, T = Math.max(1.6, top * 0.5);
+  issues.push({ level: 'info', msg: `La barra mide ${T.toFixed(1)} mm y las letras ${top.toFixed(1)} mm. Con una sola boquilla queda de un color; con dos colores, la barra y las letras van en filamentos distintos (AMS/MMU).` });
+  return {
+    parts: [
+      part('base', 'Barra', p.colorBase, extrudeRegion(difference(base, content), 0, T)),
+      part('text', 'Letras', p.colorText, extrudeRegion(content, 0, top), { focus: true }),
+    ],
+    issues,
+    ring: { x: cx, y: cy, z: T / 2, dx: -1, dy: 0 },
+  };
+}
+
 export default {
   id: 'llavero',
   name: 'Llavero con nombre',
@@ -23,8 +49,9 @@ export default {
         { value: 'contour', label: 'Contorno', hint: 'La base sigue la forma de las letras' },
         { value: 'capsule', label: 'Cápsula', hint: 'Extremos redondeados' },
         { value: 'rect', label: 'Placa', hint: 'Rectángulo con esquinas suaves' },
+        { value: 'bar', label: 'Barra', hint: 'Letras sueltas unidas por una barra fina' },
       ] },
-      { key: 'holeSide', type: 'segmented', label: 'Argolla', options: [{ value: 'left', label: 'Izquierda' }, { value: 'top', label: 'Arriba' }] },
+      { key: 'holeSide', type: 'segmented', label: 'Argolla', options: [{ value: 'left', label: 'Izquierda' }, { value: 'top', label: 'Arriba' }], visibleIf: (p) => p.variant !== 'bar' },
       { key: 'hole', type: 'range', label: 'Diámetro del agujero', min: 3, max: 8, step: 0.1, unit: 'mm' },
     ] },
     { title: 'Texto', items: [
@@ -34,7 +61,7 @@ export default {
       { key: 'symbol', type: 'symbol', label: 'Símbolo a la izquierda' },
       { key: 'mode', type: 'segmented', label: 'Acabado', options: [
         { value: 'relief', label: 'Relieve' }, { value: 'engraved', label: 'Grabado' }, { value: 'inlay', label: 'Incrustado' },
-      ], visibleIf: (p) => p.variant !== 'contour' },
+      ], visibleIf: (p) => p.variant !== 'contour' && p.variant !== 'bar' },
       { key: 'textHeight', type: 'range', label: (p) => (p.mode === 'relief' || p.variant === 'contour' ? 'Altura del relieve' : 'Profundidad del grabado'), min: 0.6, max: 3, step: 0.1, unit: 'mm' },
     ] },
     { title: 'Medidas', items: [
@@ -52,6 +79,7 @@ export default {
 
   build(p) {
     const issues = [];
+    if (p.variant === 'bar') return buildBar(p);
     const mode = p.variant === 'contour' ? 'relief' : p.mode;
     const t = textRegion(p.text || '', p.font, p.letterHeight);
     if (t.missing.length) issues.push({ level: 'warning', msg: `La tipografía no tiene estos caracteres y se omitieron: ${t.missing.join(' ')}` });
@@ -107,6 +135,6 @@ export default {
       parts.push(part('base', 'Base', p.colorBase, [extrudeRegion(base, 0, T - d), extrudeRegion(difference(base, content), T - d, T)]));
       if (mode === 'inlay') parts.push(part('text', 'Texto incrustado', p.colorText, extrudeRegion(intersection(content, base), T - d, T), { focus: true }));
     }
-    return { parts: parts.filter(Boolean), issues };
+    return { parts: parts.filter(Boolean), issues, ring: { x: cx, y: cy, z: T / 2, dx: p.holeSide === 'left' ? -1 : 0, dy: p.holeSide === 'left' ? 0 : 1 } };
   },
 };

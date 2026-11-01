@@ -11,6 +11,10 @@ import wifiSign from './wifiSign.js';
 import qrKeychain from './qrKeychain.js';
 import coasters from './coasters.js';
 import lampShade from './lampShade.js';
+import flexiName from './flexiName.js';
+import badgeKeychain from './badgeKeychain.js';
+import letteringKeychain from './letteringKeychain.js';
+import initialKeychain from './initialKeychain.js';
 import drawerTray from './drawerTray.js';
 import headphoneStand from './headphoneStand.js';
 import controllerStand from './controllerStand.js';
@@ -42,8 +46,8 @@ export const CATEGORIES = [
     { id: 'lamparas', label: 'Lámparas', ids: ['lampara-led', 'pantalla-lampara'] },
     { id: 'mesa', label: 'Mesa y cocina', ids: ['posavasos', 'posavasos-monstera', 'botellero'] },
   ] },
-  { id: 'accesorios', label: 'Accesorios', blurb: 'Llaveros con nombre o con QR', subs: [
-    { id: 'llaveros', label: 'Llaveros', ids: ['llavero', 'llavero-qr'] },
+  { id: 'accesorios', label: 'Accesorios', blurb: 'Llaveros con nombre, inicial, frase, articulados o con QR', subs: [
+    { id: 'llaveros', label: 'Llaveros', ids: ['llavero', 'llavero-articulado', 'llavero-lettering', 'llavero-placa', 'llavero-inicial', 'llavero-qr'] },
   ] },
   { id: 'organizacion', label: 'Organización', blurb: 'Escritorio, cajones, living, baño y maquillaje', subs: [
     { id: 'escritorio', label: 'Escritorio', ids: ['organizador', 'portalapices-panal', 'tachito-tapa'] },
@@ -69,6 +73,7 @@ export const OBJECTS = [
   ornament, treeTopper, snowflake, napkinRing, coneTree,
   remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase, ledLamp, swingBin,
   wineRack, makeupHolder, lipstickHolder, monsteraCoaster,
+  flexiName, badgeKeychain, letteringKeychain, initialKeychain,
 ];
 
 const SUB_OF = new Map();
@@ -77,7 +82,7 @@ for (const c of CATEGORIES) for (const sub of c.subs || []) for (const id of sub
 for (const o of OBJECTS) { const t = SUB_OF.get(o.id); if (t) o.category = t.category.id; }
 
 /** Diseños donde el usuario escribe un texto propio (nombre, frase, etiqueta). */
-const PERSONAL = new Set(['llavero', 'llavero-qr', 'placa', 'adorno-navidad', 'posavasos', 'soporte-auriculares', 'soporte-mandos', 'organizador', 'cartel-deslizante']);
+const PERSONAL = new Set(['llavero', 'llavero-articulado', 'llavero-lettering', 'llavero-placa', 'llavero-inicial', 'llavero-qr', 'placa', 'adorno-navidad', 'posavasos', 'soporte-auriculares', 'soporte-mandos', 'organizador', 'cartel-deslizante']);
 
 export const subOf = (obj) => SUB_OF.get(obj.id)?.sub || null;
 export const categoriesOf = (obj) => [obj.category, ...(PERSONAL.has(obj.id) ? ['personalizados'] : [])];
