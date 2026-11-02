@@ -46,7 +46,7 @@ function control(item, p) {
       body = `<span class="ctl-label" data-label>${esc(labelOf(item, p))}</span><div class="opt-cards" role="group">${item.options.map((o) => `<button type="button" data-key="${item.key}" data-value="${o.value}" ${pressed(o.value)}><b>${esc(o.label)}</b><span>${esc(o.hint || '')}</span></button>`).join('')}</div>`;
       break;
     case 'font':
-      body = `<span class="ctl-label" data-label>${esc(labelOf(item, p))}</span><div class="fonts" role="group">${FONTS.map((f) => `<button type="button" data-key="${item.key}" data-value="${f.id}" ${pressed(f.id)}><span class="sample" style="font-family:${f.css}">${esc(previewText(p))}</span><span class="name">${esc(f.label)} · ${esc(f.note)}</span></button>`).join('')}</div>`;
+            body = `<span class="ctl-label" data-label>${esc(labelOf(item, p))}</span><div class="fonts" role="group">${FONTS.filter((f) => !item.exclude?.includes(f.id)).map((f) => `<button type="button" data-key="${item.key}" data-value="${f.id}" ${pressed(f.id)}><span class="sample" style="font-family:${f.css}">${esc(previewText(p))}</span><span class="name">${esc(f.label)} · ${esc(f.note)}</span></button>`).join('')}</div>`;
       break;
     case 'symbol':
       body = `<span class="ctl-label" data-label>${esc(labelOf(item, p))}</span><div class="symbols" role="group">${SYMBOLS.map((s) => `<button type="button" data-key="${item.key}" data-value="${s.id}" ${pressed(s.id)} title="${esc(s.label)}" aria-label="${esc(s.label)}">${s.id === 'none' ? '—' : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${symbolSvgPath(s.id)}" fill="currentColor" fill-rule="nonzero"/></svg>`}</button>`).join('')}</div>`;

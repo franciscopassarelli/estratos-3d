@@ -26,12 +26,13 @@ export default {
   description: 'Letras paradas unidas por bisagras que giran: el nombre se dobla como una víbora. Se imprime ya armado, sin soportes, y a dos colores con un cambio de filamento.',
   tags: ['llavero', 'nombre', 'articulado', 'flexi', 'dos colores', 'regalo', 'niños'],
   printTime: '40–90 min',
-  defaults: { text: 'ESTRATOS3D', font: 'titan', letterHeight: 16, depth: 8, split: 55, clearance: 0.45, ring: true, colorBottom: '#1A1F24', colorTop: '#47D0B0' },
+  defaults: { text: 'ESTRATOS3D', font: 'titan', letterHeight: 15, depth: 8, split: 55, clearance: 0.45, ring: true, colorBottom: '#1A1F24', colorTop: '#47D0B0' },
   sections: [
     { title: 'Texto', items: [
       { key: 'text', type: 'text', label: 'Nombre', maxLength: 10, placeholder: 'Tu nombre', help: 'Se escribe en mayúsculas.' },
-      { key: 'font', type: 'font', label: 'Tipografía' },
-      { key: 'letterHeight', type: 'range', label: 'Alto de las letras', min: 12, max: 24, step: 0.5, unit: 'mm' },
+      // Pacifico (cursiva) no sirve parada: tiene trazos inclinados en el aire y partes sueltas
+      { key: 'font', type: 'font', label: 'Tipografía', exclude: ['pacifico'] },
+      { key: 'letterHeight', type: 'range', label: 'Alto de las letras', min: 12, max: 24, step: 0.5, unit: 'mm', help: 'Si el nombre es largo, se achica solo para entrar en la cama.' },
       { key: 'depth', type: 'range', label: 'Espesor de las letras', min: 6, max: 12, step: 0.5, unit: 'mm' },
     ] },
     { title: 'Bisagras', items: [
@@ -47,8 +48,7 @@ export default {
   orientations: [{ id: 'upright', label: 'Parado, en línea recta' }],
   views: [{ id: 'curved', label: 'Doblado' }],
   useOrientation: 'curved',
-
-   // Miniatura: de frente y bajo (las letras están paradas) y más cerca, porque es largo y finito
+  // Miniatura: de frente y bajo (las letras están paradas) y más cerca, porque es largo y finito
   photo: { dir: [0.25, -1, 0.3], zoom: 0.75 },
 
   build(p, orientationId = 'upright') {
@@ -56,21 +56,44 @@ export default {
     const raw = String(p.text || '').toUpperCase();
     const chars = [...raw].filter((c) => c.trim());
     if (raw.includes(' ')) issues.push({ level: 'info', msg: 'Los espacios se omiten: cada letra va unida a la siguiente.' });
-    const H = p.letterHeight, D = p.depth, c = p.clearance;
-    const R = 2.8, rp = 1.1, z1 = Math.max(3.2, H * 0.22), wa = 3, delta = c;
+    const D = p.depth, c = p.clearance;
+    // Por si llega con Pacifico guardada de antes (o desde un enlace viejo)
+    const font = p.font === 'pacifico' ? 'titan' : p.font;
+    const R = 2.8, rp = 1.1, wa = 3, delta = c;
+
+    // Letras: cada una apoyada en la cama (y = 0 abajo)
+    const makeGlyphs = (h) => {
+      const out = [], miss = [];
+      for (const ch of chars) {
+        const t = textRegion(ch, font, h);
+        if (t.missing.length || !t.region.length) { miss.push(ch); continue; }
+        const b = bbox(t.region);
+        out.push(translate(t.region, -b.minX, -b.minY));
+      }
+      return { out, miss };
+    };
+    let H = p.letterHeight;
+    let { out: glyphs, miss } = makeGlyphs(H);
+    // Si no entra en la cama, se achican las letras: las bisagras y la argolla miden siempre lo mismo,
+    // y el ancho de cada letra es proporcional a su alto.
+    const LIMIT = 215, H_MIN = 12;
+    const fixed = Math.max(0, glyphs.length - 1) * (2 * (R + c) + 0.4) + (p.ring ? 12 : 0);
+    const lettersW = glyphs.reduce((s, gl) => s + bbox(gl).w, 0);
+    if (lettersW > 0 && fixed + lettersW > LIMIT) {
+      const Hfit = Math.max(H_MIN, Math.floor(((H * (LIMIT - fixed)) / lettersW) * 2) / 2);
+      if (Hfit < H) {
+        H = Hfit;
+        ({ out: glyphs, miss } = makeGlyphs(H));
+        issues.push({ level: 'info', msg: `Las letras se achicaron a ${String(H).replace('.', ',')} mm de alto para que el llavero entre en una cama de 22 cm.` });
+      }
+    }
+    for (const ch of miss) issues.push({ level: 'warning', msg: `La tipografía no tiene la letra «${ch}» y se omitió.` });
+    const z1 = Math.max(3.2, H * 0.22);
     // Las bisagras quedan más bajas que las letras: así se lee el nombre y no parecen «I»
     const zs = H * (p.split / 100);
     // y, si se puede, terminan en el cambio de color: quedan del color de abajo, como uniones
     const Hk = Math.min(H - 1, Math.max(z1 + (R - rp) * K + 2.2, Math.min(zs, H * 0.68)));
 
-    // Letras: cada una apoyada en la cama (y = 0 abajo)
-    const glyphs = [];
-    for (const ch of chars) {
-      const t = textRegion(ch, p.font, H);
-      if (t.missing.length || !t.region.length) { issues.push({ level: 'warning', msg: `La tipografía no tiene la letra «${ch}» y se omitió.` }); continue; }
-      const b = bbox(t.region);
-      glyphs.push(translate(t.region, -b.minX, -b.minY));
-    }
     if (!glyphs.length) return { parts: [], issues: [{ level: 'error', msg: 'Escribí al menos una letra.' }] };
 
     const bottom = [], top = [];
