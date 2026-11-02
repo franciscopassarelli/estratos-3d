@@ -1,11 +1,10 @@
 import { OBJECTS, MAIN_OBJECTS, CATEGORIES, categoriesOf, getObject } from '../objects/index.js';
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { buildModel, disposeModel } from '../core/pipeline.js';
-import { FONTS } from '../core/text.js';
 import { card, bindThumbs, bindCarousels } from './catalog.js';
 import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
-import { esc, icon, $, debounce, storage } from './dom.js';
+import { esc, icon, $ } from './dom.js';
 import { galleryItems } from '../content/gallery.js';
 import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
@@ -13,6 +12,8 @@ import { bindLightbox } from './lightbox.js';
 import { WHATSAPP } from '../content/contact.js';
 
 const WA_MSG = encodeURIComponent('¡Hola! Quiero pedir una pieza impresa en 3D de Estratos 3D.');
+const SHOWCASE = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
+const SHOWCASE_LABEL = 'Ejemplos del catálogo';
 const HERO_CATS = ['accesorios', 'organizacion', 'hogar', 'negocios', 'gaming'];
 
 const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
@@ -36,16 +37,14 @@ export function homePage() {
           <div class="hero-facts"><span><b>${MAIN_OBJECTS.length}</b> diseños editables</span><span>Descarga en <b>3MF · STL · OBJ</b></span><span>Sin registrarte</span></div>
         </div>
         <div class="demo demo-mini">
-          <div class="demo-stage" id="demo-stage"><span class="tag"><span class="dot"></span>Probalo ahora</span></div>
-          <div class="demo-form">
-            <label class="ctl-label" for="demo-text">Escribí tu nombre y mirá el llavero</label>
-            <div class="demo-row">
-              <input id="demo-text" type="text" maxlength="14" value="Sofía" autocomplete="off">
-              <a class="btn btn-primary" id="demo-go" href="/crear/llavero">Personalizar ${icon.arrow}</a>
+          <div class="demo-stage" id="demo-stage"><span class="tag"><span class="dot"></span>Vista 3D en vivo</span></div>
+          <div class="demo-form demo-show">
+            <div class="show-info">
+              <span class="eyebrow" id="show-cat">${esc(SHOWCASE_LABEL)}</span>
+              <b id="show-name">${esc(getObject(SHOWCASE[0])?.name || '')}</b>
             </div>
-            <div class="seg" role="group" aria-label="Tipografía">
-              ${FONTS.map((f, i) => `<button type="button" data-font="${f.id}" aria-pressed="${i === 0}" style="font-family:${f.css}">${esc(f.label.split(' ')[0])}</button>`).join('')}
-            </div>
+            <div class="show-dots" id="show-dots" role="tablist" aria-label="Objetos de ejemplo"></div>
+            <a class="btn btn-primary" id="demo-go" href="/crear/${SHOWCASE[0]}">Personalizar este ${icon.arrow}</a>
           </div>
         </div>
       </div>
@@ -121,34 +120,40 @@ export function mountHome(root) {
   const offThumbs = bindThumbs(root), offCar = bindCarousels(root);
   const offLightbox = bindLightbox(root);
   const stage = $('#demo-stage', root);
-  const def = getObject('llavero');
-  let params = { ...def.defaults, text: 'Sofía', font: 'archivo' };
-  let viewer = null, model = null;
+  const defs = SHOWCASE.map(getObject).filter(Boolean);
+  let viewer = null, idx = 0, timer = null, stopped = false;
+  const models = new Map();
   if (webglAvailable()) {
     viewer = new Viewer(stage, { autoRotate: true, bed: false });
     if (viewer.failed) viewer = null;
   }
   if (!viewer) stage.insertAdjacentHTML('beforeend', '<div class="fallback"><strong>Vista 3D no disponible</strong><span>Tu navegador no permite WebGL. Igual podés personalizar y descargar archivos desde el editor.</span></div>');
-  const update = () => {
+  const dots = $('#show-dots', root), nameEl = $('#show-name', root), go = $('#demo-go', root);
+  dots.innerHTML = defs.map((d, i) => `<button type="button" role="tab" data-i="${i}" aria-label="${esc(d.name)}" aria-selected="${i === 0}"></button>`).join('');
+  const show = (i) => {
+    idx = (i + defs.length) % defs.length;
+    const def = defs[idx];
+    nameEl.textContent = def.name;
+    go.href = `/crear/${def.id}`;
+    dots.querySelectorAll('button').forEach((x, k) => x.setAttribute('aria-selected', String(k === idx)));
     if (!viewer) return;
-    const next = buildModel(def, params, 'flat');
-    viewer.setModel(next.parts, { reframe: 'auto' });
-    disposeModel(model);
-    model = next;
+    if (!models.has(def.id)) models.set(def.id, buildModel(def, def.defaults, def.useOrientation || def.orientations[0].id));
+    viewer.setModel(models.get(def.id).parts, { reframe: 'auto' });
   };
-  update();
-  const deb = debounce(update, 120);
-  $('#demo-text', root).addEventListener('input', (e) => { params.text = e.target.value; deb(); });
-  root.querySelector('.demo .seg').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-font]');
+  const schedule = () => {
+    clearTimeout(timer);
+    if (stopped || !viewer) return;
+    timer = setTimeout(() => { if (!document.hidden) show(idx + 1); schedule(); }, 4500);
+  };
+  show(0); schedule();
+  dots.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-i]');
     if (!b) return;
-    params.font = b.dataset.font;
-    root.querySelectorAll('.demo [data-font]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    update();
+    show(Number(b.dataset.i)); schedule();
   });
-  $('#demo-go', root).addEventListener('click', () => {
-    const saved = storage.get(`estratos:params:${def.id}`, {});
-    storage.set(`estratos:params:${def.id}`, { ...saved, text: params.text, font: params.font });
-  });
-  return () => { offThumbs(); offCar(); offLightbox(); viewer?.dispose(); disposeModel(model); };
+  return () => {
+    stopped = true; clearTimeout(timer);
+    offThumbs(); offCar(); offLightbox(); viewer?.dispose();
+    models.forEach(disposeModel);
+  };
 }
