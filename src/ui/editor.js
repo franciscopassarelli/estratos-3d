@@ -133,7 +133,7 @@ export function editorPage(id) {
     ${adSlot('banner')}
     <div class="mobile-bar" id="mobile-bar">
       <span class="mono" id="mobile-dims"></span>
-      <a class="btn btn-order btn-icon" id="mobile-order" href="#" target="_blank" rel="noopener" aria-label="Pedilo impreso por WhatsApp">${WA_ICON}</a>
+      <a class="btn btn-order btn-icon" id="mobile-order" data-order="editor_movil" data-objeto="${esc(def.id)}" href="#" target="_blank" rel="noopener" aria-label="Pedilo impreso por WhatsApp">${WA_ICON}</a>
       <button class="btn btn-primary" id="mobile-dl" type="button">${icon.download} Descargar</button>
     </div>
   </main>`;
@@ -370,7 +370,7 @@ export function mountEditor(root, id, query) {
       ${st === 'warning' ? '<p class="note">Podés descargar con advertencias; revisalas antes de imprimir.</p>' : ''}
       <div class="order-box">
         <span><b>¿No tenés impresora 3D?</b> Te lo imprimimos con estos ajustes y colores.</span>
-        <a class="btn btn-order" id="order" href="${esc(orderLink(def, params))}" target="_blank" rel="noopener">${WA_ICON} Pedilo impreso</a>
+        <a class="btn btn-order" id="order" data-order="editor" data-objeto="${esc(def.id)}" href="${esc(orderLink(def, params))}" target="_blank" rel="noopener">${WA_ICON} Pedilo impreso</a>
       </div>`;
     const mo = $('#mobile-order', root);
     if (mo) mo.href = orderLink(def, params);

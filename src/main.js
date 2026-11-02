@@ -6,7 +6,7 @@ import { loadAdsense, activateAds } from './ui/ads.js';
 import { startRouter, currentLocation } from './router.js';
 import { resolve } from './routes.js';
 import { SITE } from './config.js';
-import { trackPage } from './ui/analytics.js';
+import { trackPage, trackEvent } from './ui/analytics.js';
 
 const app = document.getElementById('app');
 let cleanup = () => {};
@@ -38,6 +38,12 @@ function render() {
   else if (!firstRender) window.scrollTo(0, 0);
   firstRender = false;
 }
+
+// Pedidos por WhatsApp: cualquier botón con data-order se cuenta como evento.
+document.addEventListener('click', (e) => {
+  const a = e.target.closest?.('[data-order]');
+  if (a) trackEvent('pedido_whatsapp', { origen: a.dataset.order, objeto: a.dataset.objeto || '' });
+});
 
 startRouter(render);
 renderThumbnails();

@@ -2,13 +2,16 @@
 import { SITE, analyticsEnabled } from '../config.js';
 import { GUIDES, getGuide } from '../content/guides.js';
 import { galleryItems } from '../content/gallery.js';
-import { getEvent, presetHref } from '../content/events.js';
+import { getEvent, presetHref, EVENTS } from '../content/events.js';
 import { renderPresetThumbs } from './thumbnails.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
+import { PEDIDOS } from '../content/pedidos.js';
+import { generalOrderLink } from '../content/contact.js';
 
 const INFO = [
+  { path: '/pedidos', label: 'Pedí tu pieza impresa' },
   { path: '/ayuda', label: 'Preguntas frecuentes' },
   { path: '/acerca', label: 'Acerca de' },
   { path: '/contacto', label: 'Contacto' },
@@ -37,7 +40,58 @@ export function helpPage() {
       <details><summary>¿El archivo está garantizado para imprimir bien?</summary><p>Cada archivo se genera con mallas cerradas, y la herramienta revisa paredes finas, trazos de texto delgados, piezas sueltas, voladizos de más de 45° y el tamaño de la cama. Son comprobaciones básicas: revisá siempre la vista previa de capas de tu laminador antes de imprimir.</p></details>
       <details><summary>¿Por qué algunas letras o símbolos no aparecen?</summary><p>Las tipografías incluyen letras latinas con tildes y ñ, pero no emojis. Para decorar, usá los símbolos del editor: están dibujados como geometría imprimible.</p></details>
       <details><summary>¿Se guardan mis diseños?</summary><p>Tus últimos valores de cada objeto quedan guardados solo en este navegador, para que no los pierdas al recargar. No se envían a ningún servidor.</p></details>
+      <details><summary>¿Puedo pedirlo ya impreso?</summary><p>Sí. En cada objeto hay un botón “Pedilo impreso” que abre WhatsApp con tu diseño. Mirá <a href="/pedidos">cómo funciona</a>.</p></details>
       <details><summary>¿Tiene costo?</summary><p>No. El sitio se mantiene con publicidad.</p></details>
+    </section>`);
+}
+
+export function pedidosPage() {
+  const ev = EVENTS[0];
+  const precios = PEDIDOS.precios.length
+    ? `<div class="table-scroll"><table class="formats"><thead><tr><th>Pieza</th><th>Precio</th><th>Detalle</th></tr></thead><tbody>${PEDIDOS.precios.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${esc(p.desde)}</td><td>${esc(p.nota || '')}</td></tr>`).join('')}</tbody></table></div>
+      <p class="note">Son precios de referencia: el valor final depende del tamaño, los colores y la cantidad, y te lo confirmamos antes de imprimir.</p>`
+    : '<p>El precio depende del diseño, el tamaño, los colores y la cantidad. Te lo pasamos por WhatsApp antes de imprimir, sin compromiso.</p>';
+  return infoLayout('/pedidos', `
+    <section>
+      <span class="eyebrow">Pedidos</span>
+      <h1>Pedí tu pieza impresa en 3D</h1>
+      <p>¿Diseñaste algo y no tenés impresora? Te lo imprimimos. Elegí el objeto, ajustalo en la web y mandanos el pedido por WhatsApp: llega con el link a tu diseño y todos tus ajustes.</p>
+      <div class="row-actions">
+        <a class="btn btn-order btn-lg" data-order="pedidos" href="${esc(generalOrderLink())}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+        <a class="btn btn-lg btn-soft" href="/catalogo">Elegir un diseño</a>
+      </div>
+    </section>
+    <section>
+      <h2>Cómo funciona</h2>
+      <ol class="pedido-steps">
+        <li><b>Elegí y personalizá.</b> Abrí un objeto del <a href="/catalogo">catálogo</a> y cambiá nombre, medidas y colores.</li>
+        <li><b>Tocá “Pedilo impreso”.</b> Se abre WhatsApp con el link de tu diseño y los ajustes ya cargados.</li>
+        <li><b>Confirmamos.</b> Te pasamos el precio, los colores disponibles y la forma de entrega antes de empezar.</li>
+        <li><b>Lo imprimimos.</b> Y te lo entregamos en ${esc(PEDIDOS.plazo)} desde que confirmás.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>Tiempos</h2>
+      <p>Entregamos en ${esc(PEDIDOS.plazo)} desde que confirmás el pedido. Esto incluye las tandas: por ejemplo, 30 llaveros para un evento. Si lo necesitás para una fecha puntual, avisanos y lo coordinamos.</p>
+    </section>
+    <section>
+      <h2>Precios</h2>
+      ${precios}
+    </section>
+    <section>
+      <h2>Ideas para pedir</h2>
+      <ul>
+        <li><a href="/catalogo?categoria=accesorios">Llaveros con nombre</a> para souvenirs de cumpleaños, eventos y regalos.</li>
+        <li><a href="/catalogo?categoria=negocios">Carteles con QR y placas</a> para tu local o emprendimiento.</li>
+        <li><a href="/catalogo?categoria=organizacion">Organizadores</a> de escritorio, cajones y baño.</li>
+        ${ev ? `<li><a href="${ev.path}">Adornos de ${esc(ev.label)}</a> con el nombre de cada uno.</li>` : ''}
+      </ul>
+    </section>
+    <section>
+      <h2>Preguntas</h2>
+      <details><summary>¿Puedo pedir varias unidades?</summary><p>Sí. Para souvenirs, eventos o negocios armamos tandas. Contanos la cantidad y te pasamos el precio.</p></details>
+      <details><summary>¿Cómo pago y cómo lo recibo?</summary><p>Lo acordamos por WhatsApp antes de imprimir, según lo que te quede mejor.</p></details>
+      <details><summary>¿Hace falta que descargue el archivo?</summary><p>No. Con tocar “Pedilo impreso” alcanza: nosotros abrimos tu diseño con los mismos ajustes.</p></details>
     </section>`);
 }
 

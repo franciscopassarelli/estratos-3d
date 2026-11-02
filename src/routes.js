@@ -9,7 +9,7 @@ import { editorPage, mountEditor } from './ui/editor.js';
 import { promoPage, mountPromo } from './ui/promo.js';
 import { adminPage, mountAdmin } from './ui/admin.js';
 import { PROMOS, getPromo } from './content/promos.js';
-import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
+import { helpPage, pedidosPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
 import { EVENTS } from './content/events.js';
 import { bindLightbox } from './ui/lightbox.js';
 
@@ -71,6 +71,7 @@ export const ROUTES = [
     meta: () => ({ title: `${ev.title} | ${SITE.name}`, description: ev.description }),
     render: () => eventPage(ev.id), mount: (root) => mountEvent(root, ev.id),
   })),
+  { pattern: /^\/pedidos$/, section: 'pedidos', meta: () => ({ title: `Pedí tu pieza impresa en 3D | ${SITE.name}`, description: 'Pedí tu diseño ya impreso en 3D: llaveros con nombre, carteles con QR, organizadores y adornos. Entrega en unos 2 días. Pedilo por WhatsApp.' }), render: pedidosPage, mount: mountContent },
   { pattern: /^\/ayuda$/, section: 'ayuda', meta: () => ({ title: `Preguntas frecuentes | ${SITE.name}`, description: 'Respuestas sobre formatos de archivo, impresión a dos colores, comprobaciones y uso del editor.' }), render: helpPage, mount: mountContent },
   { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name} y cómo genera los objetos para impresión 3D.` }), render: aboutPage, mount: mountContent },
   { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Cómo comunicarte con ${SITE.name}.` }), render: contactPage, mount: mountContent },
@@ -107,6 +108,6 @@ export function staticPaths() {
     '/', '/catalogo',
     ...OBJECTS.map((o) => `/crear/${o.id}`),
     '/guias', ...GUIDES.map((g) => `/guias/${g.slug}`), '/galeria', ...EVENTS.map((e) => e.path),
-    '/ayuda', '/acerca', '/contacto', '/condiciones', '/privacidad',
+    '/pedidos', '/ayuda', '/acerca', '/contacto', '/condiciones', '/privacidad',
   ];
 }

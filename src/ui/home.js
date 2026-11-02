@@ -9,9 +9,8 @@ import { galleryItems } from '../content/gallery.js';
 import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 import { bindLightbox } from './lightbox.js';
-import { WHATSAPP } from '../content/contact.js';
+import { generalOrderLink } from '../content/contact.js';
 
-const WA_MSG = encodeURIComponent('¡Hola! Quiero pedir una pieza impresa en 3D de Estratos 3D.');
 const SHOWCASE = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
 const SHOWCASE_LABEL = 'Ejemplos del catálogo';
 const HERO_CATS = ['accesorios', 'organizacion', 'hogar', 'negocios', 'gaming'];
@@ -76,7 +75,7 @@ export function homePage() {
         <h2 id="order-title">¿No tenés impresora 3D?</h2>
         <p>Descargá el archivo y llevalo a imprimir, o pedinos la pieza ya impresa por WhatsApp.</p>
       </div>
-      <a class="btn btn-order btn-lg" href="https://wa.me/${WHATSAPP}?text=${WA_MSG}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+      <div class="order-band-actions"><a class="btn btn-order btn-lg" data-order="home" href="${generalOrderLink()}" target="_blank" rel="noopener">Pedir por WhatsApp</a><a class="order-band-more" href="/pedidos">Cómo pedir</a></div>
     </section></div>
 
     <div class="wrap">${adSlot('inline')}</div>

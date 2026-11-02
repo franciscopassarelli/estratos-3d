@@ -14,3 +14,8 @@ export function orderLink(def, params) {
   const msg = `¡Hola! Quiero pedir impreso este diseño de Estratos 3D: *${def.name}*\n${url}`;
   return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
+
+/** Enlace de WhatsApp con un mensaje general (sin un diseño puntual). */
+export function generalOrderLink(text = '¡Hola! Quiero pedir una pieza impresa en 3D de Estratos 3D.') {
+  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+}

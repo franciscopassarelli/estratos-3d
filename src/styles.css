@@ -936,3 +936,14 @@ html.lb-lock { overflow: hidden; }
   .hero-actions .btn-lg { min-height: 46px; padding: 0 12px; font-size: 15px; flex: 1 1 0; min-width: 0; justify-content: center; white-space: nowrap; }
   .hero-actions .btn-cta { flex: 1.15 1 0; }
 }
+
+/* Página de pedidos */
+.pedido-steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; color: var(--ink-2); }
+.pedido-steps b { color: var(--ink); }
+.info .row-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.order-band-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.order-band-more { color: var(--ink-2); font-weight: 600; }
+@media (max-width: 560px) { .order-band-actions { width: 100%; } .order-band-actions .btn-order { flex: 1 1 100%; } .order-band-more { padding: 6px 0; } }
+.info a.btn-order, .info a.btn-order:hover { color: #0B2A17; text-decoration: none; }
+.info a.btn-soft { text-decoration: none; }
+@media (max-width: 560px) { .info .row-actions .btn { flex: 1 1 100%; justify-content: center; } }

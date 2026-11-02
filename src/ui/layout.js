@@ -67,7 +67,7 @@ export function footer() {
         <p class="fine">Los archivos se generan en tu navegador. Revisalos siempre en tu laminador antes de imprimir.</p>
       </div>
       <nav class="foot-links" aria-label="Enlaces del sitio">
-        <a href="/catalogo">Catálogo</a><a href="/guias">Guías</a><a href="/galeria">Galería</a>${EVENTS.map((e) => `<a href="${e.path}">${esc(e.label)}</a>`).join('')}<a href="/ayuda">Preguntas</a><a href="/contacto">Contacto</a><a href="/acerca">Acerca de</a>
+        <a href="/catalogo">Catálogo</a><a href="/guias">Guías</a><a href="/galeria">Galería</a><a href="/pedidos">Pedí impreso</a>${EVENTS.map((e) => `<a href="${e.path}">${esc(e.label)}</a>`).join('')}<a href="/ayuda">Preguntas</a><a href="/contacto">Contacto</a><a href="/acerca">Acerca de</a>
       </nav>
       <div class="foot-social" aria-label="Redes">
         <a href="https://www.instagram.com/${esc(SITE.instagram)}" target="_blank" rel="noopener">Instagram</a>
