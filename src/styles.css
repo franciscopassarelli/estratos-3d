@@ -887,3 +887,15 @@ html.lb-lock { overflow: hidden; }
 .btn-order { background: #25D366; color: #0B2A17; border-color: transparent; font-weight: 600; justify-content: center; gap: 8px; text-decoration: none; }
 .btn-order:hover { background: #2EE677; }
 .mobile-bar .btn-icon { padding: 0 12px; }
+
+/* ---------- Home: hero con catálogo ---------- */
+.hero-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-link { padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2); font-size: 13px; text-decoration: none; transition: border-color .15s, color .15s; }
+.chip-link:hover { border-color: var(--accent); color: var(--accent); }
+.demo-mini .demo-stage { height: 230px; }
+@media (max-width: 900px) { .demo-mini .demo-stage { height: 220px; } }
+.order-band { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-block: 8px 40px; padding: 22px 26px; border: 1px solid color-mix(in srgb, #25D366 35%, var(--line)); border-radius: var(--r-lg); background: color-mix(in srgb, #25D366 7%, var(--surface)); }
+.order-band h2 { font-size: 22px; margin-bottom: 4px; }
+.order-band p { color: var(--muted); max-width: 52ch; }
+.order-band .btn-order { flex: none; }
+@media (max-width: 560px) { .order-band .btn-order { width: 100%; } }

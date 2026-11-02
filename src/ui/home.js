@@ -1,4 +1,4 @@
-import { OBJECTS, CATEGORIES, categoriesOf, getObject } from '../objects/index.js';
+import { OBJECTS, MAIN_OBJECTS, CATEGORIES, categoriesOf, getObject } from '../objects/index.js';
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { buildModel, disposeModel } from '../core/pipeline.js';
 import { FONTS } from '../core/text.js';
@@ -10,6 +10,10 @@ import { galleryItems } from '../content/gallery.js';
 import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 import { bindLightbox } from './lightbox.js';
+import { WHATSAPP } from '../content/contact.js';
+
+const WA_MSG = encodeURIComponent('¡Hola! Quiero pedir una pieza impresa en 3D de Estratos 3D.');
+const HERO_CATS = ['accesorios', 'organizacion', 'hogar', 'negocios', 'gaming'];
 
 const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
 
@@ -19,19 +23,22 @@ export function homePage() {
     <section class="hero">
       <div class="wrap">
         <div class="hero-copy">
-          <span class="eyebrow">Diseño paramétrico · 3MF · STL · OBJ</span>
-          <h1>Piezas a medida para tu impresora 3D, <span>sin saber modelar.</span></h1>
-          <p class="lead">Elegí un objeto, cambiá medidas, textos y colores, y mirá el resultado en 3D mientras lo ajustás. Al terminar, descargás un archivo real generado con tus valores y revisado antes de imprimir.</p>
+          <span class="eyebrow">Generador gratis para impresión 3D</span>
+          <h1>Objetos para imprimir en 3D, <span>hechos a tu medida.</span></h1>
+          <p class="lead">Elegí un diseño, escribí tu nombre o ajustá las medidas y descargá el archivo listo para tu impresora. Gratis y sin saber modelar.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary btn-lg btn-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
+            <a class="btn btn-primary btn-lg btn-cta" href="/catalogo">${icon.plus} Ver el catálogo</a>
             <a class="btn btn-lg btn-soft" href="/#como-funciona">Cómo funciona ${icon.chevron}</a>
           </div>
-          <div class="hero-facts"><span><b>${OBJECTS.length}</b> diseños editables</span><span><b>${FONTS.length}</b> tipografías para relieve</span><span>Capa de <b>0,20 mm</b> como referencia</span></div>
+          <div class="hero-chips" aria-label="Categorías">
+            ${HERO_CATS.map((id) => CATEGORIES.find((c) => c.id === id)).filter(Boolean).map((c) => `<a class="chip-link" href="/catalogo?categoria=${c.id}">${esc(c.label)}</a>`).join('')}
+          </div>
+          <div class="hero-facts"><span><b>${MAIN_OBJECTS.length}</b> diseños editables</span><span>Descarga en <b>3MF · STL · OBJ</b></span><span>Sin registrarte</span></div>
         </div>
-        <div class="demo">
-          <div class="demo-stage" id="demo-stage"><span class="tag"><span class="dot"></span>Vista previa en vivo</span></div>
+        <div class="demo demo-mini">
+          <div class="demo-stage" id="demo-stage"><span class="tag"><span class="dot"></span>Probalo ahora</span></div>
           <div class="demo-form">
-            <label class="ctl-label" for="demo-text">Probá con un nombre</label>
+            <label class="ctl-label" for="demo-text">Escribí tu nombre y mirá el llavero</label>
             <div class="demo-row">
               <input id="demo-text" type="text" maxlength="14" value="Sofía" autocomplete="off">
               <a class="btn btn-primary" id="demo-go" href="/crear/llavero">Personalizar ${icon.arrow}</a>
@@ -47,8 +54,16 @@ export function homePage() {
     ${(() => { const ev = activeEvent(); return ev ? `<div class="wrap"><a class="event-banner" href="${ev.path}"><span class="event-banner-icon">${icon.tree}</span><span><b>Especial ${esc(ev.label)}</b><span>${esc(ev.aviso)}</span></span>${icon.arrow}</a></div>` : ''; })()}
     ${(() => { const p = featuredPromo(); return p ? `<div class="wrap"><a class="promo-banner" href="/sorteos/${esc(p.slug)}"><span class="promo-banner-tag">Sorteo</span><span><b>${esc(p.title)}</b><span>Anotate gratis y participá por premios impresos en 3D.</span></span>${icon.arrow}</a></div>` : ''; })()}
 
+    <section class="section wrap" aria-labelledby="pop-title">
+      <div class="section-head">
+        <div><span class="eyebrow">Los más elegidos</span><h2 id="pop-title">Diseños listos para personalizar</h2></div>
+        <a class="btn btn-soft btn-more" href="/catalogo">Ver catálogo completo ${icon.arrow}</a>
+      </div>
+      <div class="cards cards-featured">${FEATURED.map(getObject).filter(Boolean).map(card).join('')}</div>
+    </section>
+
     <section class="section wrap" aria-labelledby="cats-title">
-      <div class="section-head"><div><span class="eyebrow">Categorías</span><h2 id="cats-title">¿Qué necesitás imprimir?</h2></div></div>
+      <div class="section-head"><div><span class="eyebrow">Explorá por tipo</span><h2 id="cats-title">Encontrá lo que necesitás imprimir</h2></div></div>
       <div class="cat-grid">
         ${CATEGORIES.map((c) => {
           const n = OBJECTS.filter((o) => categoriesOf(o).includes(c.id)).length;
@@ -57,13 +72,13 @@ export function homePage() {
       </div>
     </section>
 
-    <section class="section wrap" aria-labelledby="pop-title">
-      <div class="section-head">
-        <div><span class="eyebrow">Diseños destacados</span><h2 id="pop-title">Listos para personalizar</h2></div>
-        <a class="btn btn-soft btn-more" href="/catalogo">Ver catálogo completo ${icon.arrow}</a>
+    <div class="wrap"><section class="order-band" aria-labelledby="order-title">
+      <div>
+        <h2 id="order-title">¿No tenés impresora 3D?</h2>
+        <p>Descargá el archivo y llevalo a imprimir, o pedinos la pieza ya impresa por WhatsApp.</p>
       </div>
-      <div class="cards cards-featured">${FEATURED.map(getObject).filter(Boolean).map(card).join('')}</div>
-    </section>
+      <a class="btn btn-order btn-lg" href="https://wa.me/${WHATSAPP}?text=${WA_MSG}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+    </section></div>
 
     <div class="wrap">${adSlot('inline')}</div>
 
