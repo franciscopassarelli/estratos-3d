@@ -318,7 +318,8 @@ export function mountEditor(root, id, query) {
         : { level: 'error', msg: 'La geometría generada tiene aristas abiertas.' });
       if (a.overhang <= 2) checks.push({ level: 'ok', msg: 'No necesita soportes en esta orientación.' });
       if (a.floating === 0) checks.push({ level: 'ok', msg: 'Todas las partes se apoyan en la cama o sobre otra parte.' });
-      if (a.fitsBed) checks.push({ level: 'ok', msg: `Entra en una cama de ${PRINT.bed.x} × ${PRINT.bed.y} mm.` });
+           if (a.fitsBed) checks.push({ level: 'ok', msg: `Entra en una cama de ${PRINT.bed.x} × ${PRINT.bed.y} mm.` });
+      else if (a.pieces > 1 && a.piecesFitBed) checks.push({ level: 'ok', msg: `Cada pieza entra en una cama de ${PRINT.bed.x} × ${PRINT.bed.y} mm.` });
     }
     const order = { error: 0, warning: 1, info: 2, ok: 3 };
     const all = [...model.issues, ...checks].sort((x, y) => order[x.level] - order[y.level]);

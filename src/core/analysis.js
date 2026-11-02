@@ -27,6 +27,30 @@ export function weld(geometry, tol = 1e-4) {
 
 function find(parent, i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; }
 
+/** Agrupa en objetos sueltos las cáscaras de una misma parte que se tocan y revisa si cada uno entra en la cama. */
+function bedPieces(shells, touches, bed) {
+  const par = shells.map((_, i) => i);
+  const root = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+  for (let i = 0; i < shells.length; i++)
+    for (let j = i + 1; j < shells.length; j++)
+      if (shells[i].part === shells[j].part && touches(shells[i], shells[j])) par[root(j)] = root(i);
+  const boxes = new Map();
+  shells.forEach((s, i) => {
+    const r = root(i);
+    const b = boxes.get(r) || { minX: Infinity, minY: Infinity, minZ: Infinity, maxX: -Infinity, maxY: -Infinity, maxZ: -Infinity };
+    b.minX = Math.min(b.minX, s.minX); b.maxX = Math.max(b.maxX, s.maxX);
+    b.minY = Math.min(b.minY, s.minY); b.maxY = Math.max(b.maxY, s.maxY);
+    b.minZ = Math.min(b.minZ, s.minZ); b.maxZ = Math.max(b.maxZ, s.maxZ);
+    boxes.set(r, b);
+  });
+  // Cada pieza se puede girar 90° sobre la cama
+  const fits = (b) => {
+    const x = b.maxX - b.minX, y = b.maxY - b.minY, z = b.maxZ - b.minZ;
+    return z <= bed.z && ((x <= bed.x && y <= bed.y) || (x <= bed.y && y <= bed.x));
+  };
+  return { count: boxes.size, allFit: [...boxes.values()].every(fits) };
+}
+
 export function analyzeParts(parts) {
   const shells = [];
   let openEdges = 0, badEdges = 0, volume = 0, triangles = 0;
@@ -128,11 +152,13 @@ export function analyzeParts(parts) {
   }
   const dims = { x: maxX - minX, y: maxY - minY, z: maxZ - minZ };
   const filamentArea = Math.PI * (PRINT.filamentDiameter / 2) ** 2;
+  const pz = bedPieces(shells, touches, PRINT.bed);
   return {
     dims, triangles, shells: shells.length, openEdges, badEdges, closed: openEdges === 0 && badEdges === 0,
     volume, grams: (volume / 1000) * PRINT.plaDensity, filamentMeters: volume / filamentArea / 1000,
     overhang, shortOverhang, floating, perPart,
     fitsBed: dims.x <= PRINT.bed.x && dims.y <= PRINT.bed.y && dims.z <= PRINT.bed.z,
+    pieces: pz.count, piecesFitBed: pz.allFit,
   };
 }
 
@@ -145,6 +171,9 @@ export function analysisIssues(a) {
   if (a.overhang > 25) out.push({ level: 'warning', msg: `Necesitará soportes: hay unos ${Math.round(a.overhang)} mm² de superficie con voladizos de más de 45°.` });
   else if (a.overhang > 2) out.push({ level: 'info', msg: `Hay voladizos pequeños (${Math.round(a.overhang)} mm²); suelen imprimirse sin soportes.` });
   if (a.shortOverhang > 0) out.push({ level: 'info', msg: 'El relieve vertical tiene voladizos cortos (≤ 2 mm) que normalmente se imprimen sin soportes.' });
-  if (!a.fitsBed) out.push({ level: 'warning', msg: `Mide más que una cama de ${PRINT.bed.x} × ${PRINT.bed.y} × ${PRINT.bed.z} mm. Verificá el tamaño de tu impresora.` });
+  if (!a.fitsBed) {
+    if (a.pieces > 1 && a.piecesFitBed) out.push({ level: 'info', msg: `Las piezas no entran todas juntas en una cama de ${PRINT.bed.x} × ${PRINT.bed.y} mm, pero cada una entra sola: imprimilas en tandas.` });
+    else out.push({ level: 'warning', msg: `Mide más que una cama de ${PRINT.bed.x} × ${PRINT.bed.y} × ${PRINT.bed.z} mm. Verificá el tamaño de tu impresora.` });
+  }
   return out;
 }

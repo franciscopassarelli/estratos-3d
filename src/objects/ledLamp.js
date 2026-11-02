@@ -139,11 +139,18 @@ function buildMushroom(p, orientationId) {
   const stem = cupMesh(stemR, Hs, stemW, 2.4, N * 4, 90, p.cable ? 4 : 0);
   const rt = rcup;
   // Sombrero (se imprime boca abajo: la tapa sobre la cama y las paredes abriéndose a menos de 45°)
-  const Rc = p.diameter / 2 * 1.3, rf = Math.max(Rc * 0.5, rt + amp + 4), Hc = Math.max(1.6 * (Rc - rf), p.height * 0.36), F = 1.2;
+  // Tapa: mismo grosor que la pared (mínimo 1,2 mm) para que brille parejo y no se transparente la luz
+  const Rc = p.diameter / 2 * 1.3, rf = Math.max(Rc * 0.5, rt + amp + 4), Hc = Math.max(1.6 * (Rc - rf), p.height * 0.36), F = Math.max(1.2, w);
   const capR = (th, t) => rf + (Rc - rf) * (0.55 * t + 0.45 * t * t) + rib(th) * (0.4 + 0.6 * t);
-  const cap = [cupMesh(capR, Hc, w, F, N * 4, 40)];
   // Collar que abraza la boca del pie
   const ci = rt + amp + 0.5, collar = difference(circle(0, 0, ci + 1.6, 96), circle(0, 0, ci, 96));
+  // Tapa abierta: agujero del tamaño de la boca del collar (sale luz hacia arriba y ventila)
+  // (dejando siempre al menos 1 mm de tapa entre el agujero y la pared, aun con mucho relieve)
+  const open = p.capTop === 'open';
+  let capIn = Infinity;
+  for (let k = 0; k < N * 4; k++) capIn = Math.min(capIn, capR((k / (N * 4)) * TAU, F / Hc) - w);
+  const hole = open ? Math.min(ci, capIn - 1) : 0;
+  const cap = [cupMesh(capR, Hc, w, F, N * 4, 40, hole)];
   cap.push(extrudeRegion(collar, 0, Math.min(14, Hc - 4)));
   if (orientationId === 'assembled') {
     const m = new THREE.Matrix4().makeTranslation(0, 0, Hs + F).multiply(new THREE.Matrix4().makeRotationX(Math.PI));
@@ -154,7 +161,12 @@ function buildMushroom(p, orientationId) {
     if (off + RbOk + Rc > 215) issues.push({ level: 'info', msg: 'El pie y el sombrero juntos no entran en una cama de 22 cm: imprimilos por separado.' });
   }
   if (Rc * 2 > 215) issues.push({ level: 'warning', msg: 'El sombrero es más ancho que una cama de 22 cm.' });
-  issues.push({ level: 'info', msg: 'La luz LED se apoya arriba del pie, en el vaso. El sombrero se calza encima y se ilumina entero. El cable baja por adentro del pie.' });
+  if (open) {
+    issues.push({ level: 'info', msg: 'Tapa abierta: sale luz hacia arriba (al techo) y el calor se ventila. Desde arriba se ve la luz LED.' });
+  } else {
+    issues.push({ level: 'info', msg: 'La luz LED se apoya arriba del pie, en el vaso. El sombrero se calza encima y brilla entero. El cable baja por adentro del pie.' });
+    issues.push({ level: 'info', msg: 'Tapa cerrada: la luz queda cerca de la tapa y en el centro se ve un círculo más brillante. Como el calor queda adentro, usá solo luces LED de 5 W o menos.' });
+  }
   issues.push({ level: 'info', msg: 'Las dos piezas se pueden imprimir en modo vaso (Spiral vase) con piso. El sombrero va boca abajo, con la tapa sobre la cama.' });
   return {
     parts: [
@@ -174,8 +186,8 @@ export default {
   tags: ['lámpara', 'velador', 'led', 'luz', 'decoración', 'pantalla', 'modo vaso', 'regalo'],
   printTime: '4–8 h',
   defaults: {
-    style: 'ondas', diameter: 120, height: 150, tiers: 3, ribs: 48, lobes: 6, depth: 22, wall: 1.2,
-    baseHeight: 40, led: 42, cable: true, colorBase: '#8FD3B6', colorShade: '#F1F1EC',
+    style: 'ondas', diameter: 110, height: 150, tiers: 3, ribs: 48, lobes: 6, depth: 22, wall: 1.2,
+    baseHeight: 40, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
   },
   sections: [
     { title: 'Pantalla', items: [
@@ -191,6 +203,7 @@ export default {
       { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 120, visibleIf: (p) => ['acanalada', 'texturada', 'espiral', 'hongo'].includes(p.style) },
       { key: 'lobes', type: 'stepper', label: (p) => (p.style === 'texturada' ? 'Bultos por vuelta' : 'Ondas'), min: 3, max: 12, visibleIf: (p) => p.style === 'ondulada' || p.style === 'texturada' },
       { key: 'depth', type: 'range', label: 'Profundidad del relieve', min: 5, max: 100, step: 1, unit: '%' },
+      { key: 'capTop', type: 'segmented', label: 'Tapa del sombrero', options: [{ value: 'closed', label: 'Cerrada (difusa)' }, { value: 'open', label: 'Abierta' }], visibleIf: (p) => p.style === 'hongo' },
     ] },
     { title: 'Medidas', items: [
       { key: 'diameter', type: 'range', label: (p) => (p.style === 'hongo' ? 'Ancho del sombrero' : 'Ancho de la pantalla'), min: 70, max: 180, step: 1, unit: 'mm' },
