@@ -26,7 +26,7 @@ export default {
   description: 'Letras paradas unidas por bisagras que giran: el nombre se dobla como una víbora. Se imprime ya armado, sin soportes, y a dos colores con un cambio de filamento.',
   tags: ['llavero', 'nombre', 'articulado', 'flexi', 'dos colores', 'regalo', 'niños'],
   printTime: '40–90 min',
-  defaults: { text: 'ETHAN', font: 'titan', letterHeight: 16, depth: 8, split: 55, clearance: 0.45, ring: true, colorBottom: '#1D3557', colorTop: '#3B8FD9' },
+  defaults: { text: 'ESTRATOS3D', font: 'titan', letterHeight: 16, depth: 8, split: 55, clearance: 0.45, ring: true, colorBottom: '#1A1F24', colorTop: '#47D0B0' },
   sections: [
     { title: 'Texto', items: [
       { key: 'text', type: 'text', label: 'Nombre', maxLength: 10, placeholder: 'Tu nombre', help: 'Se escribe en mayúsculas.' },
