@@ -52,7 +52,7 @@ function tabBar(cur) {
   <nav class="tabbar" aria-label="Navegación">
     <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
     <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
-    <a class="tab-create" href="/catalogo"${cur('catalogo')}><span class="tab-create-btn">${icon.plus}</span><span>Crear</span></a>
+    <a class="tab-create" href="/catalogo"${cur('catalogo')}><span class="tab-create-btn">${icon.plus}</span><span>Catálogo</span></a>
     <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
     <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
   </nav>`;
@@ -61,23 +61,19 @@ function tabBar(cur) {
 export function footer() {
   return `
   <footer class="site-footer">
-    <div class="wrap">
-      <div>
+    <div class="wrap foot">
+      <div class="foot-brand">
         <a class="logo" href="/">${logo}</a>
-        <p class="fine">Los archivos se generan en tu navegador a partir de tus medidas. Revisalos siempre en tu laminador antes de imprimir.</p>
+        <p class="fine">Los archivos se generan en tu navegador. Revisalos siempre en tu laminador antes de imprimir.</p>
       </div>
-      <div>
-        <h4>Herramienta</h4>
-        <ul><li><a href="/catalogo">Catálogo</a></li><li><a href="/#como-funciona">Cómo funciona</a></li><li><a href="/guias">Guías</a></li><li><a href="/galeria">Galería</a></li>${EVENTS.map((e) => `<li><a href="${e.path}">Especial ${esc(e.label)}</a></li>`).join('')}<li><a href="/acerca">Acerca de</a></li></ul>
+      <nav class="foot-links" aria-label="Enlaces del sitio">
+        <a href="/catalogo">Catálogo</a><a href="/guias">Guías</a><a href="/galeria">Galería</a>${EVENTS.map((e) => `<a href="${e.path}">${esc(e.label)}</a>`).join('')}<a href="/ayuda">Preguntas</a><a href="/contacto">Contacto</a><a href="/acerca">Acerca de</a>
+      </nav>
+      <div class="foot-social" aria-label="Redes">
+        <a href="https://www.instagram.com/${esc(SITE.instagram)}" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.tiktok.com/@${esc(SITE.instagram)}" target="_blank" rel="noopener">TikTok</a>
       </div>
-      <div>
-        <h4>Ayuda</h4>
-        <ul><li><a href="/ayuda">Preguntas frecuentes</a></li><li><a href="/contacto">Contacto</a></li></ul>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <ul><li><a href="/privacidad">Política de privacidad</a></li><li><a href="/condiciones">Condiciones de uso</a></li></ul>
-      </div>
+      <p class="foot-legal">© ${new Date().getFullYear()} ${esc(SITE.name)} · <a href="/privacidad">Privacidad</a> · <a href="/condiciones">Condiciones de uso</a></p>
     </div>
   </footer>`;
 }
