@@ -5,6 +5,7 @@ import { galleryItems } from '../content/gallery.js';
 import { getEvent, presetHref, EVENTS } from '../content/events.js';
 import { renderPresetThumbs } from './thumbnails.js';
 import { IDEA_THUMBS, IDEA_THUMB_VERSION } from '../content/ideaThumbs.js';
+import { THUMB_VERSION, THUMBS } from '../content/thumbs.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
@@ -48,12 +49,32 @@ export function helpPage() {
 
 export function pedidosPage() {
   const ev = EVENTS[0];
-  const precios = PEDIDOS.precios.length
-    ? `<div class="table-scroll"><table class="formats"><thead><tr><th>Pieza</th><th>Precio</th><th>Detalle</th></tr></thead><tbody>${PEDIDOS.precios.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${esc(p.desde)}</td><td>${esc(p.nota || '')}</td></tr>`).join('')}</tbody></table></div>
-      <p class="note">Son precios de referencia: el valor final depende del tamaño, los colores y la cantidad, y te lo confirmamos antes de imprimir.</p>`
+  const ver = (src) => `${src}?v=${src.includes('/ideas/') ? IDEA_THUMB_VERSION : THUMB_VERSION}`;
+  const fotoDe = (p) => p.foto || (THUMBS.has(p.objeto) ? `/miniaturas/${p.objeto}.webp` : '');
+  const card = (p) => {
+    const href = p.objeto && getObject(p.objeto) ? presetHref({ objeto: p.objeto, params: p.params }) : '';
+    const src = fotoDe(p);
+    const img = src ? `<img src="${esc(ver(src))}" alt="${esc(p.nombre)}" width="960" height="720" loading="lazy" decoding="async">` : '';
+    return `<div class="pc-card">
+      ${href ? `<a class="pc-foto" href="${esc(href)}" tabindex="-1" aria-hidden="true">${img}</a>` : `<span class="pc-foto">${img}</span>`}
+      <h4>${esc(p.nombre)}</h4>
+      <p>${esc(p.nota || '')}</p>
+      <div class="pc-pie"><span class="pc-monto"><small>desde</small> ${esc(p.desde)}</span><a class="pedir-fila" data-order="precios" data-objeto="${esc(p.nombre)}" href="${esc(generalOrderLink(`¡Hola! Quiero pedir: ${p.nombre}.`))}" target="_blank" rel="noopener" aria-label="Pedir ${esc(p.nombre)} por WhatsApp">Pedir</a></div>
+      ${href ? `<a class="pc-ver" href="${esc(href)}">Ver y personalizar</a>` : ''}
+    </div>`;
+  };
+  const total = PEDIDOS.grupos.reduce((n, g) => n + g.items.length, 0);
+  const precios = PEDIDOS.grupos.length
+    ? `<div class="pp-tabs" role="group" aria-label="Categorías"><button type="button" data-cat="" aria-pressed="true">Todos <small>${total}</small></button>${PEDIDOS.grupos.map((g) => `<button type="button" data-cat="${esc(g.id)}" aria-pressed="false">${esc(g.titulo)} <small>${g.items.length}</small></button>`).join('')}</div>
+      ${PEDIDOS.grupos.map((g) => `<section class="pp-group" data-cat="${esc(g.id)}" aria-label="${esc(g.titulo)}">
+        <h3>${esc(g.titulo)}</h3>
+        <div class="pp-grid">${g.items.map(card).join('')}</div>
+      </section>`).join('')}
+      <p class="note">Precios de referencia por unidad, actualizados en ${esc(PEDIDOS.actualizado)}. Las fotos son vistas 3D del diseño. El valor final depende del tamaño, los colores y la cantidad, y te lo confirmamos por WhatsApp antes de imprimir. ¿No ves lo que buscás? Pedinos la cotización de cualquier otro diseño del <a href="/catalogo">catálogo</a>.</p>`
     : '<p>El precio depende del diseño, el tamaño, los colores y la cantidad. Te lo pasamos por WhatsApp antes de imprimir, sin compromiso.</p>';
-  return infoLayout('/pedidos', `
-    <section>
+  return `
+  <main class="wrap pedidos-page">
+    <header class="pp-head">
       <span class="eyebrow">Pedidos</span>
       <h1>Pedí tu pieza impresa en 3D</h1>
       <p>¿Diseñaste algo y no tenés impresora? Te lo imprimimos. Elegí el objeto, ajustalo en la web y mandanos el pedido por WhatsApp: llega con el link a tu diseño y todos tus ajustes.</p>
@@ -61,39 +82,35 @@ export function pedidosPage() {
         <a class="btn btn-order btn-lg" data-order="pedidos" href="${esc(generalOrderLink())}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
         <a class="btn btn-lg btn-soft" href="/catalogo">Elegir un diseño</a>
       </div>
-    </section>
-    <section>
-      <h2>Cómo funciona</h2>
-      <ol class="pedido-steps">
-        <li><b>Elegí y personalizá.</b> Abrí un objeto del <a href="/catalogo">catálogo</a> y cambiá nombre, medidas y colores.</li>
-        <li><b>Tocá “Pedilo impreso”.</b> Se abre WhatsApp con el link de tu diseño y los ajustes ya cargados.</li>
-        <li><b>Confirmamos.</b> Te pasamos el precio, los colores disponibles y la forma de entrega antes de empezar.</li>
-        <li><b>Lo imprimimos.</b> Y te lo entregamos en ${esc(PEDIDOS.plazo)} desde que confirmás.</li>
-      </ol>
-    </section>
-    <section>
-      <h2>Tiempos</h2>
-      <p>Entregamos en ${esc(PEDIDOS.plazo)} desde que confirmás el pedido. Esto incluye las tandas: por ejemplo, 30 llaveros para un evento. Si lo necesitás para una fecha puntual, avisanos y lo coordinamos.</p>
-    </section>
-    <section>
-      <h2>Precios</h2>
+    </header>
+    <ol class="pp-steps">
+      <li><b>1 · Elegí y personalizá</b><span>Abrí un diseño y cambiá nombre, medidas y colores.</span></li>
+      <li><b>2 · Pedilo por WhatsApp</b><span>Se abre con el link de tu diseño y los ajustes ya cargados.</span></li>
+      <li><b>3 · Confirmamos</b><span>Te pasamos precio, colores disponibles y forma de entrega.</span></li>
+      <li><b>4 · Lo imprimimos</b><span>Lo recibís en ${esc(PEDIDOS.plazo)} desde que confirmás. También tandas: por ejemplo, 30 llaveros para un evento.</span></li>
+    </ol>
+    <section class="pp-precios" id="precios">
+      <h2>Precios y productos</h2>
       ${precios}
     </section>
-    <section>
-      <h2>Ideas para pedir</h2>
-      <ul>
-        <li><a href="/catalogo?categoria=accesorios">Llaveros con nombre</a> para souvenirs de cumpleaños, eventos y regalos.</li>
-        <li><a href="/catalogo?categoria=negocios">Carteles con QR y placas</a> para tu local o emprendimiento.</li>
-        <li><a href="/catalogo?categoria=organizacion">Organizadores</a> de escritorio, cajones y baño.</li>
-        ${ev ? `<li><a href="${ev.path}">Adornos de ${esc(ev.label)}</a> con el nombre de cada uno.</li>` : ''}
-      </ul>
-    </section>
-    <section>
-      <h2>Preguntas</h2>
-      <details><summary>¿Puedo pedir varias unidades?</summary><p>Sí. Para souvenirs, eventos o negocios armamos tandas. Contanos la cantidad y te pasamos el precio.</p></details>
-      <details><summary>¿Cómo pago y cómo lo recibo?</summary><p>Lo acordamos por WhatsApp antes de imprimir, según lo que te quede mejor.</p></details>
-      <details><summary>¿Hace falta que descargue el archivo?</summary><p>No. Con tocar “Pedilo impreso” alcanza: nosotros abrimos tu diseño con los mismos ajustes.</p></details>
-    </section>`);
+    <div class="pp-more">
+      <section>
+        <h2>Ideas para pedir</h2>
+        <ul>
+          <li><a href="/catalogo?categoria=accesorios">Llaveros con nombre</a> para souvenirs de cumpleaños, eventos y regalos.</li>
+          <li><a href="/catalogo?categoria=negocios">Carteles con QR y placas</a> para tu local o emprendimiento.</li>
+          <li><a href="/catalogo?categoria=organizacion">Organizadores</a> de escritorio, cajones y baño.</li>
+          ${ev ? `<li><a href="${ev.path}">Adornos de ${esc(ev.label)}</a> con el nombre de cada uno.</li>` : ''}
+        </ul>
+      </section>
+      <section>
+        <h2>Preguntas</h2>
+        <details><summary>¿Puedo pedir varias unidades?</summary><p>Sí. Para souvenirs, eventos o negocios armamos tandas. Contanos la cantidad y te pasamos el precio.</p></details>
+        <details><summary>¿Cómo pago y cómo lo recibo?</summary><p>Lo acordamos por WhatsApp antes de imprimir, según lo que te quede mejor.</p></details>
+        <details><summary>¿Hace falta que descargue el archivo?</summary><p>No. Con tocar “Pedilo impreso” alcanza: nosotros abrimos tu diseño con los mismos ajustes.</p></details>
+      </section>
+    </div>
+  </main>`;
 }
 
 export function aboutPage() {
@@ -371,7 +388,7 @@ export function eventPage(id) {
       <section class="order-band event-order" aria-labelledby="ev-order">
         <div>
           <h2 id="ev-order">¿Preferís recibirlos ya impresos?</h2>
-          <p>Elegís el diseño y el nombre, y te los imprimimos a dos colores. Ideal para regalos y souvenirs: te respondemos con el precio y el plazo.</p>
+          <p>Elegís el diseño y el nombre, y te los imprimimos a dos colores. Adornos chicos <b>desde $2.000</b>; mirá la <a href="/pedidos#precios">lista de precios</a>. Te confirmamos precio y plazo antes de imprimir.</p>
         </div>
         <div class="order-band-actions"><a class="btn btn-order btn-lg" data-order="${esc(ev.id)}" href="${generalOrderLink(`¡Hola! Quiero pedir adornos de ${ev.label} impresos en 3D.`)}" target="_blank" rel="noopener">Pedir por WhatsApp</a><a class="order-band-more" href="/pedidos">Cómo pedir</a></div>
       </section>
@@ -404,6 +421,11 @@ export function mountEvent(root, id) {
 }
 
 export function mountContent(root) {
+  const tabs = root.querySelectorAll('.pp-tabs button');
+  tabs.forEach((t) => t.addEventListener('click', () => {
+    tabs.forEach((x) => x.setAttribute('aria-pressed', String(x === t)));
+    root.querySelectorAll('.pp-group').forEach((g) => { g.hidden = !!t.dataset.cat && g.dataset.cat !== t.dataset.cat; });
+  }));
   root.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copiada'; } catch { b.textContent = 'Seleccioná y copiá la dirección'; }
   }));

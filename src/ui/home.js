@@ -34,6 +34,7 @@ export function homePage() {
             ${HERO_CATS.map((id) => CATEGORIES.find((c) => c.id === id)).filter(Boolean).map((c) => `<a class="chip-link" href="/catalogo?categoria=${c.id}">${esc(c.label)}</a>`).join('')}
           </div>
           <div class="hero-facts"><span><b>${MAIN_OBJECTS.length}</b> diseños editables</span><span>Descarga en <b>3MF · STL · OBJ</b></span><span>Sin registrarte</span></div>
+          <a class="hero-print" href="/pedidos">¿No tenés impresora? <b>Pedilo impreso</b> ${icon.arrow}</a>
         </div>
         <div class="demo demo-mini">
           <div class="demo-stage" id="demo-stage"><span class="tag"><span class="dot"></span>Vista 3D en vivo</span></div>

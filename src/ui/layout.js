@@ -18,6 +18,7 @@ export function header(section) {
         <a href="/guias"${cur('guias')}>Guías</a>
         <a href="/galeria"${cur('galeria')}>Galería</a>
         ${(() => { const ev = activeEvent(); return ev ? `<a class="nav-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree} ${esc(ev.label)}</a>` : ''; })()}
+        <a href="/pedidos"${cur('pedidos')}>Pedí impreso</a>
         <a href="/ayuda"${cur('ayuda')}>Ayuda</a>
       </nav>
       <a class="btn btn-primary btn-sm btn-cta header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
@@ -40,6 +41,7 @@ function sideNav(cur) {
       <a href="/catalogo"${cur('catalogo')}>${icon.grid}<span>Catálogo</span></a>
       <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
       <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
+      <a href="/pedidos"${cur('pedidos')}>${icon.bag}<span>Pedidos</span></a>
       <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
     </nav>
     ${promo ? `<div class="side-bottom"><a class="side-promo" href="/sorteos/${esc(promo.slug)}" title="${esc(promo.title)}">${icon.gift}<span>Sorteo</span><i class="side-dot" aria-hidden="true"></i></a></div>` : ''}
