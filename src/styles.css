@@ -909,3 +909,9 @@ html.lb-lock { overflow: hidden; }
   .demo-mini .demo-stage { height: 190px; }
   .hero .wrap { padding-block: 28px 32px; gap: 24px; }
 }
+/* Home en celular: las categorías van en una fila deslizable en vez de una lista larga. */
+@media (max-width: 560px) {
+  .cat-grid { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; margin-inline: -16px; padding: 2px 16px 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .cat-grid::-webkit-scrollbar { display: none; }
+  .cat-grid .cat { flex: 0 0 72%; max-width: 260px; scroll-snap-align: start; }
+}
