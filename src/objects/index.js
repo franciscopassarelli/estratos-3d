@@ -16,6 +16,7 @@ import letteringKeychain from './letteringKeychain.js';
 import initialKeychain from './initialKeychain.js';
 import capsuleTower from './capsuleTower.js';
 import tissueBox from './tissueBox.js';
+import glassWineRack from './glassWineRack.js';
 import drawerTray from './drawerTray.js';
 import headphoneStand from './headphoneStand.js';
 import controllerStand from './controllerStand.js';
@@ -44,7 +45,7 @@ export const CATEGORIES = [
   { id: 'hogar', label: 'Hogar y decoración', blurb: 'Macetas, lámparas, cocina y la mesa', subs: [
     { id: 'plantas', label: 'Macetas y floreros', ids: ['maceta', 'florero-low-poly'] },
     { id: 'lamparas', label: 'Lámparas', ids: ['lampara-led'] },
-    { id: 'mesa', label: 'Mesa y cocina', ids: ['posavasos', 'posavasos-monstera', 'botellero', 'porta-capsulas'] },
+    { id: 'mesa', label: 'Mesa y cocina', ids: ['posavasos', 'posavasos-monstera', 'botellero', 'botellero-copas', 'porta-capsulas'] },
   ] },
   { id: 'accesorios', label: 'Accesorios', blurb: 'Llaveros con nombre, inicial, frase, articulados o con QR', subs: [
     { id: 'llaveros', label: 'Llaveros', ids: ['llavero', 'llavero-articulado', 'llavero-lettering', 'llavero-placa', 'llavero-inicial', 'llavero-qr'] },
@@ -78,7 +79,7 @@ export const OBJECTS = [
   remoteCaddy, honeycombKeyRack, honeycombPenHolder, lowPolyVase, ledLamp, swingBin,
   wineRack, makeupHolder, lipstickHolder, monsteraCoaster,
   flexiName, badgeKeychain, letteringKeychain, initialKeychain,
-  capsuleTower, tissueBox,
+  capsuleTower, tissueBox, glassWineRack,
 ];
 
 const SUB_OF = new Map();

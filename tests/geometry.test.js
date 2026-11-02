@@ -7,6 +7,7 @@ fs.mkdirSync('out', { recursive: true });
 
 const variants = {
   llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }, { variant: 'bar', text: 'JAXSON' }, { variant: 'bar', font: 'pacifico', text: 'Alex' }],
+  'botellero-copas': [{}, { base: 'patas' }, { base: 'patas', arms: false, depth: 110 }, { arms: false }, { depth: 100, ribs: false }, { depth: 200, stem: 12, arm: 30 }],
   'porta-capsulas': [{}, { perColumn: 3, baseRings: 1 }, { perColumn: 6, wall: 1.6, rim: 40, neck: 33 }],
   'caja-panuelos': [{}, { opening: 'slot', hole: 70, tiers: 1, texture: false }, { inner: 90, height: 100, tiers: 2, wave: 4, ribs: 60 }],
   'llavero-articulado': [{}, { text: 'Mason', font: 'archivo' }, { text: 'LIAM', font: 'bungee', split: 30 }, { text: 'Ava', font: 'pacifico', letterHeight: 12 }],

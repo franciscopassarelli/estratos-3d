@@ -29,11 +29,12 @@ function layout(n, rb, t) {
 function path(n, rb, t) {
   const { L, bump, rp } = layout(n, rb, t);
   const pts = [], seg = 40, side = (k) => (k % 2 ? L : 0); // centro de la vuelta k
-  const tail = (x0, y0, dir, up) => {  // cola que sube suavemente hacia afuera
-    const out = [];
-    for (let i = 1; i <= 20; i++) {
-      const v = i / 20;
-      out.push({ x: x0 + dir * rb * 0.95 * v, y: y0 + up * rb * 0.45 * (1 - Math.cos(Math.PI * v)) / 2 + up * rb * 0.25 * v * v });
+  const tail = (x0, y0, dir, up) => {  // cola que se enrula hacia arriba, como la cresta de una ola
+    const out = [], Rt = rb * 0.55, run = rb * 0.3;
+    for (let i = 1; i <= 6; i++) out.push({ x: x0 + dir * run * (i / 6), y: y0 });
+    for (let i = 1; i <= 28; i++) {
+      const th = (i / 28) * 1.95;
+      out.push({ x: x0 + dir * (run + Rt * Math.sin(th)), y: y0 + up * Rt * (1 - Math.cos(th)) });
     }
     return out;
   };
@@ -56,7 +57,18 @@ function path(n, rb, t) {
       pts.push(...tail(x1, y, x1 === 0 ? -1 : 1, 1));
     }
   }
-  return pts;
+  return chaikin(chaikin(pts));
+}
+
+/** Suaviza la polilínea (corta las esquinas): las uniones entre curvas quedan como una cinta continua. */
+function chaikin(pts) {
+  const out = [pts[0]];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    out.push({ x: 0.75 * a.x + 0.25 * b.x, y: 0.75 * a.y + 0.25 * b.y }, { x: 0.25 * a.x + 0.75 * b.x, y: 0.25 * a.y + 0.75 * b.y });
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
 }
 
 export default {
@@ -66,7 +78,7 @@ export default {
   description: 'Cinta en forma de ola con una cuna para cada botella: la botella queda trabada entre la vuelta y la loma y no rueda. Elegí cuántas botellas y su diámetro. Se imprime acostado, sin soportes.',
   tags: ['botellero', 'vino', 'botellas', 'cocina', 'bar', 'ola', 'decoración', 'regalo'],
   printTime: '4–8 h',
-  defaults: { bottles: 2, bottle: 76, width: 80, thickness: 4.5, color: '#26272B' },
+  defaults: { bottles: 2, bottle: 76, width: 100, thickness: 4.2, color: '#26272B' },
   sections: [
     { title: 'Forma', items: [
       { key: 'bottles', type: 'stepper', label: 'Botellas', min: 1, max: 4 },

@@ -18,6 +18,10 @@ export const VARIANTS = {
     { key: 'ondas', label: 'Ondas', params: { design: 'ondas', color: '#8FD3B6' } },
     { key: 'texto', label: 'Con nombre', params: { design: 'texto', text: 'Martina', color: '#E87BA8' } },
   ],
+  'botellero-copas': [
+    { key: 'punta', label: 'En una punta', params: {} },
+    { key: 'patas', label: 'En dos patas', params: { base: 'patas' } },
+  ],
   llavero: [
     { key: 'contorno', label: 'Contorno', params: {} },
     { key: 'barra', label: 'Barra', params: { variant: 'bar', text: 'JAXSON', font: 'archivo', colorBase: '#E8742A', colorText: '#E8742A' } },
