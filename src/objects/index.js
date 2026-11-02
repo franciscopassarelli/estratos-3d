@@ -86,6 +86,23 @@ export const OBJECTS = [
   gingerbread, candyCane, zigzagTree,
 ];
 
+// Acabado de la vista previa (mate, seda o metal) para los diseños navideños: solo cambia cómo se ve en pantalla,
+// el color de filamento lo elige cada uno. Se agrega acá para no repetirlo en cada diseño.
+const FINISH_DEFAULT = { 'adorno-navidad': 'seda', 'estrella-arbol': 'metal', 'copo-nieve': 'seda', servilletero: 'seda', 'arbol-conico': 'seda', 'galleta-jengibre': 'mate', 'baston-caramelo': 'seda', 'arbol-zigzag': 'seda' };
+const FINISH_SECTION = { title: 'Acabado de la vista', items: [{ key: 'finish', type: 'cards', label: 'Brillo', help: 'Solo cambia cómo se ve acá. En la impresora el brillo lo da el filamento: elegí uno «seda» o metalizado.', options: [
+  { value: 'mate', label: 'Mate', hint: 'PLA común' },
+  { value: 'seda', label: 'Seda', hint: 'Brillo satinado' },
+  { value: 'metal', label: 'Metal', hint: 'Metalizado' },
+] }] };
+for (const o of OBJECTS) {
+  const d = FINISH_DEFAULT[o.id];
+  if (!d) continue;
+  o.defaults.finish = d;
+  o.sections.push(FINISH_SECTION);
+  const build = o.build;
+  o.build = function (p, orientation) { const r = build.call(this, p, orientation); for (const pt of r.parts) if (pt) pt.finish = p.finish; return r; };
+}
+
 const SUB_OF = new Map();
 for (const c of CATEGORIES) for (const sub of c.subs || []) for (const id of sub.ids) SUB_OF.set(id, { category: c, sub });
 // La categoría de cada diseño sale de la tabla de arriba (así la etiqueta de la tarjeta coincide con el filtro).

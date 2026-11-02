@@ -27,8 +27,13 @@ function cssVar(name, fallback) {
  * glow: pieza que deja pasar la luz (pantallas de lámpara). Brilla más de frente que en los bordes,
  * como un plástico fino iluminado desde adentro.
  */
-function plaMaterial(color, layers, glow = false) {
-  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0, envMapIntensity: 0.35 });
+// Acabados solo para la vista: «seda» imita el PLA seda y «metal» un filamento metalizado.
+const FINISHES = {
+  seda: { roughness: 0.3, metalness: 0.45, envMapIntensity: 1.25 },
+  metal: { roughness: 0.2, metalness: 0.92, envMapIntensity: 1.6 },
+};
+function plaMaterial(color, layers, glow = false, finish = '') {
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0, envMapIntensity: 0.35, ...(FINISHES[finish] || {}) });
   if (glow) { mat.emissive = new THREE.Color(color).lerp(new THREE.Color('#FFC77A'), 0.55); mat.emissiveIntensity = 0; }
   if (!layers && !glow) return mat;
   mat.extensions = { derivatives: true };
@@ -215,7 +220,7 @@ export class Viewer {
     const tris = parts.reduce((s, p) => s + p.volumes.reduce((t, g) => t + g.attributes.position.count / 3, 0), 0);
     const smooth = tris <= SMOOTH_MAX_TRIS;
     for (const p of parts) {
-      const mat = plaMaterial(p.color, layers || !!p.glow, !!p.glow);
+      const mat = plaMaterial(p.color, layers || !!p.glow, !!p.glow, p.finish);
       // `flat`: diseños facetados a propósito (low poly): se muestran con caras planas.
       const soft = smooth && !p.flat;
       if (!soft) mat.flatShading = true;
