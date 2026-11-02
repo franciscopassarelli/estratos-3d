@@ -122,10 +122,12 @@ export function editorPage(id) {
         </div>
         <div id="tabs-anchor"></div>
         <div class="sec-tabs" role="tablist" aria-label="Secciones del diseño" id="sec-tabs"></div>
-        <div id="controls"></div>
-        <section class="group" id="print-group" data-sec="print" role="tabpanel" aria-label="Preparación para imprimir" hidden>
-          <div class="group-body" id="print-body"></div>
-        </section>
+        <div class="panel-scroll">
+          <div id="controls"></div>
+          <section class="group" id="print-group" data-sec="print" role="tabpanel" aria-label="Preparación para imprimir" hidden>
+            <div class="group-body" id="print-body"></div>
+          </section>
+        </div>
         <div class="export" id="export"></div>
       </div>
     </div>

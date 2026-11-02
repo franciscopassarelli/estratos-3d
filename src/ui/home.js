@@ -10,10 +10,28 @@ import { activeEvent } from '../content/events.js';
 import { galleryCard } from './pages.js';
 import { bindLightbox } from './lightbox.js';
 import { generalOrderLink } from '../content/contact.js';
+import { THUMB_VERSION } from '../content/thumbs.js';
 
 const SHOWCASE = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
 const SHOWCASE_LABEL = 'Ejemplos del catálogo';
-const HERO_CATS = ['accesorios', 'organizacion', 'hogar', 'negocios', 'gaming'];
+// «Inspirate»: atajos con miniatura debajo de los botones del inicio
+const INSPIRE = [
+  { label: 'Lámparas', sub: 'con luz LED', obj: 'lampara-led', href: '/catalogo?categoria=hogar' },
+  { label: 'Organizadores', sub: 'escritorio y casa', obj: 'organizador-labiales', href: '/catalogo?categoria=organizacion' },
+  { label: 'Llaveros', sub: 'con tu nombre', obj: 'llavero-articulado', href: '/catalogo?categoria=accesorios' },
+  { label: 'Gaming', sub: 'soportes y mandos', obj: 'soporte-mandos', href: '/catalogo?categoria=tecnologia' },
+  { label: 'Para negocios', sub: 'carteles con QR', obj: 'display-qr', href: '/catalogo?categoria=negocios' },
+];
+const thumbUrl = (id) => `/miniaturas/${id}.webp?v=${THUMB_VERSION}`;
+// Pestañas de «Diseños listos para personalizar»
+const TABS = [{ id: 'rec', label: 'Recomendados' }, { id: 'hogar', label: 'Hogar' }, { id: 'organizacion', label: 'Organización' }, { id: 'accesorios', label: 'Accesorios' }, { id: 'tecnologia', label: 'Gaming y tecnología' }, { id: 'negocios', label: 'Negocios' }];
+const TAB_MAX = 8;
+function tabbedDesigns() {
+  const byTab = Object.fromEntries(TABS.map((t) => [t.id, t.id === 'rec' ? FEATURED.map(getObject).filter(Boolean) : MAIN_OBJECTS.filter((o) => categoriesOf(o).includes(t.id)).slice(0, TAB_MAX)]));
+  const all = new Map();
+  for (const t of TABS) for (const d of byTab[t.id]) { if (!all.has(d.id)) all.set(d.id, { d, tabs: [] }); all.get(d.id).tabs.push(t.id); }
+  return [...all.values()];
+}
 
 const FEATURED = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 'llavero-articulado', 'organizador-labiales', 'caja-panuelos', 'soporte-celular'];
 
@@ -30,8 +48,11 @@ export function homePage() {
             <a class="btn btn-primary btn-lg btn-cta" href="/catalogo">${icon.plus} Ver el catálogo</a>
             <a class="btn btn-lg btn-soft" href="/#como-funciona">Cómo funciona ${icon.chevron}</a>
           </div>
-          <div class="hero-chips" aria-label="Categorías">
-            ${HERO_CATS.map((id) => CATEGORIES.find((c) => c.id === id)).filter(Boolean).map((c) => `<a class="chip-link" href="/catalogo?categoria=${c.id}">${esc(c.label)}</a>`).join('')}
+          <div class="inspire" aria-label="Inspirate">
+            <span class="inspire-title">Inspirate</span>
+            <div class="inspire-row">
+              ${INSPIRE.map((i) => `<a class="inspire-pill" href="${i.href}"><img src="${thumbUrl(i.obj)}" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>${esc(i.label)}</b><small>${esc(i.sub)}</small></span></a>`).join('')}
+            </div>
           </div>
           <div class="hero-facts"><span><b>${MAIN_OBJECTS.length}</b> diseños editables</span><span>Descarga en <b>3MF · STL · OBJ</b></span><span>Sin registrarte</span></div>
           <a class="hero-print" href="/pedidos">¿No tenés impresora? <b>Pedilo impreso</b> ${icon.arrow}</a>
@@ -56,9 +77,12 @@ export function homePage() {
     <section class="section wrap" aria-labelledby="pop-title">
       <div class="section-head">
         <div><span class="eyebrow">Los más elegidos</span><h2 id="pop-title">Diseños listos para personalizar</h2></div>
-        <a class="btn btn-soft btn-more" href="/catalogo">Ver catálogo completo ${icon.arrow}</a>
+        <a class="btn btn-soft btn-more" id="feat-more" href="/catalogo">Ver catálogo completo ${icon.arrow}</a>
       </div>
-      <div class="cards cards-featured">${FEATURED.map(getObject).filter(Boolean).map(card).join('')}</div>
+      <div class="feat-tabs" role="tablist" aria-label="Filtrar diseños">
+        ${TABS.map((t, i) => `<button type="button" role="tab" data-tab="${t.id}" aria-selected="${i === 0}">${esc(t.label)}</button>`).join('')}
+      </div>
+      <div class="cards cards-featured" id="feat-cards">${tabbedDesigns().map(({ d, tabs }) => `<div class="fcard" data-tabs="${tabs.join(' ')}"${tabs.includes('rec') ? '' : ' hidden'}>${card(d)}</div>`).join('')}</div>
     </section>
 
     <section class="section wrap" aria-labelledby="cats-title">
@@ -119,6 +143,16 @@ export function homePage() {
 export function mountHome(root) {
   const offThumbs = bindThumbs(root), offCar = bindCarousels(root);
   const offLightbox = bindLightbox(root);
+  const tabsEl = $('.feat-tabs', root), moreEl = $('#feat-more', root);
+  const onTab = (e) => {
+    const b = e.target.closest('button[data-tab]');
+    if (!b) return;
+    const id = b.dataset.tab;
+    tabsEl.querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    root.querySelectorAll('#feat-cards .fcard').forEach((c) => { c.hidden = !c.dataset.tabs.split(' ').includes(id); });
+    if (moreEl) moreEl.href = id === 'rec' ? '/catalogo' : `/catalogo?categoria=${id}`;
+  };
+  tabsEl?.addEventListener('click', onTab);
   const stage = $('#demo-stage', root);
   const defs = SHOWCASE.map(getObject).filter(Boolean);
   let viewer = null, idx = 0, timer = null, stopped = false;
@@ -152,7 +186,7 @@ export function mountHome(root) {
     show(Number(b.dataset.i)); schedule();
   });
   return () => {
-    stopped = true; clearTimeout(timer);
+    stopped = true; clearTimeout(timer); tabsEl?.removeEventListener('click', onTab);
     offThumbs(); offCar(); offLightbox(); viewer?.dispose();
     models.forEach(disposeModel);
   };

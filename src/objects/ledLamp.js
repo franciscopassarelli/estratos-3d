@@ -1,7 +1,7 @@
 // Lámpara LED de dos piezas: una base con lugar para una luz LED a pilas y salida de cable,
 // y una pantalla hueca que se apoya encastrada en la base. La pantalla tiene tres estilos.
 import * as THREE from 'three';
-import { difference, union, circle, rect, offset } from '../core/geometry2d.js';
+import { difference, union, intersection, circle, rect, offset } from '../core/geometry2d.js';
 import { extrudeRegion, part, geometryFromMesh } from '../core/mesh.js';
 
 const TAU = Math.PI * 2;
@@ -66,10 +66,33 @@ function shadeMesh(p, z0) {
   return geometryFromMesh(V, T);
 }
 
-/** Radio interior mínimo en la boca de abajo (para el encastre de la base). */
+// Zona de la pantalla donde entra el aro de la base (mm desde la boca de abajo)
+const LIP_H = 6;
+const LIP_W = 2.4;
+
+/** Contorno (región 2D) de la pantalla a la altura relativa t: 'in' = interior, 'out' = exterior. */
+function shadeLoop(p, t, side = 'in', n = 360) {
+  const w = side === 'in' ? p.wall : 0, ring = [];
+  for (let k = 0; k < n; k++) { const th = (k / n) * TAU, r = shadeRadius(p, th, t) - w; ring.push({ x: Math.cos(th) * r, y: Math.sin(th) * r }); }
+  return [ring];
+}
+
+/** Interior que queda libre en TODA la altura del aro: intersección de los contornos de abajo hasta LIP_H. */
+function lipZone(p) {
+  let z = null;
+  for (let j = 0; j <= 6; j++) {
+    const loop = shadeLoop(p, ((LIP_H + 1) / p.height) * (j / 6), 'in');
+    z = z ? intersection(z, loop) : loop;
+  }
+  return z;
+}
+
+/** Radio interior mínimo en la zona del aro (no solo en el borde de abajo: en Ondulada y Texturada se angosta enseguida). */
 function innerBottom(p) {
   let m = Infinity;
-  for (let k = 0; k < 360; k++) m = Math.min(m, shadeRadius(p, (k / 360) * TAU, 0) - p.wall);
+  for (let j = 0; j <= 12; j++) for (let k = 0; k < 360; k++) {
+    m = Math.min(m, shadeRadius(p, (k / 360) * TAU, ((LIP_H + 1) / p.height) * (j / 12)) - p.wall);
+  }
   return m;
 }
 function outerBottom(p) {
@@ -143,7 +166,7 @@ function buildMushroom(p, orientationId) {
   const Rc = p.diameter / 2 * 1.3, rf = Math.max(Rc * 0.5, rt + amp + 4), Hc = Math.max(1.6 * (Rc - rf), p.height * 0.36), F = Math.max(1.2, w);
   const capR = (th, t) => rf + (Rc - rf) * (0.55 * t + 0.45 * t * t) + rib(th) * (0.4 + 0.6 * t);
   // Collar que abraza la boca del pie
-  const ci = rt + amp + 0.5, collar = difference(circle(0, 0, ci + 1.6, 96), circle(0, 0, ci, 96));
+  const ci = rt + amp + p.fit + 0.1, collar = difference(circle(0, 0, ci + 1.6, 96), circle(0, 0, ci, 96));
   // Tapa abierta: agujero del tamaño de la boca del collar (sale luz hacia arriba y ventila)
   // (dejando siempre al menos 1 mm de tapa entre el agujero y la pared, aun con mucho relieve)
   const open = p.capTop === 'open';
@@ -187,7 +210,7 @@ export default {
   printTime: '4–8 h',
   defaults: {
     style: 'ondas', diameter: 110, height: 150, tiers: 3, ribs: 48, lobes: 6, depth: 22, wall: 1.2,
-    baseHeight: 40, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
+    baseHeight: 40, fit: 0.4, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
   },
   sections: [
     { title: 'Pantalla', items: [
@@ -209,6 +232,7 @@ export default {
       { key: 'diameter', type: 'range', label: (p) => (p.style === 'hongo' ? 'Ancho del sombrero' : 'Ancho de la pantalla'), min: 70, max: 180, step: 1, unit: 'mm' },
       { key: 'height', type: 'range', label: (p) => (p.style === 'hongo' ? 'Alto total' : 'Alto de la pantalla'), min: 70, max: 220, step: 1, unit: 'mm' },
       { key: 'wall', type: 'range', label: 'Pared de la pantalla', min: 0.8, max: 2.4, step: 0.1, unit: 'mm', help: 'Más fina = deja pasar más luz' },
+      { key: 'fit', type: 'range', label: 'Holgura del encastre', min: 0.1, max: 0.9, step: 0.05, unit: 'mm', help: 'Si la pantalla no entra en la base, subila; si queda floja, bajala. 0,3–0,5 mm va bien en la mayoría de las impresoras.' },
       { key: 'baseHeight', type: 'range', label: 'Alto de la base', min: 20, max: 80, step: 1, unit: 'mm', visibleIf: (p) => p.style !== 'hongo' },
     ] },
     { title: 'Luz', items: [
@@ -228,13 +252,19 @@ export default {
     if (p.style === 'hongo') return buildMushroom(p, orientationId);
     const issues = [];
     const Rin = innerBottom(p), Rout = outerBottom(p), hb = p.baseHeight;
-    const clr = 0.4, lipH = 6, lipW = 2.4;
+    const clr = p.fit, lipH = LIP_H, lipW = LIP_W;
     const ledR = p.led / 2;
     if (ledR + 2 > Rin - lipW - clr) return { parts: [], issues: [{ level: 'error', msg: 'La luz LED no entra adentro de la pantalla. Agrandá la pantalla o achicá el hueco de la luz.' }] };
 
-    // ----- Base: cilindro + aro de encastre arriba, hueco para la luz y canal de cable
-    const Rb = Rout + 3;
-    const body = circle(0, 0, Rb, 128);
+    // En «Ondas» la boca es un cuadrado redondeado: el aro y la base copian ese contorno (juego parejo en todo el borde).
+    // En los demás estilos el aro es un círculo que cabe en el punto más angosto de la zona de encastre.
+    const square = p.style === 'ondas';
+    const lipOuter = square ? offset(lipZone(p), -clr) : circle(0, 0, Rin - clr, 128);
+    const lipInner = offset(lipOuter, -lipW);
+    // Base: contorno de la pantalla en la boca + 2,5 mm de borde (círculo en los demás estilos)
+    const body = square ? offset(shadeLoop(p, 0, 'out'), 2.5) : circle(0, 0, Rout + 3, 128);
+    let Rb = 0;
+    for (const ring of body) for (const q of ring) Rb = Math.max(Rb, Math.hypot(q.x, q.y));
     const ledHole = circle(0, 0, ledR, 96);
     const depth = Math.min(14, hb - 6);
     const vols = [];
@@ -244,8 +274,9 @@ export default {
       vols.push(extrudeRegion(difference(body, circle(0, 0, 4.5, 32)), 6, hb - depth));
     } else vols.push(extrudeRegion(body, 0, hb - depth));
     vols.push(extrudeRegion(difference(body, ledHole), hb - depth, hb));
-    const lip = difference(circle(0, 0, Rin - clr, 128), circle(0, 0, Rin - clr - lipW, 128));
-    vols.push(extrudeRegion(lip, hb, hb + lipH));
+    // Aro con entrada guiada: el último milímetro y medio es 0,6 mm más fino para que la pantalla "caiga" en su lugar
+    vols.push(extrudeRegion(difference(lipOuter, lipInner), hb, hb + lipH - 1.5));
+    vols.push(extrudeRegion(difference(offset(lipOuter, -0.6), lipInner), hb + lipH - 1.5, hb + lipH));
 
     // ----- Pantalla: armada se apoya sobre la base; para imprimir va al lado
     const assembled = orientationId === 'assembled';
