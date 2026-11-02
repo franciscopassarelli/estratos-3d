@@ -84,11 +84,25 @@ export function bindCarousels(root) {
     const box = e.target.closest?.('[data-carousel]');
     if (box && !box.contains(e.relatedTarget)) stop(box);
   };
+  // Deslizar con el dedo sobre la foto cambia de imagen.
+  let tx = 0, ty = 0;
+  const onTouchStart = (e) => { const t = e.touches[0]; tx = t.clientX; ty = t.clientY; };
+  const onTouchEnd = (e) => {
+    const box = e.target.closest?.('[data-carousel]');
+    if (!box) return;
+    const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) < 36 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    stop(box);
+    go(box, dx < 0 ? 1 : -1);
+  };
+  root.addEventListener('touchstart', onTouchStart, { passive: true });
+  root.addEventListener('touchend', onTouchEnd, { passive: true });
   root.addEventListener('click', onClick, true);
   root.addEventListener('mouseover', onOver);
   root.addEventListener('mouseout', onOut);
   return () => {
     root.removeEventListener('click', onClick, true); root.removeEventListener('mouseover', onOver); root.removeEventListener('mouseout', onOut);
+    root.removeEventListener('touchstart', onTouchStart); root.removeEventListener('touchend', onTouchEnd);
     for (const t of timers.values()) clearInterval(t);
   };
 }
