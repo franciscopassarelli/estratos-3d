@@ -1,5 +1,6 @@
 import { getObject, CATEGORIES } from '../objects/index.js';
 import { storableParams, buildModel, disposeModel, statusOf, sanitize } from '../core/pipeline.js';
+import { orderLink } from '../content/contact.js';
 import { exportModel, slug } from '../export/formats.js';
 import { saveFiles, deliveryMode } from '../export/save.js';
 import { trackEvent } from './analytics.js';
@@ -10,6 +11,8 @@ import { FILAMENTS, PRINT } from '../core/palette.js';
 import { adSlot, activateAds } from './ads.js';
 import { guideForObject } from '../content/guides.js';
 import { esc, icon, $, $$, debounce, storage, toast, fmtBytes, fmtNum } from './dom.js';
+
+const WA_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 1c-1.2-.5-2.5-1.8-3-3l1-1-1-2z"/></svg>';
 
 const FORMATS = {
   '3mf': { label: '3MF', desc: 'Recomendado. Conserva una pieza por color, listas para asignar filamentos en tu laminador.' },
@@ -130,6 +133,7 @@ export function editorPage(id) {
     ${adSlot('banner')}
     <div class="mobile-bar" id="mobile-bar">
       <span class="mono" id="mobile-dims"></span>
+      <a class="btn btn-order btn-icon" id="mobile-order" href="#" target="_blank" rel="noopener" aria-label="Pedilo impreso por WhatsApp">${WA_ICON}</a>
       <button class="btn btn-primary" id="mobile-dl" type="button">${icon.download} Descargar</button>
     </div>
   </main>`;
@@ -363,7 +367,13 @@ export function mountEditor(root, id, query) {
       ${confirmOpen ? `<div class="confirm-box" role="alert"><strong>El diseño tiene errores.</strong><span>${esc(model.issues.filter((i) => i.level === 'error').map((i) => i.msg).join(' '))}</span><div class="row"><button class="btn btn-sm" data-dl-force type="button">Descargar igual</button><button class="btn btn-sm btn-ghost" data-dl-cancel type="button">Seguir editando</button></div></div>` : ''}
       <button class="btn btn-primary btn-lg" id="dl" type="button" ${model.parts.length ? '' : 'disabled'}>${icon.download} Descargar ${FORMATS[format].label}</button>
       ${zipNote ? '<p class="note">En esta vista los archivos se entregan dentro de un .zip; descomprimilo antes de abrirlo en el laminador.</p>' : ''}
-      ${st === 'warning' ? '<p class="note">Podés descargar con advertencias; revisalas antes de imprimir.</p>' : ''}`;
+      ${st === 'warning' ? '<p class="note">Podés descargar con advertencias; revisalas antes de imprimir.</p>' : ''}
+      <div class="order-box">
+        <span><b>¿No tenés impresora 3D?</b> Te lo imprimimos con estos ajustes y colores.</span>
+        <a class="btn btn-order" id="order" href="${esc(orderLink(def, params))}" target="_blank" rel="noopener">${WA_ICON} Pedilo impreso</a>
+      </div>`;
+    const mo = $('#mobile-order', root);
+    if (mo) mo.href = orderLink(def, params);
   };
   exportEl.addEventListener('click', (e) => {
     const f = e.target.closest('[data-fmt]');

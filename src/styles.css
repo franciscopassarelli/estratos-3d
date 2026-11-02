@@ -880,3 +880,10 @@ html.lb-lock { overflow: hidden; }
 .car-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .55); box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); transition: width .25s, background .25s; }
 .car-dots i.on { width: 16px; border-radius: 3px; background: #fff; }
 .car-label { position: absolute; right: 10px; top: 10px; z-index: 2; font: 500 11px var(--f-mono); color: #fff; background: rgba(20, 22, 26, .62); padding: 3px 8px; border-radius: 999px; backdrop-filter: blur(4px); }
+
+/* Pedilo impreso (WhatsApp) */
+.order-box { margin-top: 14px; padding: 12px 14px; border: 1px solid color-mix(in srgb, #25D366 35%, var(--line)); border-radius: var(--r-md); background: color-mix(in srgb, #25D366 7%, transparent); display: grid; gap: 10px; font-size: 14px; color: var(--muted); }
+.order-box b { color: var(--ink); }
+.btn-order { background: #25D366; color: #0B2A17; border-color: transparent; font-weight: 600; justify-content: center; gap: 8px; text-decoration: none; }
+.btn-order:hover { background: #2EE677; }
+.mobile-bar .btn-icon { padding: 0 12px; }
