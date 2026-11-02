@@ -899,3 +899,13 @@ html.lb-lock { overflow: hidden; }
 .order-band p { color: var(--muted); max-width: 52ch; }
 .order-band .btn-order { flex: none; }
 @media (max-width: 560px) { .order-band .btn-order { width: 100%; } }
+
+/* Home en celular: el editor del llavero apila el campo y el botón, y las tipografías van 2 por fila. */
+@media (max-width: 560px) {
+  .demo-row { flex-direction: column; align-items: stretch; }
+  .demo-row input[type=text] { flex: none; width: 100%; }
+  .demo-row .btn { width: 100%; justify-content: center; }
+  .demo-mini .seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .demo-mini .demo-stage { height: 190px; }
+  .hero .wrap { padding-block: 28px 32px; gap: 24px; }
+}
