@@ -37,6 +37,9 @@ import wineRack from './wineRack.js';
 import makeupHolder from './makeupHolder.js';
 import lipstickHolder from './lipstickHolder.js';
 import monsteraCoaster from './monsteraCoaster.js';
+import gingerbread from './gingerbread.js';
+import candyCane from './candyCane.js';
+import zigzagTree from './zigzagTree.js';
 
 // Categorías y subcategorías del catálogo. Cada diseño está en UNA sola subcategoría:
 // para sumar un diseño nuevo, agregá su id en la lista que corresponda.
@@ -66,8 +69,8 @@ export const CATEGORIES = [
   ] },
   { id: 'personalizados', label: 'Con tu nombre', blurb: 'Diseños donde escribís tu nombre o un texto', personal: true },
   // De temporada: solo aparecen con su propio filtro (no en «Todos» ni en las demás categorías)
-  { id: 'navidad', label: 'Adornos navideños', blurb: 'Adornos con nombre, estrella, copos, arbolito y servilletero', seasonal: true, subs: [
-    { id: 'adornos', label: 'Adornos navideños', ids: ['adorno-navidad', 'estrella-arbol', 'copo-nieve', 'arbol-conico', 'servilletero'] },
+  { id: 'navidad', label: 'Adornos navideños', blurb: 'Adornos con nombre, galletita de jengibre, bastón de caramelo, arbolitos, estrella y copos', seasonal: true, subs: [
+    { id: 'adornos', label: 'Adornos navideños', ids: ['adorno-navidad', 'estrella-arbol', 'copo-nieve', 'arbol-conico', 'arbol-zigzag', 'galleta-jengibre', 'baston-caramelo', 'servilletero'] },
   ] },
 ];
 
@@ -80,6 +83,7 @@ export const OBJECTS = [
   wineRack, makeupHolder, lipstickHolder, monsteraCoaster,
   flexiName, badgeKeychain, letteringKeychain, initialKeychain,
   capsuleTower, tissueBox, glassWineRack,
+  gingerbread, candyCane, zigzagTree,
 ];
 
 const SUB_OF = new Map();

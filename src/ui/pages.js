@@ -4,6 +4,7 @@ import { GUIDES, getGuide } from '../content/guides.js';
 import { galleryItems } from '../content/gallery.js';
 import { getEvent, presetHref, EVENTS } from '../content/events.js';
 import { renderPresetThumbs } from './thumbnails.js';
+import { IDEA_THUMBS, IDEA_THUMB_VERSION } from '../content/ideaThumbs.js';
 import { getObject } from '../objects/index.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
@@ -294,36 +295,86 @@ export function galleryPage() {
   </main>`;
 }
 
+/** Guirnalda de luces (SVG) y nieve para la cabecera de un evento. */
+function garland() {
+  const colors = ['#E5483F', '#F2C230', '#3DBE6E', '#F1F1EC'];
+  const W = 100, N = 16, bulbs = [];
+  let wire = '';
+  for (let j = 0; j < N; j++) {
+    const x0 = j * W, x1 = x0 + W, c = [x0 + W / 2, 52], p0 = [x0, 4], p1 = [x1, 4];
+    wire += `${j ? '' : `M${x0} 4 `}Q${c[0]} ${c[1]} ${x1} 4 `;
+    [0.22, 0.5, 0.78].forEach((t, k) => {
+      const x = (1 - t) ** 2 * p0[0] + 2 * t * (1 - t) * c[0] + t * t * p1[0];
+      const y = (1 - t) ** 2 * p0[1] + 2 * t * (1 - t) * c[1] + t * t * p1[1];
+      bulbs.push(`<g class="bulb" style="color:${colors[(j * 3 + k) % 4]};animation-delay:${((j * 3 + k) % 7) * 0.35}s" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><rect x="-1.6" y="-1" width="3.2" height="5" rx="1" fill="#2b2f33"/><path d="M-4.6 3.5h9.2c0 6-2 10-4.6 10s-4.6-4-4.6-10z" fill="currentColor"/></g>`);
+    });
+  }
+  return `<svg class="xmas-lights" viewBox="0 0 ${W * N} 70" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path d="${wire}" fill="none" stroke="#1d2a22" stroke-width="1.6"/>${bulbs.join('')}</svg>`;
+}
+function snow(n = 26) {
+  return `<div class="snow" aria-hidden="true">${Array.from({ length: n }, (_, i) => {
+    const r = (k) => ((i * 9301 + k * 49297) % 233280) / 233280;
+    return `<i style="--x:${(r(1) * 100).toFixed(1)}%;--s:${(3 + r(2) * 5).toFixed(1)}px;--d:${(7 + r(3) * 9).toFixed(1)}s;--w:${(-r(4) * 14).toFixed(1)}s;--o:${(0.35 + r(5) * 0.5).toFixed(2)}"></i>`;
+  }).join('')}</div>`;
+}
+
+const ideaPhoto = (ev, x) => (IDEA_THUMBS.has(`${ev.id}--${x.id}`) ? `/miniaturas/ideas/${ev.id}--${x.id}.webp?v=${IDEA_THUMB_VERSION}` : '');
+
 /** Página de un evento (Navidad, etc.): ideas con ajustes precargados y consejos. */
 export function eventPage(id) {
   const ev = getEvent(id);
   if (!ev) return notFoundPage();
   const ig = SITE.instagram ? `https://instagram.com/${SITE.instagram}` : '';
   const ideas = ev.ideas.filter((x) => getObject(x.objeto));
-  return `
-  <main class="event-page event-${esc(ev.id)}">
-    <section class="event-hero">
-      <div class="wrap">
-        <span class="eyebrow">${icon.tree} Especial ${esc(ev.label)}</span>
-        <h1>${esc(ev.title)}</h1>
-        <p class="lead">${esc(ev.lead)}</p>
-      </div>
-    </section>
-    <div class="wrap">
-      <div class="section-head"><div><span class="eyebrow">Ideas para imprimir</span><h2>Elegí una y cambiale el nombre</h2></div></div>
-      <div class="cards event-ideas">${ideas.map((x, i) => {
-        const def = getObject(x.objeto);
-        return `
-        <a class="card" href="${esc(presetHref(x))}" data-idea="${i}">
-          <div class="card-media"><span class="placeholder">Generando vista…</span><span class="tag">${esc(def.name)}</span></div>
+  const card = (x) => {
+    const def = getObject(x.objeto), src = ideaPhoto(ev, x);
+    return `
+        <a class="card" href="${esc(presetHref(x))}" data-idea="${ideas.indexOf(x)}" data-live="${src ? 0 : 1}">
+          <div class="card-media">${src ? `<img src="${src}" alt="${esc(x.titulo)}: ${esc(def.name)} para imprimir en 3D" width="960" height="720" loading="lazy" decoding="async">` : '<span class="placeholder">Generando vista…</span>'}<span class="tag">${esc(def.name)}</span>${x.nuevo ? '<span class="badge-new">Nuevo</span>' : ''}</div>
           <div class="card-body">
             <h3>${esc(x.titulo)}</h3>
             <p>${esc(x.texto)}</p>
             <span class="card-cta">Personalizar ${icon.arrow}</span>
           </div>
         </a>`;
-      }).join('')}</div>
+  };
+  const groups = (ev.grupos || [{ id: '', titulo: 'Elegí una y cambiale el nombre', texto: '' }]).map((g) => ({ g, list: ideas.filter((x) => (x.grupo || '') === g.id) })).filter((x) => x.list.length);
+  const heroPics = ev.hero ? ev.hero.map((k) => ideas.find((x) => x.id === k)).filter((x) => x && ideaPhoto(ev, x)) : [];
+  const nuevos = ideas.filter((x) => x.nuevo).length;
+  return `
+  <main class="event-page event-${esc(ev.id)}">
+    <section class="event-hero">
+      ${garland()}${snow()}
+      <div class="wrap event-hero-grid">
+        <div class="event-hero-copy">
+          <span class="eyebrow">${icon.tree} Especial ${esc(ev.label)}</span>
+          <h1>${esc(ev.title)}</h1>
+          <p class="lead">${esc(ev.lead)}</p>
+          <div class="event-hero-cta">
+            <a class="btn btn-primary btn-lg" href="#ideas">Ver las ${ideas.length} ideas</a>
+            <a class="btn btn-order btn-lg" data-order="${esc(ev.id)}" href="${generalOrderLink(`¡Hola! Quiero pedir adornos de ${ev.label} impresos en 3D.`)}" target="_blank" rel="noopener">Pedilos impresos</a>
+          </div>
+          <ul class="event-facts"><li>${ideas.length} diseños</li><li>A dos colores</li><li>Descarga 3MF · STL</li>${nuevos ? `<li class="is-new">${nuevos} nuevos</li>` : ''}</ul>
+        </div>
+        ${heroPics.length ? `<div class="event-hero-pics" aria-hidden="true">${heroPics.map((x, i) => `<a class="hero-pic hp-${i}" href="${esc(presetHref(x))}" tabindex="-1"><img src="${ideaPhoto(ev, x)}" alt="" width="960" height="720" decoding="async"><span>${esc(x.titulo)}</span></a>`).join('')}</div>` : ''}
+      </div>
+    </section>
+    <div class="candy-bar" aria-hidden="true"></div>
+    <div class="wrap">
+      <div id="ideas" class="ideas-anchor"></div>
+      ${groups.map(({ g, list }) => `
+      <section class="event-group" aria-label="${esc(g.titulo)}">
+        <div class="section-head"><div><span class="eyebrow">Ideas para imprimir</span><h2>${esc(g.titulo)}</h2>${g.texto ? `<p class="event-group-lead">${esc(g.texto)}</p>` : ''}</div></div>
+        <div class="cards event-ideas">${list.map(card).join('')}</div>
+      </section>`).join('')}
       ${adSlot('inline')}
+      <section class="order-band event-order" aria-labelledby="ev-order">
+        <div>
+          <h2 id="ev-order">¿Preferís recibirlos ya impresos?</h2>
+          <p>Elegís el diseño y el nombre, y te los imprimimos a dos colores. Ideal para regalos y souvenirs: te respondemos con el precio y el plazo.</p>
+        </div>
+        <div class="order-band-actions"><a class="btn btn-order btn-lg" data-order="${esc(ev.id)}" href="${generalOrderLink(`¡Hola! Quiero pedir adornos de ${ev.label} impresos en 3D.`)}" target="_blank" rel="noopener">Pedir por WhatsApp</a><a class="order-band-more" href="/pedidos">Cómo pedir</a></div>
+      </section>
       <section class="event-tips">
         ${ev.consejos.map((c) => `<article><h2>${esc(c.h)}</h2>${c.html}</article>`).join('')}
       </section>
@@ -344,8 +395,10 @@ export function mountEvent(root, id) {
   const ev = getEvent(id);
   if (!ev) return () => {};
   const ideas = ev.ideas.filter((x) => getObject(x.objeto));
-  return renderPresetThumbs(ideas.map((x) => ({ def: getObject(x.objeto), params: x.params })), (i, url) => {
-    const ph = root.querySelector(`[data-idea="${i}"] .placeholder`);
+  // Solo se generan en vivo las ideas que todavía no tienen foto de producto
+  const live = ideas.map((x, i) => ({ x, i })).filter(({ x }) => !ideaPhoto(ev, x));
+  return renderPresetThumbs(live.map(({ x }) => ({ def: getObject(x.objeto), params: x.params })), (k, url) => {
+    const i = live[k].i, ph = root.querySelector(`[data-idea="${i}"] .placeholder`);
     if (ph) ph.outerHTML = `<img src="${url}" alt="Vista 3D: ${esc(ideas[i].titulo)}">`;
   });
 }

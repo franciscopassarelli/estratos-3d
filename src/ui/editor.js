@@ -155,6 +155,7 @@ export function mountEditor(root, id, query) {
   const def = getObject(id);
   if (!def) return () => {};
   const KEY = `estratos:params:${def.id}`;
+  const captura = new URLSearchParams(location.search).has('captura'); // se lee antes de limpiar la URL
   let params = sanitize(def, storage.get(KEY, {}));
   const preset = paramsFromQuery(def, query);
   if (preset) {
@@ -469,7 +470,7 @@ export function mountEditor(root, id, query) {
     e.currentTarget.querySelector('span').textContent = on ? 'Encender' : 'Apagada';
   });
   // Para generar las miniaturas del catálogo (tools/thumbnails.mjs)
-  if (new URLSearchParams(location.search).has('captura')) window.__estratosViewer = viewer;
+  if (captura) window.__estratosViewer = viewer;
   const sceneBtn = $('#view-scene', root);
   const applyScene = (mode) => { viewer?.setScene(mode); sceneBtn?.setAttribute('aria-pressed', String(mode === 'studio')); };
   applyScene(storage.get('estratos:scene', 'bed'));

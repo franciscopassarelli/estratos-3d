@@ -10,7 +10,8 @@
     "build:artifact": "node tools/build-artifact.mjs",
     "preview": "vite preview",
     "galeria": "node tools/gallery-images.mjs",
-    "miniaturas": "node tools/thumbnails.mjs"
+    "miniaturas": "node tools/thumbnails.mjs",
+    "fotos-ideas": "node tools/fotos-ideas.mjs"
   },
   "keywords": [],
   "author": "",
