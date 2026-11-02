@@ -355,7 +355,7 @@ export class Viewer {
    * - angle 'product': ángulo de catálogo (bajo para objetos altos, desde arriba para piezas planas).
    *   Si no, respeta el ángulo que el usuario eligió girando el modelo.
    */
-  async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com', zoom = 1.15, type = 'image/png', quality, angle = 'user' } = {}) {
+    async photo({ width = 1080, height = 1350, title = '', brand = 'estratos3d.com', zoom = 1.15, type = 'image/png', quality, angle = 'user', dir: dirOpt } = {}) {
     if (this.failed || this.box.isEmpty()) return null;
     const r = this.renderer, prevMode = this.sceneMode, SS = 2;
     const prevSize = new THREE.Vector2(); r.getSize(prevSize);
@@ -373,7 +373,8 @@ export class Viewer {
     const sz = this.box.getSize(new THREE.Vector3());
     const flat = sz.z < 0.3 * Math.max(sz.x, sz.y);
     let dir;
-    if (angle === 'product') dir = flat ? new THREE.Vector3(0.32, -0.62, 1) : new THREE.Vector3(0.62, -1.05, sz.z > Math.max(sz.x, sz.y) ? 0.42 : 0.62);
+        if (dirOpt) dir = new THREE.Vector3(...dirOpt);
+    else if (angle === 'product') dir = flat ? new THREE.Vector3(0.32, -0.62, 1) : new THREE.Vector3(0.62, -1.05, sz.z > Math.max(sz.x, sz.y) ? 0.42 : 0.62);
     else {
       dir = pos.clone().sub(tgt);
       if (dir.z < 0.25 * dir.length()) dir.z = 0.25 * dir.length();

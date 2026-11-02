@@ -48,6 +48,9 @@ export default {
   views: [{ id: 'curved', label: 'Doblado' }],
   useOrientation: 'curved',
 
+   // Miniatura: de frente y bajo (las letras están paradas) y más cerca, porque es largo y finito
+  photo: { dir: [0.25, -1, 0.3], zoom: 0.75 },
+
   build(p, orientationId = 'upright') {
     const issues = [];
     const raw = String(p.text || '').toUpperCase();

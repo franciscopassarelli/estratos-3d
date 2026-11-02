@@ -34,12 +34,12 @@ try {
     await page.goto(`http://localhost:${PORT}/crear/${def.id}?captura`, { waitUntil: 'networkidle' });
     await page.waitForFunction(() => window.__estratosViewer && !window.__estratosViewer.box.isEmpty(), null, { timeout: 30000 });
     await page.waitForTimeout(800);
-    const data = await page.evaluate(async () => {
-      const blob = await window.__estratosViewer.photo({ width: 960, height: 720, brand: '', zoom: 1.28, type: 'image/webp', quality: 0.86, angle: 'product' });
+      const data = await page.evaluate(async (extra) => {
+      const blob = await window.__estratosViewer.photo({ width: 960, height: 720, brand: '', zoom: 1.28, type: 'image/webp', quality: 0.86, angle: 'product', ...extra });
       const buf = new Uint8Array(await blob.arrayBuffer());
       let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000));
       return btoa(s);
-    });
+    }, def.photo || {});
     fs.writeFileSync(`${OUT}/${def.id}.webp`, Buffer.from(data, 'base64'));
     done.push(def.id);
     console.log(`✓ ${def.id}`);
