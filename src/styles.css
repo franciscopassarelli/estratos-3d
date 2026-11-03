@@ -983,8 +983,24 @@ html.lb-lock { overflow: hidden; }
 /* Pedilo impreso (WhatsApp) */
 .order-box { margin-top: 14px; padding: 12px 14px; border: 1px solid color-mix(in srgb, #25D366 35%, var(--line)); border-radius: var(--r-md); background: color-mix(in srgb, #25D366 7%, transparent); display: grid; gap: 10px; font-size: 14px; color: var(--muted); }
 .order-box b { color: var(--ink); }
-.btn-order { background: #25D366; color: #0B2A17; border-color: transparent; font-weight: 600; justify-content: center; gap: 8px; text-decoration: none; }
-.btn-order:hover { background: #2EE677; }
+.btn-order {
+background: #B9FF35;
+color: #101010;
+border: 1px solid #B9FF35;
+font-weight: 700;
+justify-content: center;
+gap: 8px;
+text-decoration: none;
+border-radius: 12px;
+transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.btn-order {
+background: #C7FF59;
+color: #101010;
+transform: translateY(-2px);
+box-shadow: 0 5px 16px rgba(185, 255, 53, .2);
+}.btn-order:hover { background:#C7FF59; }
 .mobile-bar .btn-icon { padding: 0 12px; }
 
 /* ---------- Home: hero con catálogo ---------- */
@@ -1075,8 +1091,26 @@ html.lb-lock { overflow: hidden; }
 .pc-pie { display: grid; gap: 8px; margin: 4px 4px 0; }
 .pc-monto { font: 800 19px var(--f-body); color: var(--ink); white-space: nowrap; }
 .pc-monto small { font: 500 11.5px var(--f-body); color: var(--muted); margin-right: 2px; }
-.pedidos-page a.pedir-fila { display: block; text-align: center; padding: 9px 16px; border-radius: 999px; background: #25D366; color: #0B2A17; font-weight: 700; font-size: 14px; text-decoration: none; }
-.pedidos-page a.pedir-fila:hover { background: #2EE677; }
+.pedidos-page a.pedir-fila {
+  display: block;
+  text-align: center;
+  padding: 9px 16px;
+  border-radius: 12px;
+  background: #B9FF35;
+  color: #101010;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  border: 1px solid #B9FF35;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.pedidos-page a.pedir-fila:hover {
+  background: #C7FF59;
+  color: #101010;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(185, 255, 53, .2);
+}
 .pedidos-page a.pc-ver { color: var(--accent); margin: 0 4px; font-size: 13px; font-weight: 600; width: fit-content; }
 .pedidos-page .note { color: var(--muted); font-size: 14px; max-width: 80ch; }
 .pp-more { display: grid; gap: 28px; max-width: 70ch; }

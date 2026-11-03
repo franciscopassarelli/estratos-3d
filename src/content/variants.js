@@ -3,13 +3,15 @@
 // /miniaturas/variantes/<id>--<clave>.webp. Al tocar la tarjeta, el editor abre con esos ajustes.
 export const VARIANTS = {
   'lampara-led': [
-    { key: 'ondas', label: 'Ondas apiladas', params: {} },
-    { key: 'hongo', label: 'Hongo', params: { style: 'hongo', colorBase: '#7E8C72', colorShade: '#F3EEE2' } },
-    { key: 'texturada', label: 'Texturada', params: { style: 'texturada', colorBase: '#26272B' } },
-    { key: 'espiral', label: 'Globo espiral', params: { style: 'espiral', colorBase: '#B98A5B' } },
-    { key: 'acanalada', label: 'Acanalada', params: { style: 'acanalada', colorBase: '#E87BA8' } },
-    { key: 'ondulada', label: 'Ondulada', params: { style: 'ondulada', colorBase: '#2563C9' } },
-  ],
+    { key: 'cuadradaTorsion', label: 'Cuadrada torsionada', params: { style: 'cuadradaTorsion', twist: 0.8 } },
+  { key: 'ondas', label: 'Ondas apiladas', params: {} },
+  { key: 'tapa', label: 'Con tapa', params: {} },
+  { key: 'hongo', label: 'Hongo', params: { style: 'hongo', colorBase: '#7E8C72', colorShade: '#F3EEE2' } },
+  { key: 'texturada', label: 'Texturada', params: { style: 'texturada', colorBase: '#26272B' } },
+  { key: 'espiral', label: 'Globo espiral', params: { style: 'espiral', colorBase: '#B98A5B' } },
+  { key: 'acanalada', label: 'Acanalada', params: { style: 'acanalada', colorBase: '#E87BA8' } },
+  { key: 'ondulada', label: 'Ondulada', params: { style: 'ondulada', colorBase: '#2563C9' } }
+],
   'soporte-celular': [
     { key: 'liso', label: 'Liso', params: {} },
     { key: 'ranuras', label: 'Ranuras', params: { design: 'ranuras', color: '#26272B' } },

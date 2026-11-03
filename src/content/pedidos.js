@@ -9,6 +9,7 @@ export const PEDIDOS = {
   actualizado: 'noviembre 2026',
   grupos: [
     { id: 'hogar', titulo: 'Hogar y decoración', items: [
+      { nombre: 'Lámpara Cuadrada Torsionada', objeto: 'lampara-led', params: { style: 'cuadradaTorsion', twist: 0.8 }, foto: '/miniaturas/variantes/lampara-led--tapa.webp', desde: '$18.000', nota: 'Cuerpo espiral con tapa superior' },
       { nombre: 'Lámpara LED de dos piezas', objeto: 'lampara-led', desde: '$16.500', nota: 'Sin luz incluida · 6 diseños' },
       { nombre: 'Lámpara LED con luz incluida', objeto: 'lampara-led', params: { style: 'espiral' }, foto: '/miniaturas/variantes/lampara-led--espiral.webp', desde: '$19.500', nota: 'Lista para usar, a pilas o con cable' },
       { nombre: 'Pack de 2 veladores de mesa', objeto: 'lampara-led', params: { style: 'hongo' }, foto: '/miniaturas/variantes/lampara-led--hongo.webp', desde: '$34.000', nota: 'Con luz incluida, iguales o combinados' },
