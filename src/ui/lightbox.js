@@ -13,7 +13,8 @@ export function bindLightbox(root) {
     const items = links.map((l) => {
       const fig = l.closest('figure');
       return {
-        src: l.getAttribute('href'),
+        src: l.dataset.poster || l.getAttribute('href'),
+        video: l.dataset.video || '',
         alt: l.querySelector('img')?.alt || '',
         title: fig?.querySelector('figcaption b')?.textContent || '',
         who: fig?.querySelector('.gal-who')?.innerHTML || '',
@@ -37,11 +38,11 @@ function open(items, index) {
     <button class="lb-btn lb-close" type="button" aria-label="Cerrar">${icon.x}</button>
     ${items.length > 1 ? `<button class="lb-btn lb-prev" type="button" aria-label="Foto anterior">${icon.back}</button>
     <button class="lb-btn lb-next" type="button" aria-label="Foto siguiente">${icon.arrow}</button>` : ''}
-    <div class="lb-stage"><img class="lb-img" alt="" draggable="false"></div>
+    <div class="lb-stage"><img class="lb-img" alt="" draggable="false"><video class="lb-vid" controls playsinline muted loop preload="metadata" hidden></video></div>
     <div class="lb-caption"><div><b class="lb-title"></b><span class="lb-who"></span></div><span class="lb-count"></span><span class="lb-cta"></span></div>`;
   document.body.appendChild(el);
   document.documentElement.classList.add('lb-lock');
-  const img = el.querySelector('.lb-img'), stage = el.querySelector('.lb-stage');
+  const img = el.querySelector('.lb-img'), stage = el.querySelector('.lb-stage'), vid = el.querySelector('.lb-vid');
   let i = index, zoom = false;
 
   const show = (k) => {
@@ -49,7 +50,16 @@ function open(items, index) {
     const it = items[i];
     setZoom(false);
     img.classList.remove('lb-in'); void img.offsetWidth; img.classList.add('lb-in');
-    img.src = it.src; img.alt = it.alt;
+    vid.pause();
+    if (it.video) {
+      // Video: se reproduce solo (sin sonido, como en redes) y tiene controles
+      img.hidden = true; vid.hidden = false;
+      vid.poster = it.src; vid.src = it.video; vid.setAttribute('aria-label', it.alt);
+      vid.play().catch(() => {});
+    } else {
+      vid.hidden = true; vid.removeAttribute('src'); vid.load(); img.hidden = false;
+      img.src = it.src; img.alt = it.alt;
+    }
     el.querySelector('.lb-title').textContent = it.title;
     el.querySelector('.lb-who').innerHTML = it.who;
     el.querySelector('.lb-cta').innerHTML = it.cta;
@@ -63,6 +73,7 @@ function open(items, index) {
     img.classList.toggle('lb-zoom', on);
   };
   const toggleZoom = (cx, cy) => {
+    if (!vid.hidden) return;
     const r = img.getBoundingClientRect();
     setZoom(!zoom, Math.min(1, Math.max(0, (cx - r.left) / r.width)), Math.min(1, Math.max(0, (cy - r.top) / r.height)));
   };

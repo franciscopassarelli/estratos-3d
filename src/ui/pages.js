@@ -274,9 +274,10 @@ export function galleryCard(g, eager = false) {
     : g.autor ? `De ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.autor)}</a>` : esc(g.autor)}` : '';
   return `
     <figure class="gal-item">
-      <a class="gal-photo" href="/galeria/${esc(g.foto)}" aria-label="Ver la foto en grande: ${esc(g.titulo)}">
+      <a class="gal-photo${g.video ? ' gal-video' : ''}" href="/galeria/${esc(g.video || g.foto)}"${g.video ? ` data-video="/galeria/${esc(g.video)}" data-poster="/galeria/${esc(g.foto)}"` : ''} aria-label="${g.video ? 'Ver el video' : 'Ver la foto en grande'}: ${esc(g.titulo)}">
         <img src="${small}" srcset="${small} 640w, /galeria/${esc(g.foto)} ${g.w}w" sizes="(max-width: 560px) 92vw, 380px"
           width="${g.w}" height="${g.h}" alt="${esc(g.alt || g.titulo)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+        ${g.video ? '<span class="gal-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></span>' : ''}
       </a>
       <figcaption>
         <b>${esc(g.titulo)}</b>

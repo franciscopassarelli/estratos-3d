@@ -8,6 +8,7 @@
 //
 // Campos:
 //   foto      nombre del archivo en public/galeria/ (lo muestra `npm run galeria`)
+//   video     (opcional) nombre de un .mp4 en public/galeria/; la foto pasa a ser su portada y se reproduce en el visor
 //   titulo    qué es la pieza
 //   alt       descripción de la foto para lectores de pantalla y Google
 //   autor     quién la diseñó o a quién pertenece (opcional)
@@ -17,6 +18,37 @@
 //   fecha     AAAA-MM-DD
 import SIZES from './gallery-sizes.js';
 export const GALLERY = [
+  {
+    foto: 'lampara-ondas-video.webp',
+    video: 'lampara-ondas.mp4',
+    titulo: 'Lámpara de ondas apiladas, en video',
+    alt: 'Lámpara LED de dos piezas impresa en blanco con seis ondas apiladas, apoyada sobre una mesa con una impresora 3D de fondo',
+    autor: '',
+    imprimio: 'Gaston Romano',
+    enlace: 'https://www.instagram.com/gaston.carp93',
+    diseno: 'lampara-led',
+    fecha: '2026-11-02',
+  },
+  {
+    foto: 'lampara-ondas-frente.webp',
+    titulo: 'Lámpara LED de ondas apiladas',
+    alt: 'Lámpara impresa en 3D en filamento blanco con seis ondas apiladas y una base con hueco para el cable, vista de frente sobre la cama de la impresora',
+    autor: '',
+    imprimio: 'Gaston Romano',
+    enlace: 'https://www.instagram.com/gaston.carp93',
+    diseno: 'lampara-led',
+    fecha: '2026-11-02',
+  },
+  {
+    foto: 'lampara-ondas-perfil.webp',
+    titulo: 'La lámpara, recién terminada',
+    alt: 'Pantalla de lámpara impresa en 3D en blanco con ondas apiladas y base con salida para el cable, con una impresora desenfocada al fondo',
+    autor: '',
+    imprimio: 'Gaston Romano',
+    enlace: 'https://www.instagram.com/gaston.carp93',
+    diseno: 'lampara-led',
+    fecha: '2026-11-02',
+  },
   {
     foto: 'mis2anitoslolo-souvenirs.webp',
     titulo: 'Souvenirs para un cumple de 2 años',
