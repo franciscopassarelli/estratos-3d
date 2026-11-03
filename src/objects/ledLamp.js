@@ -67,7 +67,7 @@ function shadeMesh(p, z0) {
 }
 
 // Zona de la pantalla donde entra el aro de la base (mm desde la boca de abajo)
-const LIP_H = 6;
+const LIP_H = 10;
 const LIP_W = 2.4;
 
 /** Contorno (región 2D) de la pantalla a la altura relativa t: 'in' = interior, 'out' = exterior. */
@@ -210,7 +210,7 @@ export default {
   printTime: '4–8 h',
   defaults: {
     style: 'ondas', diameter: 110, height: 150, tiers: 3, ribs: 48, lobes: 6, depth: 22, wall: 1.2,
-    baseHeight: 40, fit: 0.4, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
+    baseHeight: 40, fit: 0.25, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
   },
   sections: [
     { title: 'Pantalla', items: [
@@ -232,7 +232,7 @@ export default {
       { key: 'diameter', type: 'range', label: (p) => (p.style === 'hongo' ? 'Ancho del sombrero' : 'Ancho de la pantalla'), min: 70, max: 180, step: 1, unit: 'mm' },
       { key: 'height', type: 'range', label: (p) => (p.style === 'hongo' ? 'Alto total' : 'Alto de la pantalla'), min: 70, max: 220, step: 1, unit: 'mm' },
       { key: 'wall', type: 'range', label: 'Pared de la pantalla', min: 0.8, max: 2.4, step: 0.1, unit: 'mm', help: 'Más fina = deja pasar más luz' },
-      { key: 'fit', type: 'range', label: 'Holgura del encastre', min: 0.1, max: 0.9, step: 0.05, unit: 'mm', help: 'Si la pantalla no entra en la base, subila; si queda floja, bajala. 0,3–0,5 mm va bien en la mayoría de las impresoras.' },
+      { key: 'fit', type: 'range', label: 'Holgura del encastre', min: 0.1, max: 0.9, step: 0.05, unit: 'mm', help: 'Si la pantalla no entra en la base, subila; si queda floja, bajala. 0,2–0,3 mm es un calce firme en impresoras bien calibradas (Bambu, Prusa); 0,4–0,5 si la tuya es más floja.' },
       { key: 'baseHeight', type: 'range', label: 'Alto de la base', min: 20, max: 80, step: 1, unit: 'mm', visibleIf: (p) => p.style !== 'hongo' },
     ] },
     { title: 'Luz', items: [
@@ -274,9 +274,9 @@ export default {
       vols.push(extrudeRegion(difference(body, circle(0, 0, 4.5, 32)), 6, hb - depth));
     } else vols.push(extrudeRegion(body, 0, hb - depth));
     vols.push(extrudeRegion(difference(body, ledHole), hb - depth, hb));
-    // Aro con entrada guiada: el último milímetro y medio es 0,6 mm más fino para que la pantalla "caiga" en su lugar
-    vols.push(extrudeRegion(difference(lipOuter, lipInner), hb, hb + lipH - 1.5));
-    vols.push(extrudeRegion(difference(offset(lipOuter, -0.6), lipInner), hb + lipH - 1.5, hb + lipH));
+    // Aro con entrada guiada: los últimos 2 mm son 0,6 mm más finos para que la pantalla "caiga" en su lugar
+    vols.push(extrudeRegion(difference(lipOuter, lipInner), hb, hb + lipH - 2));
+    vols.push(extrudeRegion(difference(offset(lipOuter, -0.6), lipInner), hb + lipH - 2, hb + lipH));
 
     // ----- Pantalla: armada se apoya sobre la base; para imprimir va al lado
     const assembled = orientationId === 'assembled';
