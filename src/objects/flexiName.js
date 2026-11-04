@@ -29,7 +29,7 @@ export default {
   defaults: { text: 'ESTRATOS3D', font: 'titan', letterHeight: 15, depth: 8, split: 55, clearance: 0.45, ring: true, colorBottom: '#1A1F24', colorTop: '#47D0B0' },
   sections: [
     { title: 'Texto', items: [
-      { key: 'text', type: 'text', label: 'Nombre', maxLength: 10, placeholder: 'Tu nombre', help: 'Se escribe en mayúsculas.' },
+      { key: 'text', type: 'text', label: 'Nombre', maxLength: 22, placeholder: 'Tu nombre', help: 'Se escribe en mayúsculas.' },
       // Pacifico (cursiva) no sirve parada: tiene trazos inclinados en el aire y partes sueltas
       { key: 'font', type: 'font', label: 'Tipografía', exclude: ['pacifico'] },
       { key: 'letterHeight', type: 'range', label: 'Alto de las letras', min: 12, max: 24, step: 0.5, unit: 'mm', help: 'Si el nombre es largo, se achica solo para entrar en la cama.' },
@@ -76,7 +76,7 @@ export default {
     let { out: glyphs, miss } = makeGlyphs(H);
     // Si no entra en la cama, se achican las letras: las bisagras y la argolla miden siempre lo mismo,
     // y el ancho de cada letra es proporcional a su alto.
-    const LIMIT = 215, H_MIN = 12;
+    const LIMIT = 215, H_MIN = 10;
     const fixed = Math.max(0, glyphs.length - 1) * (2 * (R + c) + 0.4) + (p.ring ? 12 : 0);
     const lettersW = glyphs.reduce((s, gl) => s + bbox(gl).w, 0);
     if (lettersW > 0 && fixed + lettersW > LIMIT) {

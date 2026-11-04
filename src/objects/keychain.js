@@ -55,7 +55,7 @@ export default {
       { key: 'hole', type: 'range', label: 'Diámetro del agujero', min: 3, max: 8, step: 0.1, unit: 'mm' },
     ] },
     { title: 'Texto', items: [
-      { key: 'text', type: 'text', label: 'Texto', maxLength: 14, placeholder: 'Tu nombre' },
+      { key: 'text', type: 'text', label: 'Texto', maxLength: 20, placeholder: 'Tu nombre' },
       { key: 'font', type: 'font', label: 'Tipografía' },
       { key: 'letterHeight', type: 'range', label: 'Altura de las mayúsculas', min: 6, max: 22, step: 0.5, unit: 'mm' },
       { key: 'symbol', type: 'symbol', label: 'Símbolo a la izquierda' },

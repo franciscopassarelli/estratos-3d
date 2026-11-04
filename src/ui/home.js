@@ -2,6 +2,7 @@ import { OBJECTS, MAIN_OBJECTS, CATEGORIES, categoriesOf, getObject } from '../o
 import { Viewer, webglAvailable } from '../viewer/Viewer.js';
 import { buildModel, disposeModel } from '../core/pipeline.js';
 import { card, bindThumbs, bindCarousels } from './catalog.js';
+import { bindPreview } from './preview.js';
 import { adSlot } from './ads.js';
 import { featuredPromo } from '../content/promos.js';
 import { esc, icon, $ } from './dom.js';
@@ -142,7 +143,7 @@ export function homePage() {
 
 export function mountHome(root) {
   const offThumbs = bindThumbs(root), offCar = bindCarousels(root);
-  const offLightbox = bindLightbox(root);
+  const offLightbox = bindLightbox(root), offPreview = bindPreview(root);
   const tabsEl = $('.feat-tabs', root), moreEl = $('#feat-more', root);
   const onTab = (e) => {
     const b = e.target.closest('button[data-tab]');
@@ -187,7 +188,7 @@ export function mountHome(root) {
   });
   return () => {
     stopped = true; clearTimeout(timer); tabsEl?.removeEventListener('click', onTab);
-    offThumbs(); offCar(); offLightbox(); viewer?.dispose();
+    offThumbs(); offCar(); offLightbox(); offPreview(); viewer?.dispose();
     models.forEach(disposeModel);
   };
 }

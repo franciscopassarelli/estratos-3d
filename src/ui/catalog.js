@@ -5,6 +5,7 @@ import { adSlot, activateAds } from './ads.js';
 import { allItems } from '../core/pipeline.js';
 import { THUMBS, THUMB_VERSION, VARIANT_THUMBS } from '../content/thumbs.js';
 import { VARIANTS, variantHref } from '../content/variants.js';
+import { eyeButton, bindPreview } from './preview.js';
 
 const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
 
@@ -22,6 +23,7 @@ export function card(def) {
     <div class="card-media" data-carousel>
       ${vars.map((v, i) => `<img class="thumb-photo${i ? '' : ' is-on'}" src="${src(v, i)}?v=${THUMB_VERSION}" alt="${esc(def.name)}: ${esc(v.label)}" width="960" height="720" loading="lazy" decoding="async" data-href="${esc(variantHref(def.id, v))}" data-label="${esc(v.label)}">`).join('')}
       <span class="tag">${esc(subOf(def)?.label || catLabel(def.category))}</span>
+      ${eyeButton(def.name)}
       <span class="car-label">${esc(vars[0].label)}</span>
       <button class="car-btn car-prev" type="button" aria-label="Diseño anterior">${icon.arrow}</button>
       <button class="car-btn car-next" type="button" aria-label="Diseño siguiente">${icon.arrow}</button>
@@ -42,6 +44,7 @@ export function card(def) {
         ? `<img class="thumb-photo" src="/miniaturas/${def.id}.webp?v=${THUMB_VERSION}" alt="${esc(def.name)} para imprimir en 3D" width="960" height="720" loading="lazy" decoding="async">`
         : img ? `<img src="${img}" alt="Vista 3D de ${esc(def.name)}">` : `<span class="placeholder">Generando vista…</span>`}
       <span class="tag">${esc(subOf(def)?.label || catLabel(def.category))}</span>
+      ${eyeButton(def.name)}
     </div>
     <div class="card-body">
       <h3>${esc(def.name)}</h3>
@@ -191,6 +194,6 @@ export function mountCatalog(root, state) {
     syncUrl(); render();
   });
   activateAds(root);
-  const off = bindThumbs(root), offCar = bindCarousels(root);
-  return () => { off(); offCar(); };
+  const off = bindThumbs(root), offCar = bindCarousels(root), offPv = bindPreview(root);
+  return () => { off(); offCar(); offPv(); };
 }
