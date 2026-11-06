@@ -3,14 +3,15 @@
 // /miniaturas/variantes/<id>--<clave>.webp. Al tocar la tarjeta, el editor abre con esos ajustes.
 export const VARIANTS = {
   'lampara-led': [
-    { key: 'cuadradaTorsion', label: 'Cuadrada torsionada', params: { style: 'cuadradaTorsion', twist: 0.8 } },
-  { key: 'ondas', label: 'Ondas apiladas', params: {} },
-  { key: 'tapa', label: 'Con tapa', params: {} },
-  { key: 'hongo', label: 'Hongo', params: { style: 'hongo', colorBase: '#7E8C72', colorShade: '#F3EEE2' } },
-  { key: 'texturada', label: 'Texturada', params: { style: 'texturada', colorBase: '#26272B' } },
-  { key: 'espiral', label: 'Globo espiral', params: { style: 'espiral', colorBase: '#B98A5B' } },
-  { key: 'acanalada', label: 'Acanalada', params: { style: 'acanalada', colorBase: '#E87BA8' } },
-  { key: 'ondulada', label: 'Ondulada', params: { style: 'ondulada', colorBase: '#2563C9' } }
+    { key: 'cuadradaTorsion', desc: 'Pantalla cuadrada con giro.', label: 'Cuadrada torsionada', params: { style: 'cuadradaTorsion', twist: 0.8 } },
+  { key: 'ondas', desc: 'Pantalla de ondas apiladas.', label: 'Ondas apiladas', params: {} },
+  { key: 'tapa', desc: 'Pantalla con tapa.', label: 'Con tapa', params: {} },
+  { key: 'hongo', desc: 'Pantalla en forma de hongo.', label: 'Hongo', params: { style: 'hongo', colorBase: '#7E8C72', colorShade: '#F3EEE2' } },
+  { key: 'texturada', desc: 'Pantalla con textura.', label: 'Texturada', params: { style: 'texturada', colorBase: '#26272B' } },
+  { key: 'espiral', desc: 'Globo con espiral.', label: 'Globo espiral', params: { style: 'espiral', colorBase: '#B98A5B' } },
+  { key: 'acanalada', desc: 'Pantalla con canales verticales.', label: 'Acanalada', params: { style: 'acanalada', colorBase: '#E87BA8' } },
+  { key: 'saturno', desc: 'Esfera con anillo, como el planeta.', print: 'Se imprime en piezas que se encastran.', label: 'Saturno', params: { style: 'saturno', colorShade: '#F2A33A', colorRing: '#E9C98A', colorBase: '#3A2A22' } },
+  { key: 'ondulada', desc: 'Pantalla de bordes ondulados.', label: 'Ondulada', params: { style: 'ondulada', colorBase: '#2563C9' } }
 ],
   'soporte-celular': [
     { key: 'liso', label: 'Liso', params: {} },

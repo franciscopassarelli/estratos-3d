@@ -17,7 +17,7 @@ const SHOWCASE = ['lampara-led', 'porta-capsulas', 'botellero', 'tachito-tapa', 
 const SHOWCASE_LABEL = 'Ejemplos del catálogo';
 // «Inspirate»: atajos con miniatura debajo de los botones del inicio
 const INSPIRE = [
-  { label: 'Lámparas', sub: 'con luz LED', obj: 'lampara-led', href: '/catalogo?categoria=hogar' },
+  { label: 'Lámparas', sub: 'con luz LED', obj: 'lampara-led', href: '/catalogo?categoria=hogar&tipo=lamparas' },
   { label: 'Organizadores', sub: 'escritorio y casa', obj: 'organizador-labiales', href: '/catalogo?categoria=organizacion' },
   { label: 'Llaveros', sub: 'con tu nombre', obj: 'llavero-articulado', href: '/catalogo?categoria=accesorios' },
   { label: 'Gaming', sub: 'soportes y mandos', obj: 'soporte-mandos', href: '/catalogo?categoria=tecnologia' },

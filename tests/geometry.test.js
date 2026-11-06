@@ -8,6 +8,8 @@ fs.mkdirSync('out', { recursive: true });
 const variants = {
   llavero: [{}, { variant: 'rect', mode: 'engraved' }, { variant: 'capsule', mode: 'inlay', symbol: 'heart' }, { font: 'pacifico', text: 'Martín' }, { holeSide: 'top', font: 'bungee', text: 'ÑANDÚ' }, { variant: 'rect', rim: 1.5, symbol: 'paw' }, { font: 'titan', text: 'Ale' }, { variant: 'bar', text: 'JAXSON' }, { variant: 'bar', font: 'pacifico', text: 'Alex' }],
   'botellero-copas': [{}, { base: 'patas' }, { base: 'patas', arms: false, depth: 110 }, { arms: false }, { depth: 100, ribs: false }, { depth: 200, stem: 12, arm: 30 }],
+  'porta-capsulas-ola': [{}, { test: true }, { columns: 4, rows: 7, stagger: false }, { columns: 2, rows: 3 }, { columns: 5, rows: 8, wall: 3 }],
+  'porta-capsulas-corazon': [{}, { test: true }, { test: true, rim: 34, neck: 28 }, { columns: 3 }, { columns: 5, rim: 34, neck: 28 }, { columns: 6, wall: 3 }],
   'porta-capsulas': [{}, { perColumn: 3, baseRings: 1 }, { perColumn: 6, wall: 1.6, rim: 40, neck: 33 }],
   'caja-panuelos': [{}, { opening: 'slot', hole: 70, tiers: 1, texture: false }, { inner: 90, height: 100, tiers: 2, wave: 4, ribs: 60 }],
   'llavero-articulado': [{}, { text: 'Mason', font: 'archivo' }, { text: 'LIAM', font: 'bungee', split: 30 }, { text: 'Ava', font: 'pacifico', letterHeight: 12 }],
@@ -38,7 +40,7 @@ const variants = {
   'llavero-pared-panal': [{}, { irregular: false, hooks: 8 }, { cols: 3, rows: 2, hooks: 2 }, { seed: 42, cols: 7, rows: 5, cell: 25 }],
   'portalapices-panal': [{}, { rings: 1 }, { rings: 3, cell: 18, dome: 60 }],
   'florero-low-poly': [{}, { sides: 6, rows: 3 }, { twist: 90, rows: 8, sides: 12 }, { mode: 'vase' }, { belly: 45, wall: 3, neck: 50 }],
-  'lampara-led': [{}, { style: 'hongo' }, { style: 'hongo', cable: false, diameter: 90, height: 100, led: 55 }, { style: 'acanalada', diameter: 100 }, { style: 'ondulada', diameter: 100 }, { cable: false, tiers: 4 }, { style: 'texturada', diameter: 100, height: 180 }, { style: 'espiral', diameter: 120 }],
+  'lampara-led': [{}, { style: 'hongo' }, { style: 'hongo', cable: false, diameter: 90, height: 100, led: 55 }, { style: 'acanalada', diameter: 100 }, { style: 'ondulada', diameter: 100 }, { cable: false, tiers: 4 }, { style: 'texturada', diameter: 100, height: 180 }, { style: 'espiral', diameter: 120 }, { style: 'saturno' }, { style: 'saturno', diameter: 140, ringWidth: 35, ringBands: 5, cable: false }],
   'tachito-tapa': [{}, { texture: false }, { width: 90, height: 100, cell: 12 }],
   botellero: [{}, { bottles: 1, bottle: 90 }, { bottles: 3, bottle: 60 }, { bottles: 4, bottle: 55, thickness: 3 }],
   'organizador-maquillaje': [{}, { rows: 1, cols: 4 }, { tray: 0, cols: 5, cell: 30 }],

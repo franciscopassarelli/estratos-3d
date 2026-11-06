@@ -55,6 +55,36 @@ export function card(def) {
   </a>`;
 }
 
+// Subtipos donde cada variante se muestra como su propia tarjeta (en vez del carrusel).
+const EXPAND_SUBS = new Set(['lamparas']);
+
+/** Variantes con foto de un diseño (las que se muestran como tarjeta propia). */
+const photoVariants = (def) => (VARIANTS[def.id] || []).filter((v, i) => (i === 0 ? THUMBS.has(def.id) : VARIANT_THUMBS.has(`${def.id}--${v.key}`)));
+
+/** Una tarjeta por variante con foto: las del carrusel, pero todas a la vista. */
+export function variantCards(def) {
+  const vars = photoVariants(def);
+  if (vars.length < 2) return card(def);
+  const items = allItems(def);
+  const colors = items.filter((i) => i.type === 'color').length;
+  const params = items.filter((i) => i.type !== 'color').length;
+  return vars.map((v, i) => `
+  <a class="card" href="${esc(variantHref(def.id, v))}" data-card="${def.id}">
+    <div class="card-media" data-start="${i}">
+      <img class="thumb-photo is-on" src="${i ? `/miniaturas/variantes/${def.id}--${v.key}.webp` : `/miniaturas/${def.id}.webp`}?v=${THUMB_VERSION}" alt="${esc(def.name)}: ${esc(v.label)}" width="960" height="720" loading="lazy" decoding="async">
+      <span class="tag">${esc(subOf(def)?.label || catLabel(def.category))}</span>
+      ${eyeButton(`${def.name}: ${v.label}`)}
+      <span class="car-label">${esc(v.label)}</span>
+    </div>
+    <div class="card-body">
+      <h3>Lámpara ${esc(v.label.toLowerCase())}</h3>
+      <p>${esc(v.desc ? `${v.desc} ${v.print || 'Se imprime en dos piezas y se encastra.'}` : def.description)}</p>
+      <div class="card-meta"><span>${params} ajustes</span><span>${colors} ${colors === 1 ? 'color' : 'colores'}</span><span>${esc(def.printTime)}</span></div>
+      <span class="card-cta">Personalizar ${icon.arrow}</span>
+    </div>
+  </a>`).join('');
+}
+
 /** Carruseles de las tarjetas (delegado: sirve aunque la grilla se vuelva a dibujar). */
 export function bindCarousels(root) {
   const timers = new Map();
@@ -144,13 +174,17 @@ function catChips(state) {
   return `<button class="chip" data-cat="all" aria-pressed="${cat === 'all'}">Todos ${n(objectsIn('all').length)}</button>`
     + CATEGORIES.map((c) => `<button class="chip${c.personal ? ' chip-personal' : ''}${c.seasonal ? ' chip-seasonal' : ''}" data-cat="${c.id}" aria-pressed="${cat === c.id}">${esc(c.label)} ${n(objectsIn(c.id).length)}</button>`).join('');
 }
+// Cantidad que ve la persona en ese tipo: si las variantes van como tarjetas propias, cuentan una por una.
+const subTotal = (s) => EXPAND_SUBS.has(s.id)
+  ? s.ids.reduce((t, id) => { const d = OBJECTS.find((o) => o.id === id); const k = d ? photoVariants(d).length : 0; return t + (k > 1 ? k : 1); }, 0)
+  : s.ids.length;
 function subChips(state) {
   const cat = CATEGORIES.find((c) => c.id === state.category);
   if (!cat || !cat.subs || cat.subs.length < 2) return '';
   const sub = state.sub || 'all';
   return `<span class="subchips-label">${esc(cat.label)}:</span>`
     + `<button class="subchip" data-sub="all" aria-pressed="${sub === 'all'}">Todo</button>`
-    + cat.subs.map((s) => `<button class="subchip" data-sub="${s.id}" aria-pressed="${sub === s.id}">${esc(s.label)} ${n(s.ids.length)}</button>`).join('');
+    + cat.subs.map((s) => `<button class="subchip" data-sub="${s.id}" aria-pressed="${sub === s.id}">${esc(s.label)} ${n(subTotal(s))}</button>`).join('');
 }
 
 export function mountCatalog(root, state) {
@@ -172,8 +206,11 @@ export function mountCatalog(root, state) {
       const hay = norm([o.name, o.description, subOf(o)?.label || '', ...o.tags].join(' '));
       return q.split(/\s+/).every((w) => hay.includes(w));
     });
-    count.textContent = `${list.length} ${list.length === 1 ? 'diseño' : 'diseños'}`;
-    grid.innerHTML = list.length ? list.map(card).join('')
+    const expand = EXPAND_SUBS.has(state.sub) && !q;
+    const html = list.map(expand ? variantCards : card);
+    const total = expand ? html.reduce((t, h) => t + (h.match(/class="card"/g) || []).length, 0) : list.length;
+    count.textContent = `${total} ${total === 1 ? 'diseño' : 'diseños'}`;
+    grid.innerHTML = list.length ? html.join('')
       : `<div class="empty">No encontramos diseños con esa búsqueda${state.category !== 'all' ? ' en esta categoría' : ''}. Probá con otra palabra o elegí <b>Todos</b>.</div>`;
   };
   render();

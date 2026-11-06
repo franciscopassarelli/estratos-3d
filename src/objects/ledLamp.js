@@ -92,6 +92,7 @@ function lipZone(p) {
 }
 
 function innerBottom(p) {
+  if (p.style === 'saturno') return satGeom(p).rin;
   let m = Infinity;
   for (let j = 0; j <= 12; j++) for (let k = 0; k < 360; k++) {
     m = Math.min(m, shadeRadius(p, (k / 360) * TAU, ((LIP_H + 1) / p.height) * (j / 12)) - p.wall);
@@ -99,6 +100,7 @@ function innerBottom(p) {
   return m;
 }
 function outerBottom(p) {
+  if (p.style === 'saturno') return satGeom(p).rout;
   let m = 0;
   for (let k = 0; k < 360; k++) m = Math.max(m, shadeRadius(p, (k / 360) * TAU, 0));
   return m;
@@ -182,6 +184,95 @@ function buildSquareCap(p, z0, assembled) {
   return geoms;
 }
 
+/** Datos de la esfera de Saturno: la mitad de abajo se corta para dejar la boca donde entra la base. */
+function satGeom(p) {
+  const R = p.diameter / 2, w = p.wall, ledR = p.led / 2;
+  const rin = Math.max(0.5 * R, ledR + LIP_W + p.fit + 4);          // radio interior de la boca de abajo
+  const hl = Math.sqrt(Math.max((R - w) ** 2 - rin ** 2, 0));      // cuánto baja la esfera bajo el ecuador
+  const rout = Math.sqrt(Math.max(R * R - hl * hl, 0));
+  return { R, w, rin, rout, hl, ok: rin < R - w - 2 };
+}
+
+/** Casquete de esfera hueco: de la latitud u0 (altura) hasta u1; si cierra en el polo no queda agujero arriba. */
+function sphereShell(R, w, u0, u1, pole, N = 120, L = 40) {
+  const V = [], T = [], outer = [], inner = [];
+  const nx = (k) => (k + 1) % N;
+  const ring = (r, u) => { const i0 = V.length; for (let k = 0; k < N; k++) { const th = (k / N) * TAU; V.push([Math.cos(th) * r, Math.sin(th) * r, u]); } return i0; };
+  const top = pole ? 0.985 : 1;                                       // el polo se cierra con un abanico
+  const Ri = R - w;
+  for (let l = 0; l <= L; l++) {
+    const u = u0 + (u1 * (pole ? top : 1) - u0) * (l / L);
+    outer.push(ring(Math.sqrt(Math.max(R * R - u * u, 0.01)), u));
+    if (Math.abs(u) < Ri - 0.05) inner.push(ring(Math.sqrt(Math.max(Ri * Ri - u * u, 0.01)), u));
+  }
+  for (let l = 0; l < outer.length - 1; l++) for (let k = 0; k < N; k++) {
+    const a = outer[l] + k, b = outer[l] + nx(k), c = outer[l + 1] + nx(k), d = outer[l + 1] + k;
+    T.push(a, b, c, a, c, d);
+  }
+  for (let l = 0; l < inner.length - 1; l++) for (let k = 0; k < N; k++) {
+    const e = inner[l] + k, f = inner[l] + nx(k), g = inner[l + 1] + nx(k), h = inner[l + 1] + k;
+    T.push(e, g, f, e, h, g);
+  }
+  // borde de abajo (cara plana apoyada)
+  for (let k = 0; k < N; k++) { const o0 = outer[0] + k, o1 = outer[0] + nx(k), i0 = inner[0] + k, i1 = inner[0] + nx(k); T.push(o0, i1, o1, o0, i0, i1); }
+  if (pole) {
+    const co = V.length; V.push([0, 0, R]);
+    const ci = V.length; V.push([0, 0, Ri]);
+    const lo = outer[outer.length - 1], li = inner[inner.length - 1];
+    for (let k = 0; k < N; k++) { T.push(co, lo + k, lo + nx(k)); T.push(ci, li + nx(k), li + k); }
+  } else {
+    const lo = outer[outer.length - 1], li = inner[inner.length - 1];
+    for (let k = 0; k < N; k++) { const O0 = lo + k, O1 = lo + nx(k), I0 = li + k, I1 = li + nx(k); T.push(O0, O1, I1, O0, I1, I0); }
+  }
+  return geometryFromMesh(V, T);
+}
+
+/** Saturno: esfera en dos mitades (sin soportes) con un anillo plano que queda aprisionado en el ecuador. */
+function saturnParts(p, g, hb, baseVols, assembled, issues) {
+  const { R, w, hl } = g, T = 2.4;
+  const zeq = hb + hl;                                             // altura del ecuador de la mitad de abajo
+  // Mitad de abajo: del borde de la boca hasta el ecuador. Se imprime boca abajo, apoyada en el ecuador.
+  const lower = sphereShell(R, w, -hl, 0, false);
+  // Mitad de arriba: semiesfera completa, apoyada en el ecuador (sin soportes).
+  const upper = sphereShell(R, w, 0, R, true);
+  // Anillo: base plana + franjas finas en relieve + un collar que guía a la mitad de arriba.
+  const rIn = R - w - 2.2, rOut = R + p.ringWidth;
+  const ringG = [extrudeRegion(difference(circle(0, 0, rOut, 160), circle(0, 0, rIn, 160)), 0, T)];
+  const nb = Math.round(p.ringBands), span = Math.max(rOut - 2 - (R + 4), 4);
+  for (let i = 0; i < nb; i++) {
+    const rc = R + 4 + ((i + 0.5) * span) / nb, bw = Math.min(1.8, span / nb / 2);
+    ringG.push(extrudeRegion(difference(circle(0, 0, rc + bw, 160), circle(0, 0, rc - bw, 160)), T, T + 0.8));
+  }
+  const ci = R - w - p.fit;
+  ringG.push(extrudeRegion(difference(circle(0, 0, ci, 160), circle(0, 0, ci - 1.6, 160)), T, T + 5));
+  const Rr = rOut, Rb = Math.max(R, 40);
+  if (assembled) {
+    lower.translate(0, 0, zeq);
+    upper.translate(0, 0, zeq + T);
+    ringG.forEach((q) => q.translate(0, 0, zeq));
+  } else {
+    // Cama: la mitad de abajo boca abajo y la de arriba a los costados, y el anillo plano atrás.
+    const m = new THREE.Matrix4().makeTranslation(-(Rb + 4), -(Rb + 4), 0).multiply(new THREE.Matrix4().makeRotationX(Math.PI));
+    lower.applyMatrix4(m);
+    upper.translate(Rb + 4, -(Rb + 4), 0);
+    ringG.forEach((q) => q.translate(0, Rr + 4, 0));
+    // La base va al costado del anillo, sin pisar ninguna otra pieza.
+    const rBase = g.rout + 5;
+    baseVols.forEach((q) => q.translate(Rr + rBase + 6, rBase + 4, 0));
+  }
+  issues.push({ level: 'info', msg: 'La esfera se imprime en dos mitades apoyadas en el ecuador, y el anillo plano queda entre las dos. Arriba la cúpula se cierra de a poco: ventilador a fondo y, si tu laminador lo pide, soportes en árbol.' });
+  if (p.ringWidth > 40) issues.push({ level: 'info', msg: 'Anillo muy ancho: puede no entrar en una cama chica. Imprimilo solo, en otra tanda.' });
+  return {
+    parts: [
+      part('shade', 'Esfera (mitad de arriba)', p.colorShade, upper, { focus: true, glow: true }),
+      part('shadeLow', 'Esfera (mitad de abajo)', p.colorShade, lower, { glow: true }),
+      part('ring', 'Anillo', p.colorRing, ringG),
+      part('base', 'Base', p.colorBase, baseVols, { bridges: true }),
+    ],
+    issues,
+  };
+}
+
 /** Estilo hongo */
 function buildMushroom(p, orientationId) {
   const issues = [];
@@ -229,13 +320,14 @@ export default {
   id: 'lampara-led',
   name: 'Lámpara LED de dos piezas',
   category: 'hogar',
-  description: 'Base con lugar para una luz LED a pilas o de cable, y una pantalla hueca con ondas apiladas, acanalada, cuadrada torsionada o hongo. Se imprime en dos piezas y se encastra.',
+  description: 'Base con lugar para una luz LED a pilas o de cable, y una pantalla hueca con ondas apiladas, acanalada, cuadrada torsionada, hongo o Saturno con anillo. Se imprime en piezas que se encastran.',
   tags: ['lámpara', 'velador', 'led', 'luz', 'decoración', 'pantalla', 'modo vaso', 'regalo'],
   printTime: '4–8 h',
   defaults: {
     style: 'ondas', diameter: 110, height: 150, tiers: 3, ribs: 48, lobes: 6, depth: 22, wall: 1.2,
     baseHeight: 40, fit: 0.25, led: 42, cable: true, capTop: 'closed', colorBase: '#8FD3B6', colorShade: '#F1F1EC',
-    twist: 0.8 // Valor inicial de la torsión
+    twist: 0.8, // Valor inicial de la torsión
+    ringWidth: 22, ringBands: 3, colorRing: '#E9C98A'
   },
   sections: [
     { title: 'Pantalla', items: [
@@ -247,17 +339,20 @@ export default {
         { value: 'espiral', label: 'Globo espiral', hint: 'Forma de globo con estrías que giran' },
         { value: 'cuadradaTorsion', label: 'Cuadrada torsionada', hint: 'Cuerpo cuadrado con giro espiral y tapa' },
         { value: 'hongo', label: 'Hongo', hint: 'Sombrero acanalado sobre un pie que se ensancha' },
+        { value: 'saturno', label: 'Saturno', hint: 'Esfera en dos mitades con anillo plano' },
       ] },
+      { key: 'ringWidth', type: 'range', label: 'Ancho del anillo', min: 10, max: 45, step: 1, unit: 'mm', visibleIf: (p) => p.style === 'saturno' },
+      { key: 'ringBands', type: 'stepper', label: 'Franjas del anillo', min: 1, max: 5, visibleIf: (p) => p.style === 'saturno' },
       { key: 'twist', type: 'range', label: 'Torsión (vueltas)', min: 0, max: 2, step: 0.1, visibleIf: (p) => p.style === 'cuadradaTorsion' },
       { key: 'tiers', type: 'stepper', min: 2, max: 6, visibleIf: (p) => p.style === 'ondas' || p.style === 'texturada', label: (p) => (p.style === 'texturada' ? 'Filas de bultos' : 'Pisos') },
       { key: 'ribs', type: 'stepper', label: 'Estrías', min: 20, max: 120, visibleIf: (p) => ['acanalada', 'texturada', 'espiral', 'hongo'].includes(p.style) },
       { key: 'lobes', type: 'stepper', label: (p) => (p.style === 'texturada' ? 'Bultos por vuelta' : 'Ondas'), min: 3, max: 12, visibleIf: (p) => p.style === 'ondulada' || p.style === 'texturada' },
-      { key: 'depth', type: 'range', label: 'Profundidad del relieve', min: 5, max: 100, step: 1, unit: '%' },
+      { key: 'depth', type: 'range', label: 'Profundidad del relieve', min: 5, max: 100, step: 1, unit: '%', visibleIf: (p) => p.style !== 'saturno' },
       { key: 'capTop', type: 'segmented', label: 'Tapa superior', options: [{ value: 'closed', label: 'Cerrada' }, { value: 'open', label: 'Abierta' }], visibleIf: (p) => p.style === 'hongo' || p.style === 'cuadradaTorsion' },
     ] },
     { title: 'Medidas', items: [
       { key: 'diameter', type: 'range', label: (p) => (p.style === 'hongo' ? 'Ancho del sombrero' : 'Ancho de la pantalla'), min: 70, max: 180, step: 1, unit: 'mm' },
-      { key: 'height', type: 'range', label: (p) => (p.style === 'hongo' ? 'Alto total' : 'Alto de la pantalla'), min: 70, max: 220, step: 1, unit: 'mm' },
+      { key: 'height', type: 'range', label: (p) => (p.style === 'hongo' ? 'Alto total' : 'Alto de la pantalla'), min: 70, max: 220, step: 1, unit: 'mm', visibleIf: (p) => p.style !== 'saturno' },
       { key: 'wall', type: 'range', label: 'Pared de la pantalla', min: 0.8, max: 2.4, step: 0.1, unit: 'mm', help: 'Más fina = deja pasar más luz' },
       { key: 'fit', type: 'range', label: 'Holgura del encastre', min: 0.1, max: 0.9, step: 0.05, unit: 'mm', help: 'Calce para el encastre en la base.' },
       { key: 'baseHeight', type: 'range', label: 'Alto de la base', min: 20, max: 80, step: 1, unit: 'mm', visibleIf: (p) => p.style !== 'hongo' },
@@ -268,6 +363,7 @@ export default {
     ] },
     { title: 'Colores', items: [
       { key: 'colorShade', type: 'color', label: 'Pantalla', help: 'Blanco o natural dejan pasar mejor la luz.' },
+      { key: 'colorRing', type: 'color', label: 'Anillo', visibleIf: (p) => p.style === 'saturno' },
       { key: 'colorBase', type: 'color', label: 'Base' },
     ] },
   ],
@@ -277,6 +373,12 @@ export default {
 
   build(p, orientationId = 'print') {
     if (p.style === 'hongo') return buildMushroom(p, orientationId);
+    let sat = null;
+    if (p.style === 'saturno') {
+      sat = satGeom(p);
+      if (!sat.ok) return { parts: [], issues: [{ level: 'error', msg: 'La luz LED no entra adentro de la esfera. Agrandá la esfera o achicá el hueco de la luz.' }] };
+      p = { ...p, height: sat.hl + sat.R };
+    }
     const issues = [];
     const Rin = innerBottom(p), Rout = outerBottom(p), hb = p.baseHeight;
     const clr = p.fit, lipH = LIP_H, lipW = LIP_W;
@@ -303,6 +405,7 @@ export default {
     vols.push(extrudeRegion(difference(offset(lipOuter, -0.6), lipInner), hb + lipH - 2, hb + lipH));
 
     const assembled = orientationId === 'assembled';
+    if (p.style === 'saturno') return saturnParts(p, sat, hb, vols, assembled, issues);
     const shade = shadeMesh(p, assembled ? hb : 0);
     
     // Posicionamos la pantalla hacia abajo a la derecha

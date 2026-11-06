@@ -34,7 +34,7 @@ export function bindPreview(root) {
     e.preventDefault(); e.stopPropagation();
     const imgs = [...media.querySelectorAll('img.thumb-photo')];
     const on = imgs.findIndex((im) => im.classList.contains('is-on'));
-    open(def, Math.max(0, on));
+    open(def, media.dataset.start ? Number(media.dataset.start) : Math.max(0, on));
   };
   root.addEventListener('click', onClick, true);
   return () => { root.removeEventListener('click', onClick, true); if (openState) close(true); };
