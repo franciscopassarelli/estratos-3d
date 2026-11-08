@@ -128,6 +128,26 @@ export function aboutPage() {
         <li>El visor 3D usa Three.js.</li>
       </ul>
       <p>También publicamos <a href="/guias">guías</a> sobre diseño, materiales e impresión.</p>
+      <h2>Quién está detrás</h2>
+      <p>${esc(SITE.name)} lo hace y lo mantiene ${esc(SITE.owner || 'una sola persona')}, desde Argentina. El sitio reúne un catálogo de decenas de diseños que cualquiera puede ajustar y descargar sin costo, y también permite pedir las piezas ya impresas.</p>
+      <h2>Qué vas a encontrar</h2>
+      <ul>
+        <li><strong>Un catálogo de diseños paramétricos</strong> en categorías: accesorios y llaveros, negocios y carteles, tecnología, organización, hogar y decoración, y una sección de Navidad. Cada uno tiene su propio editor con vista 3D.</li>
+        <li><strong>Verificaciones antes de imprimir:</strong> el editor revisa que la malla esté cerrada, que no haya partes flotando y que no haya voladizos que necesiten soportes, y te avisa con un mensaje claro cuando algo conviene cambiarlo.</li>
+        <li><strong>Descarga en 3MF, STL u OBJ,</strong> los formatos que abren todos los laminadores (Cura, PrusaSlicer, Bambu Studio y otros).</li>
+        <li><strong>Guías prácticas</strong> sobre materiales, uniones, tipos de archivo y problemas comunes de impresión.</li>
+        <li><strong>Piezas impresas:</strong> si no tenés impresora, podés pedir cualquier diseño ya impreso desde el botón del editor o desde la página de <a href="/pedidos">pedidos</a>.</li>
+      </ul>
+      <h2>Cómo se usa</h2>
+      <ol>
+        <li>Elegí un diseño en el <a href="/catalogo">catálogo</a>.</li>
+        <li>Cambiá las medidas, el texto y los colores. La vista 3D se actualiza al instante.</li>
+        <li>Revisá los avisos del editor y la pestaña de impresión, que sugiere cómo apoyar la pieza en la cama.</li>
+        <li>Descargá el archivo y abrilo en tu laminador, o pedí la pieza impresa.</li>
+      </ol>
+      <h2>Cómo cuidamos la calidad</h2>
+      <p>Cada diseño pasa por pruebas automáticas con distintas combinaciones de valores antes de publicarse: se comprueba que el modelo sea sólido, que las piezas no queden flotando y que los encastres tengan holgura. Esas pruebas no reemplazan una impresión de prueba, por eso en los diseños con encastres o medidas críticas, como los porta cápsulas, ofrecemos una pieza de prueba chica para verificar el calce antes de gastar horas de impresión.</p>
+      <p>Si encontrás un error o tenés una idea de un objeto nuevo, escribinos desde la página de <a href="/contacto">contacto</a>: los diseños se corrigen y se agregan en base a lo que cuentan quienes los usan.</p>
     </section>`);
 }
 
@@ -141,7 +161,14 @@ export function contactPage() {
       <h1>Escribinos</h1>
       <p>Para consultas, errores en algún diseño o ideas de nuevos objetos, escribinos a:</p>
       ${mail}
-      <p>Si reportás un problema con un archivo, contanos qué objeto usaste, los valores principales y en qué laminador lo abriste. Así podemos reproducirlo.</p>
+      <h2>Cómo escribirnos para que podamos ayudarte</h2>
+      <ul>
+        <li><strong>Si reportás un problema con un archivo:</strong> contanos qué objeto usaste, los valores principales que cambiaste y en qué laminador lo abriste. Con eso podemos reproducirlo y corregirlo.</li>
+        <li><strong>Si querés proponer un diseño nuevo:</strong> una foto o un dibujo, las medidas aproximadas y para qué lo vas a usar nos alcanzan para evaluarlo.</li>
+        <li><strong>Si querés pedir una pieza impresa:</strong> mirá la página de <a href="/pedidos">pedidos</a>, donde están los precios de referencia y cómo pedir, o escribinos por WhatsApp desde el botón "Pedilo impreso" de cada diseño.</li>
+        <li><strong>Si es por privacidad o por tus datos:</strong> revisá la <a href="/privacidad">política de privacidad</a> y escribinos a la misma dirección de correo para pedir acceso o borrado.</li>
+      </ul>
+      <p>Respondemos todos los mensajes lo antes posible. Para dudas generales sobre impresión, antes de escribir podés mirar la <a href="/ayuda">ayuda</a> y las <a href="/guias">guías</a>: muchas respuestas ya están ahí.</p>
     </section>`);
 }
 
@@ -160,6 +187,12 @@ export function termsPage() {
         <li>El sitio muestra publicidad de terceros. Ver la <a href="/privacidad">política de privacidad</a>.</li>
         <li>Podemos modificar estas condiciones. La fecha de arriba indica la última versión.</li>
       </ul>
+      <h2>Sobre las piezas impresas por encargo</h2>
+      <p>Las piezas que pedís ya impresas se fabrican con el diseño y los valores que elegiste en el editor, por eso conviene revisarlos bien antes de enviar el pedido. Los colores pueden variar levemente según el lote de filamento y la luz con la que se mire. Si una pieza llega con un defecto de impresión, escribinos con una foto y lo vemos juntos.</p>
+      <h2>Uso adecuado de los objetos</h2>
+      <p>Los diseños están pensados para uso doméstico y comercial liviano. No son aptos como juguetes para menores de 3 años por tener piezas chicas, ni para estar en contacto directo con alimentos, ni para soportar cargas de seguridad. El PLA se deforma con el calor, por ejemplo adentro de un auto al sol: para esos casos conviene PETG o ASA. Las lámparas se usan solo con luces LED que no se calienten.</p>
+      <h2>Propiedad y atribución</h2>
+      <p>Los textos, nombres y logotipos que ingresás son tu responsabilidad: asegurate de tener derecho a usarlos. El código del sitio, las guías y las imágenes de ${esc(SITE.name)} no se pueden copiar ni republicar sin permiso, pero los objetos que generes con el editor son tuyos para imprimir, regalar o vender.</p>
     </section>`);
 }
 
