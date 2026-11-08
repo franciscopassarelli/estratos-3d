@@ -390,6 +390,189 @@ export const GUIDES = [
         <p>Comparación completa en <a href="/guias/pla-petg-asa-que-material-usar">la guía de materiales</a>.</p>` },
     ],
   },
+  {
+    slug: 'porta-capsulas-cafe-imprimir-3d',
+    objectId: 'porta-capsulas',
+    kind: 'Guía de diseño',
+    title: 'Porta cápsulas de café en 3D: medidas, prueba e impresión',
+    description: 'Cómo funcionan los porta cápsulas tipo Nespresso impresos en 3D, qué medidas cargar, cómo probar el calce con una pieza chica y cómo imprimirlos y pegarlos.',
+    minutes: 6,
+    sections: [
+      { h: 'Cómo sostiene las cápsulas', html: `
+        <p>Una cápsula de café tiene un borde ancho y un cuerpo más angosto que sale de ese borde. Los porta cápsulas del sitio aprovechan esa diferencia: el cuerpo pasa por una ranura y el borde queda atrapado detrás, así que la cápsula cuelga sola y las que están debajo la sostienen.</p>
+        <p>La <a href="/crear/porta-capsulas">torre</a> tiene cuatro columnas en una sola pieza y una base de discos apilados. El <a href="/crear/porta-capsulas-corazon">corazón</a> y la <a href="/crear/porta-capsulas-ola">ola</a> son paneles: una lámina de frente con las ranuras y otra de fondo, que se pegan. En esos dos, las cápsulas se cargan por un círculo que hay arriba de cada columna y bajan hasta apoyarse.</p>` },
+      { h: 'Las medidas que importan', html: `
+        <p>Hay dos medidas: el <b>diámetro del borde</b> y el <b>diámetro del cuerpo junto al borde</b>. Para las Nespresso Original son 37,5 mm y 31 mm, que es lo que viene cargado por defecto. Si usás otra marca, medí una cápsula con un calibre y cambiá los dos valores: el diseño recalcula las ranuras y los bolsillos solo.</p>
+        <p>Medí el cuerpo cerca del borde y no en la punta: es la parte que pasa por la ranura. El diseño le suma una holgura al bolsillo y a la ranura para que la cápsula entre y baje sin trabarse, pero esa holgura no compensa una medida mal tomada.</p>` },
+      { h: 'Probar antes de imprimir todo', html: `
+        <p>El corazón y la ola llevan muchas horas de impresión. Para no arriesgarlas, activá <b>Solo la pieza de prueba</b>: es una columna con lugar para dos cápsulas, con la misma chapa, bolsillo y círculo de carga que el panel completo. Se imprime en un rato.</p>
+        <p>Cargá las dos cápsulas por el círculo de arriba y dejalas bajar. Si bajan sin esfuerzo y quedan apoyadas sin bailar, el panel completo va a funcionar. Si se traban, subí un poco el diámetro del cuerpo o del borde, reimprimí la prueba y volvé a probar.</p>` },
+      { h: 'Imprimirlo y pegarlo', html: `
+        <ul>
+          <li><b>Material:</b> PLA alcanza para uso interior. Si la cocina se calienta mucho o el panel queda cerca de la cafetera, mejor PETG.</li>
+          <li><b>Paredes:</b> la chapa del frente viene con 2,4 mm por defecto; con menos se vuelve flexible.</li>
+          <li><b>Frente y fondo:</b> se imprimen por separado. El frente va boca abajo sobre la cama, así la cara que se ve queda lisa. Pegalos con adhesivo instantáneo en gel o con epoxi, prensando hasta que seque.</li>
+          <li><b>Base:</b> el panel entra por una lengüeta en una ranura de la base. Si queda ajustado, la holgura de la base se puede subir de a 0,05 mm.</li>
+        </ul>` },
+      { h: 'Si una cápsula se traba', html: `
+        <p>Lo más común es una impresión que salió con un poco más de material del esperado: las paredes de la ranura quedan más cerca de lo diseñado. Podés pasar una lima fina por el borde de la ranura, o ajustar la compensación de tamaño de tu laminador. Si el problema es solo con una marca de cápsulas, volvé a medirlas: algunas tienen el borde más grueso que las Nespresso.</p>` },
+    ],
+  },
+  {
+    slug: 'lampara-led-impresa-3d',
+    objectId: 'lampara-led',
+    kind: 'Guía de diseño',
+    title: 'Lámpara impresa en 3D: estilos, luz LED y encastre',
+    description: 'Cómo elegir el estilo de la lámpara, qué luz LED usar sin riesgo, cómo lograr que la pantalla deje pasar la luz y cómo ajustar el encastre con la base.',
+    minutes: 6,
+    sections: [
+      { h: 'Elegir el estilo', html: `
+        <p>La lámpara del sitio tiene una base y una pantalla hueca, y se encastran sin pegamento. El estilo decide cómo se ve la luz: <b>ondas apiladas</b>, <b>acanalada</b> y <b>ondulada</b> dan sombras suaves; <b>texturada</b> y <b>globo espiral</b> dibujan puntos o espirales de luz; <b>cuadrada torsionada</b> es más geométrica; <b>hongo</b> y <b>Saturno</b> son más decorativas y llevan sombrero o anillo.</p>
+        <p>Cada estilo tiene sus propias opciones, como la torsión, las estrías, la profundidad del relieve o el ancho del anillo. La vista 3D te deja probar todas antes de imprimir.</p>` },
+      { h: 'Qué luz usar', html: `
+        <p>Usá luces LED. Una lámpara de filamento incandescente o una halógena se calientan lo suficiente como para ablandar el PLA y deformar la pantalla, y eso es un riesgo. Las luces LED a pilas o con cable USB casi no calientan, y por eso son las que el diseño prevé.</p>
+        <p>En el editor cargás el <b>diámetro de tu luz LED</b>, de 30 a 70 mm (viene en 42 mm), y la base hace un hueco a medida. Si tu lámpara va enchufada, activá la <b>salida para cable por abajo</b>.</p>` },
+      { h: 'Que la luz pase bien', html: `
+        <p>La luz atraviesa el plástico, así que el grosor de la pared lo cambia todo. La <b>pared de la pantalla</b> va de 0,8 a 2,4 mm y viene en 1,2 mm: cuanto más fina, más luz deja pasar, pero más frágil queda. Para la pantalla conviene un color claro, como blanco natural: los colores oscuros casi no dejan pasar la luz.</p>
+        <p>Para ver el relieve de las ondas o las estrías encendido, probá con una pared de 1 mm. Para una lámpara que se va a mover de lugar o que van a usar chicos, quedate cerca de los 1,6 mm.</p>` },
+      { h: 'El encastre con la base', html: `
+        <p>La <b>holgura del encastre</b> (0,25 mm por defecto) decide si la pantalla entra justa y se queda en su lugar. Si tu impresora imprime pasada de material y la pantalla no entra, subí la holgura de a 0,05 mm. Si queda floja y se mueve, bajala. Una pantalla bien calzada se levanta con la mano pero no se cae sola.</p>` },
+      { h: 'Imprimir la pantalla', html: `
+        <ul>
+          <li>Con pared de 1,2 mm o menos, pasá el laminador a un solo perímetro y quitá el relleno: la pantalla es hueca y se imprime como una cáscara.</li>
+          <li>Una velocidad moderada ayuda a que las ondas y las estrías salgan limpias.</li>
+          <li>El estilo Saturno se imprime en piezas que se encastran, y el anillo va de otro color: es lo que lo hace parecer un planeta.</li>
+        </ul>` },
+    ],
+  },
+  {
+    slug: 'qr-impreso-3d-que-se-lea',
+    objectId: 'llavero-qr',
+    kind: 'Guía de diseño',
+    title: 'Códigos QR impresos en 3D: cómo lograr que se lean bien',
+    description: 'Tamaño, contraste, relieve y corrección de errores para un QR impreso en 3D que cualquier celular lea rápido, en llaveros, carteles de mostrador o de Wi-Fi.',
+    minutes: 5,
+    sections: [
+      { h: 'Cómo se forma un QR en 3D', html: `
+        <p>Un QR es una grilla de cuadraditos oscuros y claros. En una pieza impresa, los cuadraditos oscuros salen en relieve de un color sobre una base de otro color. El celular lee el contraste entre los dos, así que lo que más cuenta es qué tan distintos se ven.</p>
+        <p>El código se genera en tu navegador con el dato que escribas (WhatsApp, teléfono, Instagram o un enlace), y el dato no se envía a ningún servidor.</p>` },
+      { h: 'El contraste decide si se lee', html: `
+        <p>La combinación que mejor funciona es una base clara y un QR oscuro, que es lo que trae el diseño por defecto: base casi blanca y QR gris muy oscuro. También sirve al revés, pero con algunas cámaras los QR claros sobre fondo oscuro tardan más en leerse. Evitá colores parecidos entre sí, como azul oscuro sobre negro, o dos colores brillantes de igual intensidad.</p>` },
+      { h: 'Tamaño y relieve', html: `
+        <p>El <b>tamaño del QR</b> va de 18 a 45 mm y viene en 28 mm. Cuanto más datos tiene el código, más cuadraditos hay y más chicos quedan, así que un enlace largo necesita más tamaño que un número de teléfono. Con una boquilla de 0,4 mm, un QR de menos de 25 mm con mucho dato empieza a perder definición.</p>
+        <p>El <b>relieve</b> va de 0,4 a 1,5 mm y viene en 0,8 mm. Con eso alcanza para que se vea el contraste: más alto no lo hace leer mejor, y en un llavero se engancha en el bolsillo.</p>` },
+      { h: 'Corrección de errores y datos cortos', html: `
+        <p>La <b>corrección de errores</b> permite que el QR se lea aunque una parte esté sucia o rayada. En el llavero hay dos niveles: baja, que da un código más simple, y media, que tolera más desgaste pero lo vuelve más denso. Si el llavero va a andar en el bolso todo el día, la media es más segura.</p>
+        <p>Una forma fácil de simplificar el QR es acortar el dato: un enlace corto genera menos cuadraditos que uno largo, y el resultado se lee más rápido.</p>` },
+      { h: 'Probalo antes de regalarlo', html: `
+        <p>Probá el QR con el celular antes de usarlo, y con más de un teléfono si podés: las cámaras viejas son más exigentes. Si no lee, hay tres cosas para revisar en este orden: el contraste, el tamaño y que la primera capa no haya salido deformada.</p>` },
+    ],
+  },
+  {
+    slug: 'elegir-color-filamento-objetos-3d',
+    kind: 'Artículo',
+    title: 'Cómo elegir los colores de un objeto impreso en 3D',
+    description: 'Combinaciones de colores para llaveros, carteles y decoración: contraste, acabados mate y seda, y qué tener en cuenta con la luz y el uso exterior.',
+    minutes: 5,
+    sections: [
+      { h: 'Primero el contraste', html: `
+        <p>Un texto en relieve se lee por la diferencia entre su color y el de la base, más que por el relieve en sí. Una base oscura con texto claro, o al revés, se lee desde lejos; dos tonos parecidos se leen solo de cerca. Antes de imprimir, mirá la vista 3D del editor achicando la pantalla: si el texto todavía se distingue, va a leerse bien impreso.</p>` },
+      { h: 'Combinaciones que funcionan', html: `
+        <ul>
+          <li><b>Negro con blanco o amarillo:</b> el mayor contraste. Ideal para carteles, placas y códigos QR.</li>
+          <li><b>Blanco con azul o verde oscuro:</b> prolijo y fácil de leer. Funciona para consultorios y oficinas.</li>
+          <li><b>Rojo con blanco o dorado:</b> clásico de Navidad, para adornos y bastones de caramelo.</li>
+          <li><b>Pasteles con un acento oscuro:</b> para llaveros y regalos, con la base clara y el nombre en un tono intenso.</li>
+        </ul>` },
+      { h: 'Mate, seda y brillo', html: `
+        <p>Los filamentos mate disimulan las líneas de capa y las pequeñas imperfecciones, y son buenos para carteles y organizadores. Los de acabado seda tienen brillo metálico y destacan en adornos y llaveros, pero muestran más las marcas de las capas. Los filamentos con brillo o purpurina quedan muy bien en decoración, y no conviene usarlos en piezas con texto fino, porque el brillo distrae.</p>` },
+      { h: 'Colores y luz', html: `
+        <p>En una <a href="/guias/lampara-led-impresa-3d">lámpara</a>, la pantalla tiene que ser clara para que pase la luz: el blanco natural y los pasteles dejan ver el relieve encendido. Los colores intensos tapan la luz. Para la base podés usar un color más oscuro sin problema.</p>` },
+      { h: 'Exterior y calor', html: `
+        <p>Al sol, los colores oscuros se calientan más que los claros, y el PLA se deforma antes. Para carteles de exterior conviene ASA o PETG en colores claros o medios. Más datos sobre cada material en <a href="/guias/pla-petg-asa-que-material-usar">PLA, PETG o ASA</a>.</p>` },
+    ],
+  },
+  {
+    slug: 'calibrar-impresora-piezas-que-encastran',
+    kind: 'Artículo',
+    title: 'Piezas que encastran: cómo calibrar la impresora y ajustar la holgura',
+    description: 'Por qué un encastre sale justo o flojo según la impresora, cómo medir cuánto material de más pone la tuya y cómo corregirlo con la holgura del editor.',
+    minutes: 6,
+    sections: [
+      { h: 'Por qué una pieza no entra aunque el modelo esté bien', html: `
+        <p>El modelo 3D tiene las medidas exactas, pero la impresora no. Cada máquina deposita un poco más o un poco menos de material del que debería, y las capas de abajo se aplastan apenas contra la cama. El resultado es que los agujeros salen algo más chicos y las espigas algo más gruesas que en el diseño. Por eso los encastres llevan una <b>holgura</b>: un espacio extra que absorbe esa diferencia.</p>
+        <p>Si tu impresora está bien calibrada, la holgura que viene por defecto funciona. Si no, una pieza puede quedar clavada o bailando.</p>` },
+      { h: 'Una prueba de 10 minutos para conocer tu máquina', html: `
+        <p>Imprimí un cuadrado de 20 × 20 mm y 5 mm de alto, y otro con un agujero cuadrado de 20 mm. Medí los dos con un calibre: si el cuadrado mide 20,2 y el agujero 19,8, tu impresora tiene unos 0,2 mm de más por lado. Ese número es el que tenés que tener en cuenta para la holgura.</p>
+        <p>Con un material y una boquilla constantes el valor se repite pieza tras pieza. Anotalo para cada filamento, porque cambia entre PLA y PETG.</p>` },
+      { h: 'Qué ajustar en la impresora', html: `
+        <ul>
+          <li><b>Flujo (extrusión):</b> si las piezas salen siempre pasadas de medida, bajá el flujo de a 2 o 3 % y repetí la prueba.</li>
+          <li><b>Primera capa:</b> si el borde de abajo se ensancha, es el efecto de la primera capa aplastada. Subí un poco la altura del cabezal o activá la compensación de ese efecto en el laminador.</li>
+          <li><b>Temperatura:</b> con demasiada temperatura el plástico se expande al salir. Probá bajar 5 °C.</li>
+          <li><b>Compensación horizontal:</b> algunos laminadores tienen una opción que achica o agranda todos los perfiles unas décimas de milímetro. Sirve para corregir un error constante.</li>
+        </ul>` },
+      { h: 'Ajustar la holgura desde el editor', html: `
+        <p>Varios diseños traen una holgura que podés cambiar: la <a href="/crear/lampara-led">lámpara</a> (encastre de la pantalla), el <a href="/crear/cartel-deslizante">cartel deslizante</a> (corredera), el <a href="/crear/display-qr">display QR</a> y el <a href="/crear/cartel-wifi">cartel Wi-Fi</a> (ranura de la base), el <a href="/crear/soporte-notebook">soporte de notebook</a> y los <a href="/crear/porta-capsulas-corazon">porta cápsulas</a> (lengüeta de la base).</p>
+        <p>La regla es simple: si la pieza no entra, subí la holgura de a 0,05 mm; si queda floja, bajala. Hacé un cambio por vez e imprimí solo la pieza del encastre, no el objeto completo.</p>` },
+      { h: 'Probar solo la parte que encastra', html: `
+        <p>Imprimir un objeto de 8 horas para descubrir que el encastre no entra es la forma más cara de aprender. Cuando el diseño lo permite, imprimí primero una pieza de prueba: los porta cápsulas la traen incluida. Si no, escalá a la mitad de alto o imprimí solo la zona del encastre.</p>
+        <p>Con el material equivocado también cambian los resultados: el PETG se estira más que el PLA y suele pedir un poco más de holgura. Más detalles en <a href="/guias/pla-petg-asa-que-material-usar">PLA, PETG o ASA</a>.</p>` },
+    ],
+  },
+  {
+    slug: 'texto-en-relieve-impresion-3d',
+    kind: 'Artículo',
+    title: 'Texto en relieve en 3D: cómo evitar que salga sucio o ilegible',
+    description: 'Tamaño mínimo de letra, tipografías, altura del relieve y ajustes del laminador para que los textos de llaveros, placas y carteles salgan nítidos.',
+    minutes: 6,
+    sections: [
+      { h: 'El límite lo pone la boquilla', html: `
+        <p>Una boquilla de 0,4 mm deposita líneas de unos 0,4 a 0,5 mm de ancho. Un trazo de letra más fino que dos de esas líneas, o sea menos de 0,8 mm, no se puede imprimir bien y sale cortado o con huecos. Por eso el editor avisa cuando un trazo del texto queda por debajo de ese valor.</p>
+        <p>En la práctica: elegí una tipografía con trazo grueso, o aumentá la altura de las letras hasta que los trazos más finos superen ese límite.</p>` },
+      { h: 'Tamaño de letra recomendado', html: `
+        <ul>
+          <li><b>Letras de carteles y placas:</b> entre 12 y 25 mm de altura se leen cómodas a un par de metros.</li>
+          <li><b>Llaveros:</b> entre 9 y 14 mm de altura de mayúscula, como en la <a href="/guias/llavero-con-nombre">guía del llavero</a>.</li>
+          <li><b>Textos secundarios:</b> no bajes de 6 a 7 mm de altura, y usá una tipografía sin trazos finos.</li>
+        </ul>` },
+      { h: 'Tipografía y relieve', html: `
+        <p>Las tipografías de trazo grueso como Archivo Black, Titan One o Bungee son las que mejor salen. Las cursivas finas, como una caligrafía, necesitan un tamaño mayor porque sus trazos más delgados se pierden. Pacifico funciona bien si la altura es de 11 mm o más.</p>
+        <p>La <b>altura del relieve</b> de 0,8 a 1,2 mm es suficiente para que se vea y se sienta. Más alto no mejora la lectura y hace que el texto se enganche o se rompa con un golpe.</p>` },
+      { h: 'Relieve, grabado o a dos colores', html: `
+        <p>El <b>relieve</b> es lo más fácil de imprimir y de leer. El <b>grabado</b> (hundido) funciona con una profundidad de 0,6 a 1 mm y se lee mejor con un color de base muy distinto del fondo. La opción <b>a dos colores</b> pide un cambio de filamento a la altura donde empieza el texto, y es la que más destaca; el panel de impresión del editor indica a qué altura va.</p>` },
+      { h: 'Ajustes del laminador', html: `
+        <ul>
+          <li>Altura de capa de 0,12 a 0,16 mm para que las curvas de las letras salgan más suaves.</li>
+          <li>Velocidad baja en las capas de texto, de 30 a 40 mm/s, para que no se corten las esquinas.</li>
+          <li>Retracción bien calibrada: si ves hilitos entre las letras, mirá la guía de <a href="/guias/hilos-stringing-impresion-3d">hilos y stringing</a>.</li>
+        </ul>` },
+    ],
+  },
+  {
+    slug: 'vender-llaveros-personalizados-3d',
+    kind: 'Artículo',
+    title: 'Vender llaveros y objetos personalizados impresos en 3D: por dónde empezar',
+    description: 'Cómo calcular costos, elegir qué productos ofrecer, ordenar los pedidos y mantener la calidad si querés vender piezas personalizadas hechas con una impresora 3D.',
+    minutes: 7,
+    sections: [
+      { h: 'Empezar con pocos productos', html: `
+        <p>Los objetos personalizados que más se piden son los de impresión corta: llaveros con nombre, adornos de Navidad con nombre, posavasos y carteles chicos. Se imprimen en menos de una hora y varios entran en la misma cama. Elegí dos o tres diseños del <a href="/catalogo">catálogo</a>, probalos hasta que salgan bien siempre y recién entonces sumá otros.</p>` },
+      { h: 'Calcular cuánto cuesta cada pieza', html: `
+        <p>El costo tiene tres partes. El <b>filamento</b>: el laminador te dice cuántos gramos usa la pieza, y los multiplicás por el precio del gramo de tu bobina. La <b>electricidad y el desgaste</b> de la máquina, que se calcula por hora de impresión. Y tu <b>tiempo</b>: preparar el archivo, cambiar el filamento, limpiar y empaquetar.</p>
+        <p>Sumá siempre un margen para piezas fallidas: aunque la impresora ande bien, algunas impresiones se pierden. Un cálculo prolijo evita vender a pérdida sin darte cuenta.</p>` },
+      { h: 'Ordenar los pedidos', html: `
+        <p>Antes de imprimir, confirmá con el cliente el texto exacto, el color y la cantidad, preferentemente por escrito. Un nombre mal escrito obliga a reimprimir. Mandale al cliente una captura de la vista 3D del editor, o usá el botón Foto, para que vea la pieza antes de aprobarla: es la forma más simple de evitar malentendidos.</p>` },
+      { h: 'Calidad constante', html: `
+        <ul>
+          <li>Imprimí siempre con el mismo filamento y la misma configuración para cada producto, así todas las piezas se ven iguales.</li>
+          <li>Revisá cada pieza antes de entregarla: quitá rebabas, controlá que el texto esté completo y que la argolla no tenga hilitos.</li>
+          <li>Si usás dos colores, probá el cambio de filamento: ver <a href="/guias/imprimir-dos-colores-sin-multicolor">imprimir a dos colores sin multicolor</a>.</li>
+        </ul>` },
+      { h: 'Cuidar la presentación', html: `
+        <p>Una bolsita con una tarjeta chica o una etiqueta con tu contacto cambia la percepción del producto, y los clientes lo recomiendan. Sacá fotos buenas con luz natural y fondo liso: es lo que decide si alguien te escribe o no. Si el objeto va a usarse mucho, aclará el material: el PLA no aguanta el calor de un auto al sol.</p>` },
+    ],
+  },
 ];
 
 export const getGuide = (slug) => GUIDES.find((g) => g.slug === slug);
