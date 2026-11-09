@@ -16,6 +16,27 @@ import { bindLightbox } from './ui/lightbox.js';
 const noop = () => () => {};
 const catalogState = { category: 'all', sub: 'all', query: '' };
 
+/** Título de una página de diseño: el más completo que entre en ~60 caracteres (lo que muestra Google). */
+function objectTitle(o) {
+  const tail = ` | ${SITE.name}`;
+  const base = /personaliz/i.test(o.name) ? o.name : `${o.name} personalizable`;
+  for (const t of [`${base} para imprimir en 3D`, `${o.name} para imprimir en 3D`, `${o.name} en 3D`, o.name]) if (t.length + tail.length <= 60) return t + tail;
+  return o.name + tail;
+}
+
+/** Descripción de una página de diseño: la idea principal en ~155 caracteres, sin cortar frases a la mitad. */
+function objectDescription(o, max = 155) {
+  const tail = ' Vista previa 3D y descarga en 3MF, STL u OBJ.';
+  if ((o.description + tail).length <= max) return o.description + tail;
+  const room = max - tail.length;
+  const sentences = o.description.match(/[^.]+\.?/g) || [o.description];
+  let out = '';
+  for (const sent of sentences) { if ((out + sent).trim().length > room) break; out += sent; }
+  out = out.trim();
+  if (!out) { out = o.description.slice(0, room - 1).replace(/[\s,;:]+\S*$/, '') + '…'; }
+  return out + tail;
+}
+
 export const ROUTES = [
   {
     pattern: /^\/$/, section: 'inicio',
@@ -36,7 +57,7 @@ export const ROUTES = [
   {
     pattern: /^\/crear\/([a-z0-9-]+)$/, section: 'catalogo',
     exists: ([id]) => !!getObject(id),
-    meta: ([id]) => { const o = getObject(id); return { title: `${o.name}${/personaliz/i.test(o.name) ? '' : ' personalizable'} para imprimir en 3D | ${SITE.name}`, description: `${o.description} Vista previa 3D y descarga en 3MF, STL u OBJ.` }; },
+    meta: ([id]) => { const o = getObject(id); return { title: objectTitle(o), description: objectDescription(o) }; },
     render: ([id]) => editorPage(id), mount: (root, [id], query) => mountEditor(root, id, query),
   },
   {
@@ -47,7 +68,7 @@ export const ROUTES = [
   {
     pattern: /^\/guias\/([a-z0-9-]+)$/, section: 'guias',
     exists: ([slug]) => !!getGuide(slug),
-    meta: ([slug]) => { const g = getGuide(slug); return { title: `${g.title} | ${SITE.name}`, description: g.description, type: 'article' }; },
+    meta: ([slug]) => { const g = getGuide(slug); const full = `${g.title} | ${SITE.name}`; return { title: full.length <= 62 ? full : g.title, description: g.description, type: 'article' }; },
     render: ([slug]) => guidePage(slug), mount: (root) => mountContent(root),
   },
   {
@@ -73,9 +94,9 @@ export const ROUTES = [
   })),
   { pattern: /^\/pedidos$/, section: 'pedidos', meta: () => ({ title: `Pedí tu pieza impresa en 3D | ${SITE.name}`, description: 'Pedí tu diseño ya impreso en 3D: llaveros con nombre, carteles con QR, organizadores y adornos. Entrega en unos 2 días. Pedilo por WhatsApp.' }), render: pedidosPage, mount: mountContent },
   { pattern: /^\/ayuda$/, section: 'ayuda', meta: () => ({ title: `Preguntas frecuentes | ${SITE.name}`, description: 'Respuestas sobre formatos de archivo, impresión a dos colores, comprobaciones y uso del editor.' }), render: helpPage, mount: mountContent },
-  { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name} y cómo genera los objetos para impresión 3D.` }), render: aboutPage, mount: mountContent },
-  { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Cómo comunicarte con ${SITE.name}.` }), render: contactPage, mount: mountContent },
-  { pattern: /^\/condiciones$/, section: 'ayuda', meta: () => ({ title: `Condiciones de uso | ${SITE.name}`, description: `Condiciones de uso de ${SITE.name}.` }), render: termsPage, mount: mountContent },
+  { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name}, quién lo hace y cómo se usa: un catálogo gratuito de objetos personalizables para imprimir en 3D, con guías y piezas por encargo.` }), render: aboutPage, mount: mountContent },
+  { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Escribinos por consultas, errores en un diseño, ideas de objetos nuevos o para pedir una pieza impresa en 3D. Te contamos cómo hacerlo.` }), render: contactPage, mount: mountContent },
+  { pattern: /^\/condiciones$/, section: 'ayuda', meta: () => ({ title: `Condiciones de uso | ${SITE.name}`, description: `Condiciones de uso de ${SITE.name}: uso gratuito del editor, propiedad de los objetos, piezas por encargo y recomendaciones de seguridad.` }), render: termsPage, mount: mountContent },
   { pattern: /^\/privacidad$/, section: 'ayuda', meta: () => ({ title: `Política de privacidad | ${SITE.name}`, description: `Cómo trata ${SITE.name} tus datos, cookies y publicidad.` }), render: privacyPage, mount: mountContent },
 ];
 
