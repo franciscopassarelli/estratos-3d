@@ -1,8 +1,9 @@
 // Torre porta cápsulas: cuatro columnas (una por cara) donde la cápsula se cuelga del borde
 // y baja por una ranura. Abajo, una base redonda de discos apilados (otro color).
-import { union, difference, offset, rect, roundedRect } from '../core/geometry2d.js';
+import { union, difference, offset, rect, roundedRect, circle } from '../core/geometry2d.js';
 import { extrudeRegion, part } from '../core/mesh.js';
 import { revolve } from '../core/revolve.js';
+import { brandMark } from './shared/brand.js';
 
 const TYPES = {
   original: { rim: 37.5, neck: 31, len: 29 }, // Nespresso Original
@@ -33,7 +34,7 @@ export default {
   description: 'Torre de cuatro columnas para cápsulas de café tipo Nespresso: la cápsula se cuelga del borde y baja sola. Base redonda de discos apilados en otro color.',
   tags: ['cápsulas', 'café', 'nespresso', 'cocina', 'organizador', 'torre', 'cafetera'],
   printTime: '6–10 h',
-  defaults: { perColumn: 5, rim: 37.5, neck: 31, wall: 2.4, baseRings: 3, colorTower: '#26272B', colorBase: '#4A3024' },
+  defaults: { perColumn: 5, rim: 37.5, neck: 31, wall: 2.4, baseRings: 3, brand: true, colorTower: '#26272B', colorBase: '#4A3024' },
   sections: [
     { title: 'Capacidad', items: [
       { key: 'perColumn', type: 'stepper', label: 'Cápsulas por columna', min: 3, max: 6, help: 'Son cuatro columnas: el total es cuatro veces este número.' },
@@ -45,6 +46,7 @@ export default {
     { title: 'Forma', items: [
       { key: 'wall', type: 'range', label: 'Paredes', min: 1.6, max: 3.2, step: 0.1, unit: 'mm' },
       { key: 'baseRings', type: 'stepper', label: 'Discos de la base', min: 1, max: 4 },
+      { key: 'brand', type: 'toggle', label: 'Marca Estratos 3D grabada abajo', help: 'Grabado de 0,6 mm en la cara de abajo de la base. No cambia el uso ni se ve con la torre apoyada.' },
     ] },
     { title: 'Colores', items: [
       { key: 'colorTower', type: 'color', label: 'Torre' },
@@ -62,19 +64,25 @@ export default {
 
     // Base: discos apilados con canto redondeado (pendiente < 45°, sin soportes)
     const rings = Math.round(p.baseRings), hr = 6.5, Hb = rings * hr, Rb = b + c.len * 0.8, dep = 1.8;
-    const prof = [[0, 0]];
+    // Marca grabada: una placa de 0,6 mm con el logo calado en la cara de abajo (se imprime sobre la cama)
+    const T = 0.6, zo = p.brand ? T : 0;
+    const prof = [[0, zo]];
     for (let i = 0; i < rings; i++) for (let k = 0; k <= 12; k++) {
       if (i > 0 && k === 0) continue;
       const u = k / 12;
-      prof.push([Rb - dep * (1 - Math.sin(Math.PI * u)), i * hr + u * hr]);
+      prof.push([Rb - dep * (1 - Math.sin(Math.PI * u)), zo + i * hr + u * hr]);
     }
-    prof.push([0, Hb]);
-    const base = revolve(prof, 0, 0, 128);
+    prof.push([0, zo + Hb]);
+    const baseBody = revolve(prof, 0, 0, 128);
+    const plate = p.brand
+      ? extrudeRegion(difference(circle(0, 0, Rb - dep, 128), brandMark(Math.min(58, (Rb - dep) * 1.15))), 0, T)
+      : null;
+    const base = [plate, baseBody];
 
     // Torre con canto de arriba redondeado en dos escalones finos
-    const Ht = n * pitch + 4, top = Hb + Ht;
+    const Ht = n * pitch + 4, top = zo + Hb + Ht;
     const tower = [
-      extrudeRegion(region, Hb, top - 1.6),
+      extrudeRegion(region, zo + Hb, top - 1.6),
       extrudeRegion(offset(region, -0.4), top - 1.6, top - 0.8),
       extrudeRegion(offset(region, -1), top - 0.8, top),
     ];
@@ -83,11 +91,12 @@ export default {
     const capsules = [];
     const a = b - 2.6 - p.wall;
     for (const [nx, ny] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      for (let k = 0; k < n; k++) capsules.push({ x: nx * (a + 1.3), y: ny * (a + 1.3), z: Hb + k * pitch + c.rim / 2 + 0.3, dx: nx, dy: ny });
+      for (let k = 0; k < n; k++) capsules.push({ x: nx * (a + 1.3), y: ny * (a + 1.3), z: zo + Hb + k * pitch + c.rim / 2 + 0.3, dx: nx, dy: ny });
     }
     if (top > 245) issues.push({ level: 'warning', msg: `Mide ${top.toFixed(0)} mm de alto: puede no entrar en tu impresora. Bajá las cápsulas por columna.` });
     issues.push({ level: 'info', msg: `Entran ${n * 4} cápsulas. Se cargan por arriba: la cápsula entra con el borde en la ranura y baja hasta apoyarse en la de abajo.` });
-    issues.push({ level: 'info', msg: `Para los dos colores, cambiá el filamento en la capa de ${Hb.toFixed(1)} mm (donde termina la base).` });
+    issues.push({ level: 'info', msg: `Para los dos colores, cambiá el filamento en la capa de ${(zo + Hb).toFixed(1)} mm (donde termina la base).` });
+    if (p.brand) issues.push({ level: 'info', msg: 'La marca va grabada 0,6 mm en la cara de abajo: se imprime sobre la cama y se lee al dar vuelta la pieza.' });
     return {
       parts: [
         part('base', 'Base', p.colorBase, base),
