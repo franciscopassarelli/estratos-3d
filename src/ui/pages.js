@@ -5,15 +5,14 @@ import { galleryItems } from '../content/gallery.js';
 import { getEvent, presetHref, EVENTS } from '../content/events.js';
 import { renderPresetThumbs } from './thumbnails.js';
 import { IDEA_THUMBS, IDEA_THUMB_VERSION } from '../content/ideaThumbs.js';
-import { THUMB_VERSION, THUMBS } from '../content/thumbs.js';
 import { getObject } from '../objects/index.js';
+import { getProducto } from '../content/tienda.js';
 import { adSlot } from './ads.js';
 import { esc, icon } from './dom.js';
-import { PEDIDOS } from '../content/pedidos.js';
 import { generalOrderLink } from '../content/contact.js';
 
 const INFO = [
-  { path: '/pedidos', label: 'Pedí tu pieza impresa' },
+  { path: '/tienda', label: 'Tienda' },
   { path: '/ayuda', label: 'Preguntas frecuentes' },
   { path: '/acerca', label: 'Acerca de' },
   { path: '/contacto', label: 'Contacto' },
@@ -42,75 +41,9 @@ export function helpPage() {
       <details><summary>¿El archivo está garantizado para imprimir bien?</summary><p>Cada archivo se genera con mallas cerradas, y la herramienta revisa paredes finas, trazos de texto delgados, piezas sueltas, voladizos de más de 45° y el tamaño de la cama. Son comprobaciones básicas: revisá siempre la vista previa de capas de tu laminador antes de imprimir.</p></details>
       <details><summary>¿Por qué algunas letras o símbolos no aparecen?</summary><p>Las tipografías incluyen letras latinas con tildes y ñ, pero no emojis. Para decorar, usá los símbolos del editor: están dibujados como geometría imprimible.</p></details>
       <details><summary>¿Se guardan mis diseños?</summary><p>Tus últimos valores de cada objeto quedan guardados solo en este navegador, para que no los pierdas al recargar. No se envían a ningún servidor.</p></details>
-      <details><summary>¿Puedo pedirlo ya impreso?</summary><p>Sí. En cada objeto hay un botón “Pedilo impreso” que abre WhatsApp con tu diseño. Mirá <a href="/pedidos">cómo funciona</a>.</p></details>
+      <details><summary>¿Puedo pedirlo ya impreso?</summary><p>Sí. En cada objeto hay un botón “Pedilo impreso” que abre WhatsApp con tu diseño. Mirá la <a href="/tienda">tienda</a> o escribinos por WhatsApp.</p></details>
       <details><summary>¿Tiene costo?</summary><p>No. El sitio se mantiene con publicidad.</p></details>
     </section>`);
-}
-
-export function pedidosPage() {
-  const ev = EVENTS[0];
-  const ver = (src) => `${src}?v=${src.includes('/ideas/') ? IDEA_THUMB_VERSION : THUMB_VERSION}`;
-  const fotoDe = (p) => p.foto || (THUMBS.has(p.objeto) ? `/miniaturas/${p.objeto}.webp` : '');
-  const card = (p) => {
-    const href = p.objeto && getObject(p.objeto) ? presetHref({ objeto: p.objeto, params: p.params }) : '';
-    const src = fotoDe(p);
-    const img = src ? `<img src="${esc(ver(src))}" alt="${esc(p.nombre)}" width="960" height="720" loading="lazy" decoding="async">` : '';
-    return `<div class="pc-card">
-      ${href ? `<a class="pc-foto" href="${esc(href)}" tabindex="-1" aria-hidden="true">${img}</a>` : `<span class="pc-foto">${img}</span>`}
-      <h4>${esc(p.nombre)}</h4>
-      <p>${esc(p.nota || '')}</p>
-      <div class="pc-pie"><span class="pc-monto"><small>desde</small> ${esc(p.desde)}</span><a class="pedir-fila" data-order="precios" data-objeto="${esc(p.nombre)}" href="${esc(generalOrderLink(`¡Hola! Quiero pedir: ${p.nombre}.`))}" target="_blank" rel="noopener" aria-label="Pedir ${esc(p.nombre)} por WhatsApp">Pedir</a></div>
-      ${href ? `<a class="pc-ver" href="${esc(href)}">Ver y personalizar</a>` : ''}
-    </div>`;
-  };
-  const total = PEDIDOS.grupos.reduce((n, g) => n + g.items.length, 0);
-  const precios = PEDIDOS.grupos.length
-    ? `<div class="pp-tabs" role="group" aria-label="Categorías"><button type="button" data-cat="" aria-pressed="true">Todos <small>${total}</small></button>${PEDIDOS.grupos.map((g) => `<button type="button" data-cat="${esc(g.id)}" aria-pressed="false">${esc(g.titulo)} <small>${g.items.length}</small></button>`).join('')}</div>
-      ${PEDIDOS.grupos.map((g) => `<section class="pp-group" data-cat="${esc(g.id)}" aria-label="${esc(g.titulo)}">
-        <h3>${esc(g.titulo)}</h3>
-        <div class="pp-grid">${g.items.map(card).join('')}</div>
-      </section>`).join('')}
-      <p class="note">Precios de referencia por unidad, actualizados en ${esc(PEDIDOS.actualizado)}. Las fotos son vistas 3D del diseño. El valor final depende del tamaño, los colores y la cantidad, y te lo confirmamos por WhatsApp antes de imprimir. ¿No ves lo que buscás? Pedinos la cotización de cualquier otro diseño del <a href="/catalogo">catálogo</a>.</p>`
-    : '<p>El precio depende del diseño, el tamaño, los colores y la cantidad. Te lo pasamos por WhatsApp antes de imprimir, sin compromiso.</p>';
-  return `
-  <main class="wrap pedidos-page">
-    <header class="pp-head">
-      <span class="eyebrow">Pedidos</span>
-      <h1>Pedí tu pieza impresa en 3D</h1>
-      <p>¿Diseñaste algo y no tenés impresora? Te lo imprimimos. Elegí el objeto, ajustalo en la web y mandanos el pedido por WhatsApp: llega con el link a tu diseño y todos tus ajustes.</p>
-      <div class="row-actions">
-        <a class="btn btn-order btn-lg" data-order="pedidos" href="${esc(generalOrderLink())}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
-        <a class="btn btn-lg btn-soft" href="/catalogo">Elegir un diseño</a>
-      </div>
-    </header>
-    <ol class="pp-steps">
-      <li><b>1 · Elegí y personalizá</b><span>Abrí un diseño y cambiá nombre, medidas y colores.</span></li>
-      <li><b>2 · Pedilo por WhatsApp</b><span>Se abre con el link de tu diseño y los ajustes ya cargados.</span></li>
-      <li><b>3 · Confirmamos</b><span>Te pasamos precio, colores disponibles y forma de entrega.</span></li>
-      <li><b>4 · Lo imprimimos</b><span>Lo recibís en ${esc(PEDIDOS.plazo)} desde que confirmás. También tandas: por ejemplo, 30 llaveros para un evento.</span></li>
-    </ol>
-    <section class="pp-precios" id="precios">
-      <h2>Precios y productos</h2>
-      ${precios}
-    </section>
-    <div class="pp-more">
-      <section>
-        <h2>Ideas para pedir</h2>
-        <ul>
-          <li><a href="/catalogo?categoria=accesorios">Llaveros con nombre</a> para souvenirs de cumpleaños, eventos y regalos.</li>
-          <li><a href="/catalogo?categoria=negocios">Carteles con QR y placas</a> para tu local o emprendimiento.</li>
-          <li><a href="/catalogo?categoria=organizacion">Organizadores</a> de escritorio, cajones y baño.</li>
-          ${ev ? `<li><a href="${ev.path}">Adornos de ${esc(ev.label)}</a> con el nombre de cada uno.</li>` : ''}
-        </ul>
-      </section>
-      <section>
-        <h2>Preguntas</h2>
-        <details><summary>¿Puedo pedir varias unidades?</summary><p>Sí. Para souvenirs, eventos o negocios armamos tandas. Contanos la cantidad y te pasamos el precio.</p></details>
-        <details><summary>¿Cómo pago y cómo lo recibo?</summary><p>Lo acordamos por WhatsApp antes de imprimir, según lo que te quede mejor.</p></details>
-        <details><summary>¿Hace falta que descargue el archivo?</summary><p>No. Con tocar “Pedilo impreso” alcanza: nosotros abrimos tu diseño con los mismos ajustes.</p></details>
-      </section>
-    </div>
-  </main>`;
 }
 
 export function aboutPage() {
@@ -136,7 +69,7 @@ export function aboutPage() {
         <li><strong>Verificaciones antes de imprimir:</strong> el editor revisa que la malla esté cerrada, que no haya partes flotando y que no haya voladizos que necesiten soportes, y te avisa con un mensaje claro cuando algo conviene cambiarlo.</li>
         <li><strong>Descarga en 3MF, STL u OBJ,</strong> los formatos que abren todos los laminadores (Cura, PrusaSlicer, Bambu Studio y otros).</li>
         <li><strong>Guías prácticas</strong> sobre materiales, uniones, tipos de archivo y problemas comunes de impresión.</li>
-        <li><strong>Piezas impresas:</strong> si no tenés impresora, podés pedir cualquier diseño ya impreso desde el botón del editor o desde la página de <a href="/pedidos">pedidos</a>.</li>
+        <li><strong>Piezas impresas:</strong> si no tenés impresora, podés pedir cualquier diseño ya impreso desde el botón del editor o o escribirnos por WhatsApp desde la <a href="/tienda">tienda</a>.</li>
       </ul>
       <h2>Cómo se usa</h2>
       <ol>
@@ -165,7 +98,7 @@ export function contactPage() {
       <ul>
         <li><strong>Si reportás un problema con un archivo:</strong> contanos qué objeto usaste, los valores principales que cambiaste y en qué laminador lo abriste. Con eso podemos reproducirlo y corregirlo.</li>
         <li><strong>Si querés proponer un diseño nuevo:</strong> una foto o un dibujo, las medidas aproximadas y para qué lo vas a usar nos alcanzan para evaluarlo.</li>
-        <li><strong>Si querés pedir una pieza impresa:</strong> mirá la página de <a href="/pedidos">pedidos</a>, donde están los precios de referencia y cómo pedir, o escribinos por WhatsApp desde el botón "Pedilo impreso" de cada diseño.</li>
+        <li><strong>Si querés pedir una pieza impresa:</strong> mirá la <a href="/tienda">tienda</a> con los productos y sus precios, o escribinos por WhatsApp desde el botón "Pedilo impreso" de cada diseño.</li>
         <li><strong>Si es por privacidad o por tus datos:</strong> revisá la <a href="/privacidad">política de privacidad</a> y escribinos a la misma dirección de correo para pedir acceso o borrado.</li>
       </ul>
       <p>Respondemos todos los mensajes lo antes posible. Para dudas generales sobre impresión, antes de escribir podés mirar la <a href="/ayuda">ayuda</a> y las <a href="/guias">guías</a>: muchas respuestas ya están ahí.</p>
@@ -298,13 +231,13 @@ export function notFoundPage() {
   </main>`;
 }
 
-/** Tarjeta de una foto de la galería (también se usa en la portada). */
+/** Tarjeta de una foto de «Nuestros trabajos» (también se usa en el inicio). */
 export function galleryCard(g, eager = false) {
   const obj = g.diseno ? getObject(g.diseno) : null;
   const small = `/galeria/${g.foto.replace(/\.webp$/, '-chica.webp')}`;
-  const who = g.imprimio
-    ? `Impreso por ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.imprimio)}</a>` : esc(g.imprimio)}`
-    : g.autor ? `De ${g.enlace ? `<a href="${esc(g.enlace)}" target="_blank" rel="noopener nofollow">${esc(g.autor)}</a>` : esc(g.autor)}` : '';
+  const cta = g.producto && getProducto(g.producto)
+    ? `<a class="gal-cta" href="/tienda/${esc(g.producto)}">Ver en la tienda ${icon.arrow}</a>`
+    : obj ? `<a class="gal-cta" href="/crear/${obj.id}" title="${esc(obj.name)}">Diseñá el tuyo ${icon.arrow}</a>` : '';
   return `
     <figure class="gal-item">
       <a class="gal-photo${g.video ? ' gal-video' : ''}" href="/galeria/${esc(g.video || g.foto)}"${g.video ? ` data-video="/galeria/${esc(g.video)}" data-poster="/galeria/${esc(g.foto)}"` : ''} aria-label="${g.video ? 'Ver el video' : 'Ver la foto en grande'}: ${esc(g.titulo)}">
@@ -314,32 +247,30 @@ export function galleryCard(g, eager = false) {
       </a>
       <figcaption>
         <b>${esc(g.titulo)}</b>
-        ${who ? `<span class="gal-who">${who}</span>` : ''}
-        ${obj ? `<a class="gal-cta" href="/crear/${obj.id}" title="${esc(obj.name)}">Hacé el tuyo ${icon.arrow}</a>` : ''}
+        ${cta}
       </figcaption>
     </figure>`;
 }
 
 export function galleryPage() {
   const items = galleryItems();
-  const ig = SITE.instagram ? `https://instagram.com/${SITE.instagram}` : '';
   return `
   <main class="wrap">
     <div class="page-head">
-      <span class="eyebrow">Galería</span>
-      <h1>Hecho con ${esc(SITE.name)}</h1>
-      <p class="lead">Piezas reales, impresas a partir de diseños de la web. Así quedan los archivos fuera de la pantalla.</p>
+      <span class="eyebrow">Trabajos</span>
+      <h1>Nuestros trabajos</h1>
+      <p class="lead">Piezas que imprimimos nosotros, fotografiadas tal cual salen de la impresora.</p>
     </div>
     ${items.length ? `<div class="gallery">${items.map((g, i) => galleryCard(g, i < 2)).join('')}</div>`
-      : `<p class="empty">Todavía no hay fotos. ¡La tuya puede ser la primera!</p>`}
+      : `<p class="empty">Estamos cargando los trabajos.</p>`}
     <section class="gal-send">
       <div>
-        <h2>¿Imprimiste algo con ${esc(SITE.name)}?</h2>
-        <p>Mandanos una foto de tu pieza y la sumamos a la galería con tu nombre o tu @. Revisamos cada foto antes de publicarla.</p>
+        <h2>¿Te gustó alguno?</h2>
+        <p>Mirá los productos disponibles en la tienda o escribinos por WhatsApp y te imprimimos el tuyo.</p>
       </div>
       <div class="gal-send-actions">
-        ${ig ? `<a class="btn btn-primary" href="${ig}" target="_blank" rel="noopener">Mandala por Instagram</a>` : ''}
-        ${SITE.email ? `<a class="btn" href="mailto:${esc(SITE.email)}?subject=${encodeURIComponent('Foto para la galería')}">Por correo</a>` : ''}
+        <a class="btn btn-primary" href="/tienda">Ver la tienda</a>
+        <a class="btn btn-order" data-order="trabajos" href="${esc(generalOrderLink())}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
       </div>
     </section>
     ${adSlot('banner')}
@@ -422,9 +353,9 @@ export function eventPage(id) {
       <section class="order-band event-order" aria-labelledby="ev-order">
         <div>
           <h2 id="ev-order">¿Preferís recibirlos ya impresos?</h2>
-          <p>Elegís el diseño y el nombre, y te los imprimimos a dos colores. Adornos chicos <b>desde $2.000</b>; mirá la <a href="/pedidos#precios">lista de precios</a>. Te confirmamos precio y plazo antes de imprimir.</p>
+          <p>Elegís el diseño y el nombre, y te los imprimimos a dos colores. Adornos chicos <b>desde $2.000</b>. Te confirmamos precio y plazo antes de imprimir.</p>
         </div>
-        <div class="order-band-actions"><a class="btn btn-order btn-lg" data-order="${esc(ev.id)}" href="${generalOrderLink(`¡Hola! Quiero pedir adornos de ${ev.label} impresos en 3D.`)}" target="_blank" rel="noopener">Pedir por WhatsApp</a><a class="order-band-more" href="/pedidos">Cómo pedir</a></div>
+        <div class="order-band-actions"><a class="btn btn-order btn-lg" data-order="${esc(ev.id)}" href="${generalOrderLink(`¡Hola! Quiero pedir adornos de ${ev.label} impresos en 3D.`)}" target="_blank" rel="noopener">Pedir por WhatsApp</a><a class="order-band-more" href="/tienda">Ver la tienda</a></div>
       </section>
       <section class="event-tips">
         ${ev.consejos.map((c) => `<article><h2>${esc(c.h)}</h2>${c.html}</article>`).join('')}

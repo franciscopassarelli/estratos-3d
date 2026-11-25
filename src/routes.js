@@ -9,9 +9,11 @@ import { editorPage, mountEditor } from './ui/editor.js';
 import { promoPage, mountPromo } from './ui/promo.js';
 import { adminPage, mountAdmin } from './ui/admin.js';
 import { PROMOS, getPromo } from './content/promos.js';
-import { helpPage, pedidosPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
+import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
 import { EVENTS } from './content/events.js';
 import { bindLightbox } from './ui/lightbox.js';
+import { tiendaPage, productoPage, mountTienda } from './ui/tienda.js';
+import { getProducto, productos } from './content/tienda.js';
 
 const noop = () => () => {};
 const catalogState = { category: 'all', sub: 'all', query: '' };
@@ -40,7 +42,7 @@ function objectDescription(o, max = 155) {
 export const ROUTES = [
   {
     pattern: /^\/$/, section: 'inicio',
-    meta: () => ({ title: `${SITE.name}: objetos personalizados para imprimir en 3D`, description: 'Diseñá llaveros, placas, macetas, soportes y organizadores a medida, con vista previa 3D, y descargá archivos 3MF, STL u OBJ gratis.' }),
+    meta: () => ({ title: `${SITE.name}: lámparas y objetos impresos en 3D`, description: 'Lámparas, porta cápsulas y objetos para tu casa, diseñados e impresos en 3D. Elegí tu producto y comprá por WhatsApp, con precio por mayor.' }),
     render: () => homePage(), mount: (root) => mountHome(root),
   },
   {
@@ -84,7 +86,7 @@ export const ROUTES = [
   },
   {
     pattern: /^\/galeria$/, section: 'galeria',
-    meta: () => ({ title: `Galería: piezas impresas con ${SITE.name}`, description: 'Fotos reales de llaveros, placas y objetos impresos en 3D a partir de diseños personalizados de Estratos 3D. Mandá la tuya.' }),
+    meta: () => ({ title: `Nuestros trabajos: piezas impresas en 3D | ${SITE.name}`, description: 'Lámparas, llaveros y objetos que imprimimos en Estratos 3D, fotografiados tal cual salen de la impresora. Mirá los trabajos y pedí el tuyo.' }),
     render: () => galleryPage(), mount: (root) => { const off = bindLightbox(root); mountContent(root); return off; },
   },
   ...EVENTS.map((ev) => ({
@@ -92,7 +94,17 @@ export const ROUTES = [
     meta: () => ({ title: `${ev.title} | ${SITE.name}`, description: ev.description }),
     render: () => eventPage(ev.id), mount: (root) => mountEvent(root, ev.id),
   })),
-  { pattern: /^\/pedidos$/, section: 'pedidos', meta: () => ({ title: `Pedí tu pieza impresa en 3D | ${SITE.name}`, description: 'Pedí tu diseño ya impreso en 3D: llaveros con nombre, carteles con QR, organizadores y adornos. Entrega en unos 2 días. Pedilo por WhatsApp.' }), render: pedidosPage, mount: mountContent },
+  {
+    pattern: /^\/tienda$/, section: 'tienda',
+    meta: () => ({ title: `Tienda: lámparas y objetos impresos en 3D | ${SITE.name}`, description: 'Lámparas, porta cápsulas y más, impresos en 3D por Estratos 3D. Mirá los precios, elegí el color y comprá por WhatsApp. Precio por mayor.' }),
+    render: () => tiendaPage(), mount: (root) => mountTienda(root),
+  },
+  {
+    pattern: /^\/tienda\/([a-z0-9-]+)$/, section: 'tienda',
+    exists: ([id]) => !!getProducto(id),
+    meta: ([id]) => { const p = getProducto(id); const tail = ` | ${SITE.name}`; const t = `${p.nombre} impreso en 3D`; return { title: (t + tail).length <= 60 ? t + tail : p.nombre + tail, description: `${p.descripcion || p.nombre} Comprá por WhatsApp.`.slice(0, 155) }; },
+    render: ([id]) => productoPage(id), mount: (root, [id]) => mountTienda(root, id),
+  },
   { pattern: /^\/ayuda$/, section: 'ayuda', meta: () => ({ title: `Preguntas frecuentes | ${SITE.name}`, description: 'Respuestas sobre formatos de archivo, impresión a dos colores, comprobaciones y uso del editor.' }), render: helpPage, mount: mountContent },
   { pattern: /^\/acerca$/, section: 'ayuda', meta: () => ({ title: `Acerca de | ${SITE.name}`, description: `Qué es ${SITE.name}, quién lo hace y cómo se usa: un catálogo gratuito de objetos personalizables para imprimir en 3D, con guías y piezas por encargo.` }), render: aboutPage, mount: mountContent },
   { pattern: /^\/contacto$/, section: 'ayuda', meta: () => ({ title: `Contacto | ${SITE.name}`, description: `Escribinos por consultas, errores en un diseño, ideas de objetos nuevos o para pedir una pieza impresa en 3D. Te contamos cómo hacerlo.` }), render: contactPage, mount: mountContent },
@@ -126,9 +138,9 @@ export function hiddenPaths() {
 /** Todas las rutas públicas (para el HTML estático y el sitemap). */
 export function staticPaths() {
   return [
-    '/', '/catalogo',
+    '/', '/tienda', '/catalogo',
     ...OBJECTS.map((o) => `/crear/${o.id}`),
     '/guias', ...GUIDES.map((g) => `/guias/${g.slug}`), '/galeria', ...EVENTS.map((e) => e.path),
-    '/pedidos', '/ayuda', '/acerca', '/contacto', '/condiciones', '/privacidad',
+    ...productos().map((p) => `/tienda/${p.id}`), '/ayuda', '/acerca', '/contacto', '/condiciones', '/privacidad',
   ];
 }

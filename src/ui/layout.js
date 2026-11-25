@@ -17,16 +17,16 @@ export function header(section) {
         <div class="nav-card" role="dialog" aria-label="Menú">
           <button class="icon-btn nav-close" id="nav-close" type="button" aria-label="Cerrar menú">${icon.x}</button>
         <a href="/"${cur('inicio')}>Inicio</a>
-        <a href="/catalogo"${cur('catalogo')}>Catálogo</a>
+        <a href="/tienda"${cur('tienda')}>Tienda</a>
+        <a href="/galeria"${cur('galeria')}>Trabajos</a>
+        <a href="/catalogo"${cur('catalogo')}>Diseñá el tuyo</a>
         <a href="/guias"${cur('guias')}>Guías</a>
-        <a href="/galeria"${cur('galeria')}>Galería</a>
         ${(() => { const ev = activeEvent(); return ev ? `<a class="nav-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree} ${esc(ev.label)}</a>` : ''; })()}
-        <a href="/pedidos"${cur('pedidos')}>Pedí impreso</a>
         <a href="/ayuda"${cur('ayuda')}>Ayuda</a>
-          <a class="btn btn-primary nav-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
+          <a class="btn btn-primary nav-cta" href="/tienda">${icon.bag} Ver la tienda</a>
         </div>
       </nav>
-      <a class="btn btn-primary btn-sm btn-cta header-cta" href="/catalogo">${icon.plus} Crear un objeto</a>
+      <a class="btn btn-primary btn-sm btn-cta header-cta" href="/tienda">${icon.bag} Ver la tienda</a>
     </div>
   </header>
   ${sideNav(cur)}
@@ -39,19 +39,19 @@ function sideNav(cur) {
   return `
   <aside class="side-nav" aria-label="Navegación principal">
     <a class="side-logo" href="/" aria-label="${esc(SITE.name)}, inicio"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span></a>
-    <a class="side-create" href="/catalogo"${cur('catalogo')}><span class="side-create-btn">${icon.plus}</span><span>Crear</span></a>
+    <a class="side-create" href="/tienda"${cur('tienda')}><span class="side-create-btn">${icon.bag}</span><span>Tienda</span></a>
     ${(() => { const ev = activeEvent(); return ev ? `<a class="side-event" href="${ev.path}"${cur(`evento-${ev.id}`)}>${icon.tree}<span>${esc(ev.label)}</span></a>` : ''; })()}
     <nav class="side-links">
       <i class="side-sep" aria-hidden="true"></i>
       <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
+      <a href="/tienda"${cur('tienda')}>${icon.bag}<span>Tienda</span></a>
+      <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Trabajos</span></a>
+      <i class="side-sep" aria-hidden="true"></i>
       <div class="side-item">
-        <a href="/catalogo"${cur('catalogo')}>${icon.grid}<span>Catálogo</span></a>
+        <a href="/catalogo"${cur('catalogo')}>${icon.grid}<span>Diseñá</span></a>
         ${catalogFly()}
       </div>
-      <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
-      <i class="side-sep" aria-hidden="true"></i>
       <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
-      <a href="/pedidos"${cur('pedidos')}>${icon.bag}<span>Pedidos</span></a>
       <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
     </nav>
     ${promo ? `<div class="side-bottom"><a class="side-promo" href="/sorteos/${esc(promo.slug)}" title="${esc(promo.title)}">${icon.gift}<span>Sorteo</span><i class="side-dot" aria-hidden="true"></i></a></div>` : ''}
@@ -64,13 +64,13 @@ function catalogFly() {
   const n = (id) => OBJECTS.filter((o) => categoriesOf(o).includes(id)).length;
   return `
         <div class="side-fly"><div class="side-fly-panel" role="group" aria-label="Categorías del catálogo">
-          <a class="fly-link fly-all" href="/catalogo">${icon.grid}<span>Todo el catálogo</span></a>
+          <a class="fly-link fly-all" href="/catalogo">${icon.grid}<span>Todos los diseños</span></a>
           <span class="fly-title">Categorías</span>
           ${cats.map((c) => `<a class="fly-link" href="/catalogo?categoria=${c.id}"><span>${esc(c.label)}</span><small>${n(c.id)}</small></a>`).join('')}
           <span class="fly-sep" aria-hidden="true"></span>
           <span class="fly-title">Atajos</span>
-          <a class="fly-link" href="/pedidos"><span>Pedilo impreso</span></a>
-          <a class="fly-link" href="/galeria"><span>Así quedan impresos</span></a>
+          <a class="fly-link" href="/tienda"><span>Tienda</span></a>
+          <a class="fly-link" href="/galeria"><span>Nuestros trabajos</span></a>
         </div></div>`;
 }
 
@@ -79,9 +79,9 @@ function tabBar(cur) {
   return `
   <nav class="tabbar" aria-label="Navegación">
     <a href="/"${cur('inicio')}>${icon.home}<span>Inicio</span></a>
-    <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Galería</span></a>
-    <a class="tab-create" href="/catalogo"${cur('catalogo')}><span class="tab-create-btn">${icon.plus}</span><span>Catálogo</span></a>
-    <a href="/guias"${cur('guias')}>${icon.book}<span>Guías</span></a>
+    <a href="/galeria"${cur('galeria')}>${icon.gallery}<span>Trabajos</span></a>
+    <a class="tab-create" href="/tienda"${cur('tienda')}><span class="tab-create-btn">${icon.bag}</span><span>Tienda</span></a>
+    <a href="/catalogo"${cur('catalogo')}>${icon.grid}<span>Diseñá</span></a>
     <a href="/ayuda"${cur('ayuda')}>${icon.help}<span>Ayuda</span></a>
   </nav>`;
 }
@@ -95,7 +95,7 @@ export function footer() {
         <p class="fine">Los archivos se generan en tu navegador. Revisalos siempre en tu laminador antes de imprimir.</p>
       </div>
       <nav class="foot-links" aria-label="Enlaces del sitio">
-        <a href="/catalogo">Catálogo</a><a href="/guias">Guías</a><a href="/galeria">Galería</a><a href="/pedidos">Pedí impreso</a>${EVENTS.map((e) => `<a href="${e.path}">${esc(e.label)}</a>`).join('')}<a href="/ayuda">Preguntas</a><a href="/contacto">Contacto</a><a href="/acerca">Acerca de</a>
+        <a href="/tienda">Tienda</a><a href="/galeria">Trabajos</a><a href="/catalogo">Diseñá el tuyo</a><a href="/guias">Guías</a>${EVENTS.map((e) => `<a href="${e.path}">${esc(e.label)}</a>`).join('')}<a href="/ayuda">Preguntas</a><a href="/contacto">Contacto</a><a href="/acerca">Acerca de</a>
       </nav>
       <div class="foot-social" aria-label="Redes">
         <a href="https://www.instagram.com/${esc(SITE.instagram)}" target="_blank" rel="noopener">Instagram</a>
