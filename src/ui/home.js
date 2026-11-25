@@ -55,7 +55,7 @@ export function homePage() {
       <a class="btn btn-order btn-lg" data-order="home_mayor" href="${esc(generalOrderLink('¡Hola! Quiero consultar por una compra por mayor.'))}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
     </section></div>
 
-    ${(() => { const g = galleryItems().slice(0, 4); return g.length ? `
+    ${(() => { const g = galleryItems().filter((x) => x.categoria !== 'proceso').slice(0, 4); return g.length ? `
     <section class="section wrap" aria-labelledby="gal-title">
       <div class="section-head">
         <div><span class="eyebrow">Trabajos</span><h2 id="gal-title">Así quedan impresos</h2></div>

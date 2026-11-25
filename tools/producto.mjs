@@ -42,30 +42,34 @@ for (const file of fs.readdirSync(SRC).sort()) {
   grupos.get(id).push({ n, file, base });
 }
 
-const fotos = {};
-for (const [id, list] of [...grupos].sort()) {
-  list.sort((a, b) => a.n - b.n || a.file.localeCompare(b.file));
-  fotos[id] = [];
+// 1) Convierte las fotos nuevas o cambiadas de tienda-originales/ a public/tienda/
+for (const list of grupos.values()) {
   for (const { file, base } of list) {
     const src = path.join(SRC, file);
-    const name = `${base}.webp`;
-    const dst = path.join(OUT, name);
+    const dst = path.join(OUT, `${base}.webp`);
     try {
-      const meta = await sharp(src).rotate().metadata();
-      const swap = (meta.orientation || 1) >= 5;
-      const sw = swap ? meta.height : meta.width, sh = swap ? meta.width : meta.height;
-      const k = Math.min(1, MAX / Math.max(sw, sh));
-      const size = [Math.round(sw * k), Math.round(sh * k)];
-      if (!(fs.existsSync(dst) && fs.statSync(dst).mtimeMs >= fs.statSync(src).mtimeMs)) {
-        await sharp(src).rotate().resize({ width: MAX, height: MAX, fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toFile(dst);
-        await sharp(src).rotate().resize({ width: THUMB, height: THUMB * 2, fit: 'inside', withoutEnlargement: true }).webp({ quality: 66 }).toFile(dst.replace(/\.webp$/, '-chica.webp'));
-        console.log(`✓ ${file} → public/tienda/${name} (${kb(fs.statSync(src).size)} → ${kb(fs.statSync(dst).size)})`);
-      }
-      fotos[id].push([name, ...size]);
+      if (fs.existsSync(dst) && fs.statSync(dst).mtimeMs >= fs.statSync(src).mtimeMs) continue;
+      await sharp(src).rotate().resize({ width: MAX, height: MAX, fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toFile(dst);
+      await sharp(src).rotate().resize({ width: THUMB, height: THUMB * 2, fit: 'inside', withoutEnlargement: true }).webp({ quality: 66 }).toFile(dst.replace(/\.webp$/, '-chica.webp'));
+      console.log(`✓ ${file} → public/tienda/${base}.webp (${kb(fs.statSync(src).size)} → ${kb(fs.statSync(dst).size)})`);
     } catch (err) {
-      console.warn(`✗ ${file}: no se pudo convertir (${err.message}).${/heic|heif/.test(file) ? ' Pasala a JPG y volvé a probar.' : ''}`);
+      console.warn(`✗ ${file}: no se pudo convertir (${err.message}).${/heic|heif/i.test(file) ? ' Pasala a JPG y volvé a probar.' : ''}`);
     }
   }
+}
+
+// 2) El listado de fotos sale de lo que hay en public/tienda/ (así no depende de tener los originales)
+const fotos = {};
+const hechas = fs.readdirSync(OUT).filter((f) => f.endsWith('.webp') && !f.endsWith('-chica.webp')).sort();
+for (const f of hechas) {
+  const base = f.replace(/\.webp$/, '');
+  const m = base.match(/^(.*?)-(\d+)$/);
+  const id = m ? m[1] : base, n = m ? Number(m[2]) : 1;
+  const meta = await sharp(path.join(OUT, f)).metadata();
+  (fotos[id] ||= []).push({ n, f, w: meta.width, h: meta.height });
+}
+for (const id of Object.keys(fotos)) {
+  fotos[id] = fotos[id].sort((a, b) => a.n - b.n || a.f.localeCompare(b.f)).map(({ f, w, h }) => [f, w, h]);
 }
 
 fs.writeFileSync(FOTOS, `// Generado por \`npm run producto\`. No lo edites a mano.\n// producto -> [[archivo, ancho, alto], …] (la primera es la foto principal)\nexport default ${JSON.stringify(fotos, null, 2)};\n`);

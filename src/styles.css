@@ -1441,3 +1441,6 @@ box-shadow: 0 5px 16px rgba(185, 255, 53, .2);
   .gallery-home .gal-item { flex: 0 0 72%; scroll-snap-align: start; }
   .gallery-home .gal-item:nth-child(n+3) { display: flex; }
 }
+
+/* Filtros de «Nuestros trabajos» */
+.gal-tabs { margin: 4px 0 18px; }

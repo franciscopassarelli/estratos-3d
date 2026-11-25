@@ -1,7 +1,7 @@
 // Páginas de contenido: guías, ayuda, acerca, contacto, condiciones y privacidad.
 import { SITE, analyticsEnabled } from '../config.js';
 import { GUIDES, getGuide } from '../content/guides.js';
-import { galleryItems } from '../content/gallery.js';
+import { galleryItems, CATEGORIAS } from '../content/gallery.js';
 import { getEvent, presetHref, EVENTS } from '../content/events.js';
 import { renderPresetThumbs } from './thumbnails.js';
 import { IDEA_THUMBS, IDEA_THUMB_VERSION } from '../content/ideaThumbs.js';
@@ -239,7 +239,7 @@ export function galleryCard(g, eager = false) {
     ? `<a class="gal-cta" href="/tienda/${esc(g.producto)}">Ver en la tienda ${icon.arrow}</a>`
     : obj ? `<a class="gal-cta" href="/crear/${obj.id}" title="${esc(obj.name)}">Diseñá el tuyo ${icon.arrow}</a>` : '';
   return `
-    <figure class="gal-item">
+    <figure class="gal-item" data-cat="${esc(g.categoria || '')}">
       <a class="gal-photo${g.video ? ' gal-video' : ''}" href="/galeria/${esc(g.video || g.foto)}"${g.video ? ` data-video="/galeria/${esc(g.video)}" data-poster="/galeria/${esc(g.foto)}"` : ''} aria-label="${g.video ? 'Ver el video' : 'Ver la foto en grande'}: ${esc(g.titulo)}">
         <img src="${small}" srcset="${small} 640w, /galeria/${esc(g.foto)} ${g.w}w" sizes="(max-width: 560px) 92vw, 380px"
           width="${g.w}" height="${g.h}" alt="${esc(g.alt || g.titulo)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
@@ -254,6 +254,7 @@ export function galleryCard(g, eager = false) {
 
 export function galleryPage() {
   const items = galleryItems();
+  const cats = CATEGORIAS.map((c) => ({ ...c, n: items.filter((g) => g.categoria === c.id).length })).filter((c) => c.n);
   return `
   <main class="wrap">
     <div class="page-head">
@@ -261,6 +262,7 @@ export function galleryPage() {
       <h1>Nuestros trabajos</h1>
       <p class="lead">Piezas que imprimimos nosotros, fotografiadas tal cual salen de la impresora.</p>
     </div>
+    ${cats.length > 1 ? `<div class="pp-tabs gal-tabs" role="group" aria-label="Filtrar por tipo"><button type="button" data-cat="" aria-pressed="true">Todo <small>${items.length}</small></button>${cats.map((c) => `<button type="button" data-cat="${esc(c.id)}" aria-pressed="false">${esc(c.titulo)} <small>${c.n}</small></button>`).join('')}</div>` : ''}
     ${items.length ? `<div class="gallery">${items.map((g, i) => galleryCard(g, i < 2)).join('')}</div>`
       : `<p class="empty">Estamos cargando los trabajos.</p>`}
     <section class="gal-send">
@@ -383,6 +385,20 @@ export function mountEvent(root, id) {
     const i = live[k].i, ph = root.querySelector(`[data-idea="${i}"] .placeholder`);
     if (ph) ph.outerHTML = `<img src="${url}" alt="Vista 3D: ${esc(ideas[i].titulo)}">`;
   });
+}
+
+/** Filtros de «Nuestros trabajos»: muestra solo las piezas de la categoría elegida. */
+export function mountGallery(root) {
+  const tabs = root.querySelector('.gal-tabs');
+  const onTab = (e) => {
+    const b = e.target.closest('button[data-cat]');
+    if (!b) return;
+    tabs.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    root.querySelectorAll('.gallery .gal-item').forEach((f) => { f.hidden = !!b.dataset.cat && f.dataset.cat !== b.dataset.cat; });
+  };
+  tabs?.addEventListener('click', onTab);
+  const offContent = mountContent(root);
+  return () => { tabs?.removeEventListener('click', onTab); if (typeof offContent === 'function') offContent(); };
 }
 
 export function mountContent(root) {

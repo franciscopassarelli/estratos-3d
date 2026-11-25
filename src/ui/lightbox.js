@@ -9,7 +9,7 @@ export function bindLightbox(root) {
     const a = e.target.closest('a.gal-photo');
     if (!a || !root.contains(a) || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
-    const links = [...root.querySelectorAll('a.gal-photo')];
+    const links = [...root.querySelectorAll('a.gal-photo')].filter((l) => !l.closest('[hidden]'));
     const items = links.map((l) => {
       const fig = l.closest('figure');
       return {

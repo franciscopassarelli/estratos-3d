@@ -9,7 +9,7 @@ import { editorPage, mountEditor } from './ui/editor.js';
 import { promoPage, mountPromo } from './ui/promo.js';
 import { adminPage, mountAdmin } from './ui/admin.js';
 import { PROMOS, getPromo } from './content/promos.js';
-import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
+import { helpPage, aboutPage, contactPage, termsPage, privacyPage, guidesIndexPage, guidePage, galleryPage, mountGallery, eventPage, mountEvent, notFoundPage, mountContent } from './ui/pages.js';
 import { EVENTS } from './content/events.js';
 import { bindLightbox } from './ui/lightbox.js';
 import { tiendaPage, productoPage, mountTienda } from './ui/tienda.js';
@@ -87,7 +87,7 @@ export const ROUTES = [
   {
     pattern: /^\/galeria$/, section: 'galeria',
     meta: () => ({ title: `Nuestros trabajos: piezas impresas en 3D | ${SITE.name}`, description: 'Lámparas, llaveros y objetos que imprimimos en Estratos 3D, fotografiados tal cual salen de la impresora. Mirá los trabajos y pedí el tuyo.' }),
-    render: () => galleryPage(), mount: (root) => { const off = bindLightbox(root); mountContent(root); return off; },
+    render: () => galleryPage(), mount: (root) => { const off = bindLightbox(root); const off2 = mountGallery(root); return () => { off(); off2(); }; },
   },
   ...EVENTS.map((ev) => ({
     pattern: new RegExp(`^${ev.path}$`), section: `evento-${ev.id}`,

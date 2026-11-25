@@ -45,12 +45,19 @@ export default {
   ],
   "porta-capsulas-nespresso": [
     [
-      "porta-capsulas-nespresso.webp",
+      "portacapsulas.webp",
       960,
       1280
     ],
     [
-      "porta-capsulas-nespresso-2.webp",
+      "portacapsulas.webp",
+      960,
+      1280
+    ]
+  ],
+  "portacapsulas": [
+    [
+      "portacapsulas.webp",
       960,
       1280
     ]
