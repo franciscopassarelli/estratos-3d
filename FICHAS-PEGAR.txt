@@ -1,0 +1,11 @@
+Pegá esto en src/content/tienda.js, justo ANTES de la línea "// ⬇ PRODUCTOS NUEVOS".
+Poné el precio de cada una (precio: null muestra "Consultá el precio").
+
+    { id: 'lampara-espiral', nombre: 'Lámpara Espiral', categoria: 'lamparas', precio: null,
+      descripcion: 'Pantalla de pliegues en espiral impresa en 3D. La luz recorre las curvas y deja un brillo cálido y envolvente.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-hongo', nombre: 'Lámpara Hongo', categoria: 'lamparas', precio: null,
+      descripcion: 'Lámpara de mesa con forma de hongo, impresa en 3D. Base texturada y sombrero liso que reparte una luz suave.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-rombos', nombre: 'Lámpara Rombos', categoria: 'lamparas', precio: null,
+      descripcion: 'Pantalla con textura de rombos sobre base oscura, impresa en 3D. Proyecta un dibujo de luz en la pared.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-tejida', nombre: 'Lámpara Tejida', categoria: 'lamparas', precio: null,
+      descripcion: 'Lámpara cilíndrica con textura tejida, impresa en 3D. La luz se filtra por el relieve y deja un brillo cálido.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },

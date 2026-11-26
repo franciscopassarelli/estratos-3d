@@ -26,7 +26,7 @@ export const TIENDA = {
     { id: 'otros', titulo: 'Otros' },
   ],
   productos: [
-    { id: 'lampara-corazones', nombre: 'Lámpara Corazones', categoria: 'lamparas', precio: 24900, destacado: true,
+    { id: 'lampara-corazones', nombre: 'Lámpara Corazones', categoria: 'lamparas', precio: 26000, destacado: true,
       descripcion: 'Lámpara de mesa impresa en 3D con relieve de corazones. Al prenderla, la luz se filtra y deja un brillo cálido y suave.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)']  },
     { id: 'lampara-escamas', nombre: 'Lámpara Escamas', categoria: 'lamparas', precio: 27600, destacado: true,
       descripcion: 'Lámpara de mesa impresa en 3D con textura de escamas que juega con la luz y las sombras.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
@@ -40,8 +40,16 @@ export const TIENDA = {
       descripcion: 'Lámpara de mesa de ondas torcidas, impresa en 3D. Con luz de color.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
     { id: 'porta-capsulas-nespresso', nombre: 'Torre porta cápsulas', categoria: 'cocina', precio: 25900, mayor: { desde: 4, precio: 19000 }, destacado: true,
       colores: ['Negro', 'Blanco', 'Gris'],
-      descripcion: 'Torre giratoria para tener tus cápsulas de café a la vista y a mano. Entran 20 cápsulas, 5 por cada lado.',
+      descripcion: 'Torre para tener tus cápsulas de café a la vista y a mano. Entran 20 cápsulas, 5 por cada lado.',
       detalles: ['Compatible con cápsulas Nespresso', 'Capacidad: 20 cápsulas (4 lados de 5)', 'Medidas: 101 × 101 × 215 mm', 'Impresa en 3D, base antideslizante', 'Otros colores: consultá'] },
+    { id: 'lampara-espiral', nombre: 'Lámpara Espiral', categoria: 'lamparas', precio: 27000,
+      descripcion: 'Pantalla de pliegues en espiral impresa en 3D. La luz recorre las curvas y deja un brillo cálido y envolvente.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-hongo', nombre: 'Lámpara Hongo', categoria: 'lamparas', precio: 22500,
+      descripcion: 'Lámpara de mesa con forma de hongo, impresa en 3D. Base texturada y sombrero liso que reparte una luz suave.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-rombos', nombre: 'Lámpara Rombos', categoria: 'lamparas', precio: 25000,
+      descripcion: 'Pantalla con textura de rombos sobre base oscura, impresa en 3D. Proyecta un dibujo de luz en la pared.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
+    { id: 'lampara-tejida', nombre: 'Lámpara Tejida', categoria: 'lamparas', precio: 20000,
+      descripcion: 'Lámpara cilíndrica con textura tejida, impresa en 3D. La luz se filtra por el relieve y deja un brillo cálido.', detalles: ['Luz LED incluida (módulo LED redondo con cable e interruptor)'] },
     // ⬇ PRODUCTOS NUEVOS: la herramienta agrega las fichas acá abajo
   ],
 };

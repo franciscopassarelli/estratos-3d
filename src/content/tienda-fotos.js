@@ -61,5 +61,33 @@ export default {
       960,
       1280
     ]
+  ],
+  "lampara-espiral": [
+    [
+      "lampara-espiral.webp",
+      1050,
+      1400
+    ]
+  ],
+  "lampara-hongo": [
+    [
+      "lampara-hongo.webp",
+      1045,
+      1400
+    ]
+  ],
+  "lampara-rombos": [
+    [
+      "lampara-rombos.webp",
+      1050,
+      1400
+    ]
+  ],
+  "lampara-tejida": [
+    [
+      "lampara-tejida.webp",
+      1050,
+      1400
+    ]
   ]
 };
